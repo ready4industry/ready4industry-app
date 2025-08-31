@@ -188,7 +188,7 @@
             <h2 class="text-3xl md:text-4xl font-bold text-[#3b3a30]">Let’s Talk!</h2>
             <p class="mt-4 text-lg text-[#5c5c50] max-w-3xl mx-auto">Thank you for your time and attention! We're excited to help you on your career journey. The conversation doesn't have to stop here.</p>
             <div class="flex justify-center items-center flex-col mt-8">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://ready4industry.com&size=150x150" alt="WhatsApp QR Code" class="w-36 h-36 rounded-lg shadow-md mb-4" onclick="openWhatsAppModal()">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://ready4industry.github.io/ready4industry-app/&size=150x150" alt="WhatsApp QR Code" class="w-36 h-36 rounded-lg shadow-md mb-4" onclick="openWhatsAppModal()">
                 <p class="text-lg text-[#5c5c50] mb-6">Scan to message us on WhatsApp!</p>
             </div>
             <div class="flex justify-center space-x-6 text-4xl">
@@ -211,14 +211,27 @@
             <p class="mt-4 text-xl font-semibold text-[#3b3a30]">Find us on all channels with the handle @ready4industry.</p>
         </section>
 
-        <!-- New section to display live scan data from Firestore -->
+        <!-- Updated section to display live scan data in a table -->
         <section id="scan-data" class="container py-16 md:py-24">
             <h2 class="text-3xl md:text-4xl font-bold text-center text-[#3b3a30] mb-8">Live Scan Data</h2>
-            <div class="bg-white p-8 rounded-lg shadow-md">
-                <ul id="scans-list" class="space-y-4 text-[#5c5c50]">
-                    <!-- Scan data will be populated here by JavaScript -->
-                    <li class="text-center">No inquiries yet. Fill out the form or click the WhatsApp link to see data appear here.</li>
-                </ul>
+            <div class="bg-white p-8 rounded-lg shadow-md overflow-x-auto">
+                <table class="w-full text-left table-auto border-collapse">
+                    <thead>
+                        <tr class="bg-[#f7f3ed]">
+                            <th class="px-4 py-2 border border-[#d6d0c6]">Name</th>
+                            <th class="px-4 py-2 border border-[#d6d0c6]">City</th>
+                            <th class="px-4 py-2 border border-[#d6d0c6]">Status</th>
+                            <th class="px-4 py-2 border border-[#d6d0c6]">Service</th>
+                            <th class="px-4 py-2 border border-[#d6d0c6]">Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scans-table-body">
+                        <!-- Table rows will be populated here by JavaScript -->
+                        <tr>
+                            <td colspan="5" class="text-center px-4 py-2 text-[#5c5c50]">No inquiries yet. Fill out the form to see data appear here.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
         
@@ -282,8 +295,8 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         
-        // This is a Firestore path for public data, allowing any authenticated user to read and write.
-        const inquiriesCollection = collection(db, `artifacts/${appId}/public/data/inquiries`);
+        // This is a new Firestore path for private data, associated with the current user's ID.
+        let inquiriesCollection;
 
         // Enable debug logging for Firebase services.
         setLogLevel('debug');
@@ -319,7 +332,7 @@
 
             try {
                 // Ensure a user is authenticated before attempting to add a document.
-                if (auth.currentUser) {
+                if (auth.currentUser && inquiriesCollection) {
                     await addDoc(inquiriesCollection, inquiryData);
                     console.log("Inquiry data successfully added to Firestore!");
                     
@@ -331,7 +344,7 @@
                     inquiryModal.style.display = 'none';
 
                 } else {
-                    console.error("User not authenticated. Cannot log inquiry data.");
+                    console.error("User not authenticated or inquiries collection not initialized. Cannot log inquiry data.");
                 }
             } catch (e) {
                 console.error("Error adding document: ", e);
@@ -339,23 +352,37 @@
         });
 
         // Function to listen for new inquiries and display them in real-time
-        const setupRealtimeListener = () => {
-            const scansList = document.getElementById('scans-list');
+        const setupRealtimeListener = (userId) => {
+            const scansTableBody = document.getElementById('scans-table-body');
+            // The collection path now includes the specific user's ID.
+            inquiriesCollection = collection(db, `artifacts/${appId}/users/${userId}/inquiries`);
             const q = query(inquiriesCollection);
             
             // onSnapshot will automatically handle permissions after a user is authenticated
             onSnapshot(q, (snapshot) => {
-                scansList.innerHTML = '';
+                scansTableBody.innerHTML = ''; // Clear existing table rows
                 if (snapshot.empty) {
-                    scansList.innerHTML = '<li class="text-center">No inquiries yet. Fill out the form or click the WhatsApp link to see data appear here.</li>';
+                    const noDataRow = document.createElement('tr');
+                    noDataRow.innerHTML = '<td colspan="5" class="text-center px-4 py-2 text-[#5c5c50]">No inquiries yet. Fill out the form to see data appear here.</td>';
+                    scansTableBody.appendChild(noDataRow);
                 } else {
-                    snapshot.forEach(doc => {
+                    // Sort documents by timestamp in memory to show the first one at the top.
+                    const sortedDocs = snapshot.docs.sort((a, b) => a.data().timestamp.toDate() - b.data().timestamp.toDate());
+                    
+                    sortedDocs.forEach(doc => {
                         const data = doc.data();
-                        const li = document.createElement('li');
-                        li.className = 'p-4 bg-[#f7f3ed] rounded-lg shadow-sm';
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-[#f7f3ed]';
                         const timestampText = data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A';
-                        li.textContent = `Name: ${data.name} | City: ${data.city} | Status: ${data.status} | Service: ${data.service} | Timestamp: ${timestampText}`;
-                        scansList.appendChild(li);
+                        
+                        row.innerHTML = `
+                            <td class="px-4 py-2 border border-[#d6d0c6]">${data.name}</td>
+                            <td class="px-4 py-2 border border-[#d6d0c6]">${data.city}</td>
+                            <td class="px-4 py-2 border border-[#d6d0c6]">${data.status}</td>
+                            <td class="px-4 py-2 border border-[#d6d0c6]">${data.service}</td>
+                            <td class="px-4 py-2 border border-[#d6d0c6]">${timestampText}</td>
+                        `;
+                        scansTableBody.appendChild(row);
                     });
                 }
             }, (error) => {
@@ -368,7 +395,7 @@
             if (user) {
                 // User is signed in. Now it is safe to set up the Firestore listener.
                 console.log("User is authenticated:", user.uid);
-                setupRealtimeListener();
+                setupRealtimeListener(user.uid);
             } else {
                 // User is signed out or not yet authenticated. Try to sign them in.
                 console.log("User not authenticated, attempting to sign in...");
@@ -490,4 +517,3 @@
     </script>
 </body>
 </html>
-
