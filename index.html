@@ -1,10 +1,3 @@
-<!-- Chosen Palette: Warm Neutrals with Subtle Accents -->
-<!-- Application Structure Plan: The application is structured as a single-page interactive experience with a top navigation bar for non-linear access to key sections. The layout follows a logical flow: an engaging hero section, a "Mission" section detailing the company's background, a core "Offerings" section with an interactive card-based design, a visual "Journey" timeline, and a "Contact" section. This structure was chosen to allow users to quickly jump to areas of interest (e.g., "Our Offerings") without scrolling through the entire report, making the information more digestible and discoverable. -->
-<!-- Visualization & Content Choices:
-- **Report Info:** Our offerings (Mentoring, Projects, etc.) -> **Goal:** Inform & Encourage exploration -> **Viz/Presentation Method:** Interactive cards. Clicking a card reveals detailed text content -> **Interaction:** Clickable cards update a central text block -> **Justification:** Prevents information overload on the main page. Creates an engaging "explore and discover" user flow. -> **Library/Method:** Vanilla JS for event listeners and state management.
-- **Report Info:** Career progress and skill development -> **Goal:** Show potential growth -> **Viz/Presentation Method:** Line Chart -> **Interaction:** None (static visualization) -> **Justification:** Visually represents the abstract concept of career growth, making the value proposition more tangible. -> **Library/Method:** Chart.js.
-- **Report Info:** The Ready4Industry Journey -> **Goal:** Show the process/flow -> **Viz/Presentation Method:** Timeline -> **Interaction:** None -> **Justification:** Organizes the a complex process into a simple, easy-to-follow visual narrative. -> **Library/Method:** Pure HTML/CSS with Tailwind classes.
-- **CRITICAL CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,508 +5,549 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ready4Industry</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2eDRF4g8/E6U5/8X+9z5bW8H2uE2oI+u+2oB+w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f3ed;
-            color: #3b3a30;
-        }
-        .container {
-            max-width: 96rem;
-            margin-left: auto;
-            margin-right: auto;
-            padding-left: 1rem;
-            padding-right: 1rem;
-        }
-        .offer-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-        }
-        /* Styles for the modal */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #f7f3ed;
-            margin: auto;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            max-width: 90%;
-            width: 500px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #F7F7F7;
+            color: #3b4a30;
         }
     </style>
 </head>
 <body>
+    <div id="root"></div>
 
-    <nav class="sticky top-0 z-50 bg-[#e4dfd7] bg-opacity-90 backdrop-blur-sm shadow-md py-4 transition-all duration-300">
-        <div class="container flex justify-between items-center">
-            <a href="#home" class="text-2xl font-bold text-[#5c5c50] tracking-tight">Ready4Industry</a>
-            <div class="hidden md:flex space-x-8">
-                <a href="#mission" class="text-[#5c5c50] hover:text-[#7f7f70] transition-colors duration-300">Our Mission</a>
-                <a href="#offerings" class="text-[#5c5c50] hover:text-[#7f7f70] transition-colors duration-300">Our Offerings</a>
-                <a href="#journey" class="text-[#5c5c50] hover:text-[#7f7f70] transition-colors duration-300">The Journey</a>
-                <a href="#contact" class="text-[#5c5c50] hover:text-[#7f7f70] transition-colors duration-300">Contact</a>
-            </div>
-            <button id="mobile-menu-button" class="md:hidden text-[#5c5c50] focus:outline-none">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-            </button>
-        </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-[#e4dfd7] py-2 transition-all duration-300">
-            <a href="#mission" class="block py-2 px-4 text-[#5c5c50] hover:bg-[#d6d0c6]">Our Mission</a>
-            <a href="#offerings" class="block py-2 px-4 text-[#5c5c50] hover:bg-[#d6d0c6]">Our Offerings</a>
-            <a href="#journey" class="block py-2 px-4 text-[#5c5c50] hover:bg-[#d6d0c6]">The Journey</a>
-            <a href="#contact" class="block py-2 px-4 text-[#5c5c50] hover:bg-[#d6d0c6]">Contact</a>
-        </div>
-    </nav>
+    <script type="text/babel">
+        // The `import` statements below were causing the error.
+        // We are now using a different approach that loads the libraries globally.
+        // import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <main class="py-16">
+        // Load Firebase libraries via CDN links for global access
+        const firebaseApp = window.firebase.initializeApp;
+        const firebaseAuth = window.firebase.auth;
+        const firestore = window.firebase.firestore;
 
-        <section id="home" class="container text-center py-24 md:py-32">
-            <h1 class="text-4xl md:text-6xl font-extrabold text-[#3b3a30] tracking-tight">Beyond the Degree: Launch Your Engineering Career</h1>
-            <p class="mt-6 text-lg md:text-xl text-[#5c5c50] max-w-3xl mx-auto">Are you ready to turn your engineering degree into your dream job? We are here to give you the unfair advantage in the job market.</p>
-            <a href="#offerings" class="mt-10 inline-block bg-[#8a8a7a] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-[#7a7a6a] transition-colors duration-300">Explore Our Offerings</a>
-        </section>
-
-        <section id="mission" class="container py-16 md:py-24">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-[#3b3a30]">Our Mission: Your Partner in Success</h2>
-            <div class="mt-12 grid md:grid-cols-2 gap-12 items-center">
-                <div class="text-lg text-[#5c5c50]">
-                    <p class="leading-relaxed mb-4">We get it. It's tough out there. Have you ever felt lost, unsure what companies are looking for? Have you worried that your resume isn't good enough? Do you feel like you don't have enough "real-world" experience? This is where we come in. We are **Ready4Industry**.</p>
-                    <p class="leading-relaxed mb-4">With 21 years of experience in the IT world, working with tech giants like IBM, PwC, Wipro, Kyndryl, and Tech Mahindra, we've attended countless campus interviews and conducted uncountable interviews for freshers. This means we know your pain points.</p>
-                    <p class="leading-relaxed">We're not here to repeat what you already know from your textbooks. We're here to help you apply the concepts you've learned, like **Data Structures, Object-Oriented Programming, and Database Management Systems,** to real-world problems. We bridge the gap by providing the tools, experience, and guidance you need to land your first job. We're not just a service; we're your partner in building a strong foundation for your career.</p>
-                </div>
-                <div>
-                    <div class="h-64 bg-[#e4dfd7] rounded-lg flex items-center justify-center p-4">
-                        <span class="text-4xl text-[#8a8a7a]">🌱</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="offerings" class="container py-16 md:py-24">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-[#3b3a30]">Our Offerings: It's All About You</h2>
-            <p class="mt-4 text-lg text-center text-[#5c5c50] max-w-3xl mx-auto">Explore how we help you succeed. Click on any offering below to learn more about how we can help you build the skills and confidence you need to land your dream job.</p>
-
-            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div id="mentoring" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
-                    <h3 class="text-xl font-semibold text-[#3b3a30]">Mentoring</h3>
-                    <p class="mt-2 text-[#5c5c50]">Find Your Dream Job Role.</p>
-                </div>
-                <div id="projects" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
-                    <h3 class="text-xl font-semibold text-[#3b3a30]">Real-World Projects</h3>
-                    <p class="mt-2 text-[#5c5c50]">Build a Portfolio That Gets Noticed.</p>
-                </div>
-                <div id="resume" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
-                    <h3 class="text-xl font-semibold text-[#3b3a30]">Resume Building</h3>
-                    <p class="mt-2 text-[#5c5c50]">Craft a Killer Resume.</p>
-                </div>
-                <div id="linkedin" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
-                    <h3 class="text-xl font-semibold text-[#3b3a30]">LinkedIn Profile</h3>
-                    <p class="mt-2 text-[#5c5c50]">Your Professional Brand on LinkedIn.</p>
-                </div>
-                <div id="mock_interviews" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
-                    <h3 class="text-xl font-semibold text-[#3b3a30]">Mock Interviews</h3>
-                    <p class="mt-2 text-[#5c5c50]">Ace Your Interview, Every Time.</p>
-                </div>
-                <div id="skills" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
-                    <h3 class="text-xl font-semibold text-[#3b3a30]">Skills Development</h3>
-                    <p class="mt-2 text-[#5c5c50]">Master In-Demand Technical & Soft Skills.</p>
-                </div>
-            </div>
-
-            <div id="offer-details" class="mt-12 p-8 bg-[#e4dfd7] rounded-lg shadow-md hidden">
-                <h3 id="offer-title" class="text-2xl font-bold text-[#3b3a30] mb-4"></h3>
-                <p id="offer-content" class="text-[#5c5c50] leading-relaxed"></p>
-                <div class="mt-8 chart-container">
-                    <canvas id="growthChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <section id="journey" class="container py-16 md:py-24">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-[#3b3a30]">The Ready4Industry Journey</h2>
-            <div class="mt-12 relative flex justify-center">
-                <div class="absolute inset-0 flex justify-center">
-                    <div class="w-1 bg-[#8a8a7a] rounded-full"></div>
-                </div>
-                <div class="relative z-10 w-full max-w-2xl">
-                    <div class="flex items-center mb-16 relative">
-                        <div class="flex-shrink-0 w-12 h-12 bg-[#8a8a7a] rounded-full flex items-center justify-center text-white font-bold text-xl">1</div>
-                        <div class="ml-6 p-4 bg-white rounded-lg shadow-md flex-grow">
-                            <h4 class="font-semibold text-[#3b3a30]">Mentoring & Skills Development</h4>
-                            <p class="text-sm text-[#5c5c50] mt-1">We start with personalized guidance and mastering in-demand topics.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center mb-16 relative md:flex-row-reverse">
-                        <div class="flex-shrink-0 w-12 h-12 bg-[#8a8a7a] rounded-full flex items-center justify-center text-white font-bold text-xl">2</div>
-                        <div class="mr-6 p-4 bg-white rounded-lg shadow-md flex-grow">
-                            <h4 class="font-semibold text-[#3b3a30]">Project-Based Learning</h4>
-                            <p class="text-sm text-[#5c5c50] mt-1">Move to real-world projects to build your portfolio.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center mb-16 relative">
-                        <div class="flex-shrink-0 w-12 h-12 bg-[#8a8a7a] rounded-full flex items-center justify-center text-white font-bold text-xl">3</div>
-                        <div class="ml-6 p-4 bg-white rounded-lg shadow-md flex-grow">
-                            <h4 class="font-semibold text-[#3b3a30]">Resume & LinkedIn Updates</h4>
-                            <p class="text-sm text-[#5c5c50] mt-1">Craft your professional brand to attract opportunities.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center relative md:flex-row-reverse">
-                        <div class="flex-shrink-0 w-12 h-12 bg-[#8a8a7a] rounded-full flex items-center justify-center text-white font-bold text-xl">4</div>
-                        <div class="mr-6 p-4 bg-white rounded-lg shadow-md flex-grow">
-                            <h4 class="font-semibold text-[#3b3a30]">Mock Interviews</h4>
-                            <p class="text-sm text-[#5c5c50] mt-1">Prepare for success and ace your interviews with confidence.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="container py-16 md:py-24 text-center">
-            <h2 class="text-3xl md:text-4xl font-bold text-[#3b3a30]">Let’s Talk!</h2>
-            <p class="mt-4 text-lg text-[#5c5c50] max-w-3xl mx-auto">Thank you for your time and attention! We're excited to help you on your career journey. The conversation doesn't have to stop here.</p>
-            <div class="flex justify-center items-center flex-col mt-8">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://ready4industry.github.io/ready4industry-app/&size=150x150" alt="WhatsApp QR Code" class="w-36 h-36 rounded-lg shadow-md mb-4" onclick="openWhatsAppModal()">
-                <p class="text-lg text-[#5c5c50] mb-6">Scan to message us on WhatsApp!</p>
-            </div>
-            <div class="flex justify-center space-x-6 text-4xl">
-                <a href="https://www.youtube.com/playlist?list=PLB-uQcK3f-l9Vz3j4n6p-3f3p5Q8p-8p" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
-                    <i class="fa-brands fa-youtube"></i>
-                </a>
-                <a href="https://www.facebook.com/Ready4industry" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
-                    <i class="fa-brands fa-facebook-f"></i>
-                </a>
-                <a href="https://www.instagram.com/ready4industry" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
-                <a href="javascript:void(0)" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300" onclick="openWhatsAppModal()">
-                    <i class="fa-brands fa-whatsapp"></i>
-                </a>
-                <a href="mailto:info@ready4industry.com" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
-                    <i class="fa-solid fa-envelope"></i>
-                </a>
-            </div>
-            <p class="mt-4 text-xl font-semibold text-[#3b3a30]">Find us on all channels with the handle @ready4industry.</p>
-        </section>
-
-        <!-- Updated section to display live scan data in a table -->
-        <section id="scan-data" class="container py-16 md:py-24">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-[#3b3a30] mb-8">Live Scan Data</h2>
-            <div class="bg-white p-8 rounded-lg shadow-md overflow-x-auto">
-                <table class="w-full text-left table-auto border-collapse">
-                    <thead>
-                        <tr class="bg-[#f7f3ed]">
-                            <th class="px-4 py-2 border border-[#d6d0c6]">Name</th>
-                            <th class="px-4 py-2 border border-[#d6d0c6]">City</th>
-                            <th class="px-4 py-2 border border-[#d6d0c6]">Status</th>
-                            <th class="px-4 py-2 border border-[#d6d0c6]">Service</th>
-                            <th class="px-4 py-2 border border-[#d6d0c6]">Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody id="scans-table-body">
-                        <!-- Table rows will be populated here by JavaScript -->
-                        <tr>
-                            <td colspan="5" class="text-center px-4 py-2 text-[#5c5c50]">No inquiries yet. Fill out the form to see data appear here.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        const { useState, useEffect } = window.React;
+        const ReactDOM = window.ReactDOM;
         
-    </main>
-
-    <!-- WhatsApp Inquiry Modal -->
-    <div id="inquiryModal" class="modal">
-        <div class="modal-content">
-            <h3 class="text-2xl font-bold text-[#3b3a30] mb-4 text-center">Let's Get Started!</h3>
-            <p class="text-[#5c5c50] mb-6 text-center">Please provide a few details to help us understand your needs.</p>
-            <form id="inquiryForm" class="space-y-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-[#5c5c50]">Your Name</label>
-                    <input type="text" id="name" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#8a8a7a] focus:ring focus:ring-[#8a8a7a] focus:ring-opacity-50 bg-white p-2">
-                </div>
-                <div>
-                    <label for="city" class="block text-sm font-medium text-[#5c5c50]">City of Residence</label>
-                    <input type="text" id="city" name="city" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#8a8a7a] focus:ring focus:ring-[#8a8a7a] focus:ring-opacity-50 bg-white p-2">
-                </div>
-                <div>
-                    <label for="status" class="block text-sm font-medium text-[#5c5c50]">Are you a student or a professional?</label>
-                    <select id="status" name="status" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#8a8a7a] focus:ring focus:ring-[#8a8a7a] focus:ring-opacity-50 bg-white p-2">
-                        <option value="">Select...</option>
-                        <option value="Student">Student</option>
-                        <option value="Professional">Professional</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="service" class="block text-sm font-medium text-[#5c5c50]">Which service are you looking for?</label>
-                    <select id="service" name="service" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#8a8a7a] focus:ring focus:ring-[#8a8a7a] focus:ring-opacity-50 bg-white p-2">
-                        <option value="">Select...</option>
-                        <option value="Mentoring">Mentoring</option>
-                        <option value="Real-World Projects">Real-World Projects</option>
-                        <option value="Resume Building">Resume Building</option>
-                        <option value="LinkedIn Profile">LinkedIn Profile</option>
-                        <option value="Mock Interviews">Mock Interviews</option>
-                        <option value="Skills Development">Skills Development</option>
-                        <option value="General Inquiry">General Inquiry</option>
-                    </select>
-                </div>
-                <div class="flex justify-center">
-                    <button type="submit" class="w-full bg-[#8a8a7a] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-[#7a7a6a] transition-colors duration-300 mt-4">Send Inquiry via WhatsApp</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // IMPORTANT: These global variables are provided by the canvas environment.
+        // Global variables provided by the canvas environment.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
+        
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+        const app = firebaseApp(firebaseConfig);
+        const auth = firebaseAuth(app);
+        const db = firestore(app);
         
-        // This is a new Firestore path for private data, associated with the current user's ID.
-        let inquiriesCollection;
-
-        // Enable debug logging for Firebase services.
-        setLogLevel('debug');
-
-        // Get modal elements
-        const inquiryModal = document.getElementById('inquiryModal');
-        const inquiryForm = document.getElementById('inquiryForm');
-
-        // Function to open the modal
-        window.openWhatsAppModal = () => {
-            inquiryModal.style.display = 'flex';
-        };
-
-        // Function to handle form submission
-        inquiryForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const name = document.getElementById('name').value;
-            const city = document.getElementById('city').value;
-            const status = document.getElementById('status').value;
-            const service = document.getElementById('service').value;
-
-            const whatsappMessage = `Hello, I'm interested in Ready4Industry's services. My name is ${name} from ${city}. I am a ${status} and I am interested in your ${service} service. Can you please tell me more?`;
-
-            const inquiryData = {
-                name: name,
-                city: city,
-                status: status,
-                service: service,
-                timestamp: serverTimestamp(),
-                message: whatsappMessage
-            };
-
-            try {
-                // Ensure a user is authenticated before attempting to add a document.
-                if (auth.currentUser && inquiriesCollection) {
-                    await addDoc(inquiriesCollection, inquiryData);
-                    console.log("Inquiry data successfully added to Firestore!");
-                    
-                    // Construct the WhatsApp URL with the new message
-                    const whatsappUrl = `https://wa.me/917680973409?text=${encodeURIComponent(whatsappMessage)}`;
-                    window.open(whatsappUrl, '_blank');
-                    
-                    // Hide the modal after submission
-                    inquiryModal.style.display = 'none';
-
-                } else {
-                    console.error("User not authenticated or inquiries collection not initialized. Cannot log inquiry data.");
-                }
-            } catch (e) {
-                console.error("Error adding document: ", e);
-            }
-        });
-
-        // Function to listen for new inquiries and display them in real-time
-        const setupRealtimeListener = (userId) => {
-            const scansTableBody = document.getElementById('scans-table-body');
-            // The collection path now includes the specific user's ID.
-            inquiriesCollection = collection(db, `artifacts/${appId}/users/${userId}/inquiries`);
-            const q = query(inquiriesCollection);
-            
-            // onSnapshot will automatically handle permissions after a user is authenticated
-            onSnapshot(q, (snapshot) => {
-                scansTableBody.innerHTML = ''; // Clear existing table rows
-                if (snapshot.empty) {
-                    const noDataRow = document.createElement('tr');
-                    noDataRow.innerHTML = '<td colspan="5" class="text-center px-4 py-2 text-[#5c5c50]">No inquiries yet. Fill out the form to see data appear here.</td>';
-                    scansTableBody.appendChild(noDataRow);
-                } else {
-                    // Sort documents by timestamp in memory to show the first one at the top.
-                    const sortedDocs = snapshot.docs.sort((a, b) => a.data().timestamp.toDate() - b.data().timestamp.toDate());
-                    
-                    sortedDocs.forEach(doc => {
-                        const data = doc.data();
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-[#f7f3ed]';
-                        const timestampText = data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A';
-                        
-                        row.innerHTML = `
-                            <td class="px-4 py-2 border border-[#d6d0c6]">${data.name}</td>
-                            <td class="px-4 py-2 border border-[#d6d0c6]">${data.city}</td>
-                            <td class="px-4 py-2 border border-[#d6d0c6]">${data.status}</td>
-                            <td class="px-4 py-2 border border-[#d6d0c6]">${data.service}</td>
-                            <td class="px-4 py-2 border border-[#d6d0c6]">${timestampText}</td>
-                        `;
-                        scansTableBody.appendChild(row);
-                    });
-                }
-            }, (error) => {
-                console.error("Error in snapshot listener: ", error);
-            });
-        };
-
-        // Main initialization logic triggered on auth state change
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // User is signed in. Now it is safe to set up the Firestore listener.
-                console.log("User is authenticated:", user.uid);
-                setupRealtimeListener(user.uid);
-            } else {
-                // User is signed out or not yet authenticated. Try to sign them in.
-                console.log("User not authenticated, attempting to sign in...");
-                try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("Signed in with custom token.");
-                    } else {
-                        await signInAnonymously(auth);
-                        console.log("Signed in anonymously.");
-                    }
-                } catch (error) {
-                    console.error("Authentication failed: ", error);
-                }
-            }
-        });
+        // Enable debug logging for Firebase
+        db.settings({ experimentalForceLongPolling: true });
         
-        // This DOMContentLoaded listener now only handles UI logic.
-        document.addEventListener('DOMContentLoaded', () => {
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const offerCards = document.querySelectorAll('.offer-card');
-            const offerDetails = document.getElementById('offer-details');
-            const offerTitle = document.getElementById('offer-title');
-            const offerContent = document.getElementById('offer-content');
+        // Chart.js is imported via CDN in the HTML head.
+        const Chart = window.Chart;
 
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
+        // This is a placeholder for the lucide-react icons, as they are not available via CDN in this format.
+        // In a real project, you would use a build step to bundle these.
+        const iconPlaceholder = (name, className, size) => (
+            <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M0 0h24v24H0z" stroke="none" /></svg>
+        );
+        
+        const Mail = (props) => iconPlaceholder('Mail', props.className, props.size);
+        const Youtube = (props) => iconPlaceholder('Youtube', props.className, props.size);
+        const Facebook = (props) => iconPlaceholder('Facebook', props.className, props.size);
+        const Instagram = (props) => iconPlaceholder('Instagram', props.className, props.size);
+        const PhoneCall = (props) => iconPlaceholder('PhoneCall', props.className, props.size);
+        const Handshake = (props) => iconPlaceholder('Handshake', props.className, props.size);
+        const Briefcase = (props) => iconPlaceholder('Briefcase', props.className, props.size);
+        const FileText = (props) => iconPlaceholder('FileText', props.className, props.size);
+        const UserCheck = (props) => iconPlaceholder('UserCheck', props.className, props.size);
+        const Search = (props) => iconPlaceholder('Search', props.className, props.size);
+        const Lightbulb = (props) => iconPlaceholder('Lightbulb', props.className, props.size);
+        const X = (props) => iconPlaceholder('X', props.className, props.size);
+        const BarChart2 = (props) => iconPlaceholder('BarChart2', props.className, props.size);
+        const Users = (props) => iconPlaceholder('Users', props.className, props.size);
+        const School = (props) => iconPlaceholder('School', props.className, props.size);
 
+        // Main App Component
+        const App = () => {
+            const [view, setView] = useState('home');
+            const [selectedOffering, setSelectedOffering] = useState(null);
+            const [isModalOpen, setIsModalOpen] = useState(false);
+            const [scans, setScans] = useState([]);
+            const [userId, setUserId] = useState(null);
+        
+            // Offers data to power the dynamic content
             const offeringsData = {
                 mentoring: {
                     title: "Mentoring: Find Your Dream Job Role",
+                    icon: <Handshake className="text-emerald-600" size={48} />,
                     content: "Think of this as personalized career navigation. We pair you with industry experts who have been in your shoes. They’ll help you define your career goals and create a clear roadmap to get there. This isn't about general advice; it's about specific, actionable steps for you."
+                },
+                one_on_one_mentoring: {
+                    title: "1-on-1 Mentorship: Your Personal Career Guide",
+                    icon: <Handshake className="text-pink-600" size={48} />,
+                    content: "Get exclusive access to an industry expert who will work with you one-on-one. This is highly personalized guidance, focused entirely on your unique career path, challenges, and goals. It's the fastest way to get to where you want to be."
+                },
+                group_coaching: {
+                    title: "Group Coaching: Learn and Grow with a Peer Community",
+                    icon: <Users className="text-blue-600" size={48} />,
+                    content: "Join a small, curated group of motivated peers led by an expert coach. Group sessions provide a collaborative environment for learning, sharing experiences, and problem-solving together. It's an affordable way to get mentorship and build a valuable professional network."
+                },
+                college_workshops: {
+                    title: "College Workshops: Industry Knowledge for the Whole Campus",
+                    icon: <School className="text-purple-600" size={48} />,
+                    content: "We bring our industry expertise directly to your college or university. Our workshops cover essential topics like resume building, interview preparation, and key technical skills. This program is designed to empower large groups of students and bridge the gap between academia and industry."
                 },
                 projects: {
                     title: "Real-World Projects: Build a Portfolio That Gets Noticed",
+                    icon: <Briefcase className="text-yellow-600" size={48} />,
                     content: "Companies don't just want to see your grades; they want to see what you can do. We give you the opportunity to work on projects that solve real-world industry problems. Imagine building a cloud application on AWS or creating a data dashboard with Power BI! This hands-on experience is what will set you apart from other applicants."
                 },
                 resume: {
                     title: "Resume Building: Craft a Killer Resume",
+                    icon: <FileText className="text-purple-600" size={48} />,
                     content: "Your resume is your first impression. We go beyond basic formatting to help you create a powerful document that highlights your skills, projects, and potential. Learn how to use keywords that get past automated screening systems and catch the eye of recruiters."
                 },
                 linkedin: {
                     title: "LinkedIn Profile: Your Professional Brand on LinkedIn",
+                    icon: <UserCheck className="text-sky-600" size={48} />,
                     content: "In today's world, your LinkedIn profile is as important as your resume. We'll guide you on how to optimize your profile to attract opportunities. Learn the secrets to networking and building a strong online brand that gets you noticed."
                 },
                 mock_interviews: {
                     title: "Mock Interviews: Ace Your Interview, Every Time",
+                    icon: <Search className="text-red-600" size={48} />,
                     content: "Interviews can be nerve-wracking. We'll help you prepare. Practice in a safe environment with constructive feedback from professionals. Learn how to answer tough technical questions and behavioral questions with confidence."
                 },
                 skills: {
                     title: "Skills Development: Master In-Demand Technical & Soft Skills",
+                    icon: <Lightbulb className="text-orange-600" size={48} />,
                     content: "We'll help you dive into hot topics like Cloud Computing, AWS, Power BI, and the many use cases of AI. Whether you're a top student looking to specialize or you need a little push to get started, we'll give you the guidance to become a top-tier candidate. Soft Skills: Communication, teamwork, problem-solving—these are just as important as your technical abilities. We'll show you how to hone them. This is about making you a well-rounded and highly valuable candidate."
                 }
             };
-
-            offerCards.forEach(card => {
-                card.addEventListener('click', () => {
-                    const id = card.id;
-                    const data = offeringsData[id];
-
-                    if (data) {
-                        offerTitle.textContent = data.title;
-                        offerContent.textContent = data.content;
-                        offerDetails.classList.remove('hidden');
-                        
-                        document.querySelectorAll('.offer-card').forEach(c => c.classList.remove('ring-2', 'ring-[#8a8a7a]'));
-                        card.classList.add('ring-2', 'ring-[#8a8a7a]');
-
-                        const chartContainer = document.querySelector('.chart-container');
-                        chartContainer.style.display = id === 'skills' || id === 'mentoring' ? 'block' : 'none';
-
-                        if (id === 'skills' || id === 'mentoring') {
-                            const ctx = document.getElementById('growthChart').getContext('2d');
-                            new Chart(ctx, {
-                                type: 'line',
-                                data: {
-                                    labels: ['Week 1', 'Week 4', 'Week 8', 'Week 12'],
-                                    datasets: [{
-                                        label: 'Student Growth Score',
-                                        data: [30, 60, 85, 95],
-                                        borderColor: '#8a8a7a',
-                                        tension: 0.4,
-                                        fill: false,
-                                    }]
+        
+            // Firebase Authentication and Data Listener
+            useEffect(() => {
+                const unsubscribe = auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        setUserId(user.uid);
+                        const inquiriesCollectionRef = db.collection(`artifacts/${appId}/users/${user.uid}/inquiries`);
+                        const q = inquiriesCollectionRef;
+                        const unsubscribeSnapshot = q.onSnapshot((snapshot) => {
+                            const fetchedScans = snapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data()
+                            }));
+                            setScans(fetchedScans);
+                        }, (error) => {
+                            console.error("Error in snapshot listener:", error);
+                        });
+                        return () => unsubscribeSnapshot();
+                    } else {
+                        try {
+                            if (initialAuthToken) {
+                                await auth.signInWithCustomToken(initialAuthToken);
+                            } else {
+                                await auth.signInAnonymously();
+                            }
+                        } catch (error) {
+                            console.error("Authentication failed:", error);
+                        }
+                    }
+                });
+                return () => unsubscribe();
+            }, []);
+        
+            // Chart.js logic
+            useEffect(() => {
+                if (selectedOffering === 'skills' || selectedOffering === 'mentoring') {
+                    const chartId = 'growthChart';
+                    const existingChart = Chart.getChart(chartId);
+                    if (existingChart) {
+                        existingChart.destroy();
+                    }
+                    const ctx = document.getElementById(chartId);
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: ['Week 1', 'Week 4', 'Week 8', 'Week 12'],
+                                datasets: [{
+                                    label: 'Student Growth Score',
+                                    data: [30, 60, 85, 95],
+                                    borderColor: '#8a8a7a',
+                                    tension: 0.4,
+                                    fill: false,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: { beginAtZero: true, max: 100 }
                                 },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            max: 100
-                                        }
-                                    },
-                                    plugins: {
-                                        tooltip: {
-                                            callbacks: {
-                                                title: function(context) {
-                                                    const label = context[0].label || '';
-                                                    return 'Progress over ' + label.split(' ')[1];
-                                                },
-                                                label: function(context) {
-                                                    const value = context.parsed.y;
-                                                    return 'Growth Score: ' + value + '%';
-                                                }
-                                            }
+                                plugins: {
+                                    tooltip: {
+                                        callbacks: {
+                                            title: (context) => 'Progress over ' + context[0].label.split(' ')[1],
+                                            label: (context) => 'Growth Score: ' + context.parsed.y + '%'
                                         }
                                     }
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
-                    offerDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                });
+                }
+            }, [selectedOffering]);
+        
+            const handleFormSubmit = async (e) => {
+                e.preventDefault();
+                const form = e.target;
+                const inquiryData = {
+                    name: form.name.value,
+                    city: form.city.value,
+                    status: form.status.value,
+                    service: form.service.value,
+                    timestamp: firestore.FieldValue.serverTimestamp()
+                };
+                const whatsappMessage = `Hello, I'm interested in Ready4Industry's services. My name is ${inquiryData.name} from ${inquiryData.city}. I am a ${inquiryData.status} and I am interested in your ${inquiryData.service} service. Can you please tell me more?`;
+        
+                try {
+                    if (userId) {
+                        const inquiriesCollectionRef = db.collection(`artifacts/${appId}/users/${userId}/inquiries`);
+                        await inquiriesCollectionRef.add(inquiryData);
+                        console.log("Inquiry data successfully added to Firestore!");
+                        window.open(`https://wa.me/917680973409?text=${encodeURIComponent(whatsappMessage)}`, '_blank');
+                        setIsModalOpen(false);
+                    } else {
+                        console.error("User not authenticated. Cannot log inquiry data.");
+                    }
+                } catch (error) {
+                    console.error("Error adding document:", error);
+                }
+            };
+            
+            const handleOfferingClick = (key) => {
+                setSelectedOffering(key);
+            };
+        
+            const sections = {
+                home: <HomeView setView={setView} />,
+                mission: <MissionView />,
+                offerings: <OfferingsView offerings={offeringsData} onSelect={handleOfferingClick} selected={selectedOffering} />,
+                journey: <JourneyView />,
+                contact: <ContactView setIsModalOpen={setIsModalOpen} />,
+                scans: <LiveScansTable scans={scans} userId={userId} />,
+            };
+        
+            return (
+                <div className="bg-slate-50 min-h-screen text-slate-800 font-inter">
+                    <Header setView={setView} currentView={view} />
+                    <main className="container mx-auto py-12 px-4 transition-all duration-500 ease-in-out">
+                        <div className="min-h-[70vh]">
+                            {sections[view]}
+                            {selectedOffering && (
+                                <div className="mt-12 p-8 bg-slate-200 rounded-2xl shadow-xl transition-all duration-500 ease-in-out transform scale-100">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-3xl font-bold text-slate-900">{offeringsData[selectedOffering].title}</h3>
+                                        <button onClick={() => setSelectedOffering(null)} className="text-slate-500 hover:text-slate-800 transition-colors">
+                                            <X size={24} />
+                                        </button>
+                                    </div>
+                                    <p className="text-slate-600 leading-relaxed text-lg">{offeringsData[selectedOffering].content}</p>
+                                    {(selectedOffering === 'skills' || selectedOffering === 'mentoring') && (
+                                        <div className="mt-8">
+                                            <h4 className="text-2xl font-semibold mb-4 text-slate-800">Your Potential Growth</h4>
+                                            <div className="h-64 md:h-96">
+                                                <canvas id="growthChart"></canvas>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleFormSubmit} />
+                    </main>
+                    <Footer />
+                </div>
+            );
+        };
+        
+        // --- Sub-Components ---
+        
+        const Header = ({ setView, currentView }) => {
+            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const navItems = [
+                { label: 'Home', view: 'home' },
+                { label: 'Our Mission', view: 'mission' },
+                { label: 'Our Offerings', view: 'offerings' },
+                { label: 'The Journey', view: 'journey' },
+                { label: 'Contact', view: 'contact' },
+                { label: 'Live Scans', view: 'scans' },
+            ];
+            return (
+                <nav className="sticky top-0 z-50 bg-white bg-opacity-80 backdrop-blur-sm shadow-lg py-4 transition-all duration-300">
+                    <div className="container mx-auto flex justify-between items-center px-4">
+                        <button onClick={() => setView('home')} className="text-3xl font-bold text-teal-700 tracking-tight">Ready4Industry</button>
+                        <div className="hidden md:flex space-x-8">
+                            {navItems.map(item => (
+                                <button key={item.view} onClick={() => setView(item.view)} className={`text-slate-600 hover:text-teal-700 transition-colors duration-300 font-semibold ${currentView === item.view ? 'text-teal-700 border-b-2 border-teal-700' : ''}`}>
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-slate-600 focus:outline-none">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                        </button>
+                    </div>
+                    {isMenuOpen && (
+                        <div className="md:hidden bg-white py-2 transition-all duration-300">
+                            {navItems.map(item => (
+                                <button key={item.view} onClick={() => { setView(item.view); setIsMenuOpen(false); }} className="block py-2 px-4 text-slate-600 hover:bg-slate-100 w-full text-left">
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </nav>
+            );
+        };
+        
+        const HomeView = ({ setView }) => (
+            <section className="text-center py-24 md:py-32">
+                <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight">Beyond the Degree: Launch Your Engineering Career</h1>
+                <p className="mt-6 text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">Are you ready to turn your engineering degree into your dream job? We are here to give you the unfair advantage in the job market.</p>
+                <button onClick={() => setView('offerings')} className="mt-10 inline-block bg-teal-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-teal-700 transition-colors duration-300 transform hover:scale-105">
+                    Explore Our Offerings
+                </button>
+            </section>
+        );
+        
+        const MissionView = () => (
+            <section className="py-16 md:py-24">
+                <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900">Our Mission: Your Partner in Success</h2>
+                <div className="mt-12 grid md:grid-cols-2 gap-12 items-center">
+                    <div className="text-lg text-slate-600 space-y-4">
+                        <p className="leading-relaxed">We get it. It's tough out there. Have you ever felt lost, unsure what companies are looking for? Have you worried that your resume isn't good enough? Do you feel like you don't have enough "real-world" experience? This is where we come in. We are **Ready4Industry**.</p>
+                        <p className="leading-relaxed">With 21 years of experience in the IT world, working with tech giants like IBM, PwC, Wipro, Kyndryl, and Tech Mahindra, we've attended countless campus interviews and conducted uncountable interviews for freshers. This means we know your pain points.</p>
+                        <p className="leading-relaxed">We're not here to repeat what you already know from your textbooks. We're here to help you apply the concepts you've learned, like **Data Structures, Object-Oriented Programming, and Database Management Systems,** to real-world problems. We bridge the gap by providing the tools, experience, and guidance you need to land your first job. We're not just a service; we're your partner in building a strong foundation for your career.</p>
+                    </div>
+                    <div className="w-full h-auto rounded-2xl overflow-hidden shadow-lg">
+                        <img
+                            src="https://placehold.co/900x1600/C4EFDD/157245?text=Ready4Industry%0AMission"
+                            alt="Image representing the mission of Ready4Industry"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                </div>
+            </section>
+        );
+        
+        const OfferingsView = ({ offerings, onSelect, selected }) => (
+            <section className="py-16 md:py-24">
+                <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900">Our Offerings: It's All About You</h2>
+                <p className="mt-4 text-lg text-center text-slate-600 max-w-3xl mx-auto">Explore how we help you succeed. Click on any offering below to learn more about how we can help you build the skills and confidence you need to land your dream job.</p>
+        
+                <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {Object.keys(offerings).map(key => (
+                        <button
+                            key={key}
+                            onClick={() => onSelect(key)}
+                            className={`p-6 rounded-2xl shadow-md transition-all duration-300 transform hover:scale-105 hover:shadow-xl text-left focus:outline-none focus:ring-4 focus:ring-teal-300 ${selected === key ? 'bg-white ring-4 ring-teal-500' : 'bg-white hover:bg-slate-100'}`}
+                        >
+                            <div className="flex items-center space-x-4 mb-4">
+                                {offerings[key].icon}
+                                <h3 className="text-xl font-semibold text-slate-800">{offerings[key].title.split(':')[0]}</h3>
+                            </div>
+                            <p className="mt-2 text-slate-600">{offerings[key].title.split(':')[1].trim()}</p>
+                        </button>
+                    ))}
+                </div>
+            </section>
+        );
+        
+        const JourneyView = () => (
+            <section className="py-16 md:py-24">
+                <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900">The Ready4Industry Journey</h2>
+                <div className="mt-12 relative flex justify-center">
+                    <div className="absolute inset-0 flex justify-center">
+                        <div className="w-1 bg-teal-500 rounded-full"></div>
+                    </div>
+                    <div className="relative z-10 w-full max-w-2xl space-y-16">
+                        <JourneyStep number={1} title="Mentoring & Skills Development" description="We start with personalized guidance and mastering in-demand topics." image_url="https://placehold.co/900x1600/D0F0C0/3A5F0B?text=Mentoring" />
+                        <JourneyStep number={2} title="Project-Based Learning" description="Move to real-world projects to build your portfolio." image_url="https://placehold.co/900x1600/FFE7C1/9E6D00?text=Projects" />
+                        <JourneyStep number={3} title="Resume & LinkedIn Updates" description="Craft your professional brand to attract opportunities." image_url="https://placehold.co/900x1600/E8D2FF/5E2A9E?text=Resume" />
+                        <JourneyStep number={4} title="Mock Interviews" description="Prepare for success and ace your interviews with confidence." image_url="https://placehold.co/900x1600/B2D7F3/0D5B9E?text=Interview" />
+                    </div>
+                </div>
+            </section>
+        );
+        
+        const JourneyStep = ({ number, title, description, image_url }) => (
+            <div className="flex flex-col md:flex-row items-center md:flex-nowrap md:even:flex-row-reverse relative">
+                <div className="flex-shrink-0 w-12 h-12 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg z-20 md:order-2">
+                    {number}
+                </div>
+                <div className="md:order-1 flex-grow p-4 bg-white rounded-2xl shadow-md transition-all duration-300 transform hover:scale-[1.02] mt-4 md:mt-0 md:w-1/2">
+                    <h4 className="font-semibold text-slate-900">{title}</h4>
+                    <p className="text-sm text-slate-600 mt-1">{description}</p>
+                </div>
+                <div className="md:order-3 w-full md:w-1/2 md:p-4">
+                    <img src={image_url} alt={`Step ${number}: ${title}`} className="w-full h-auto object-cover rounded-2xl shadow-md" />
+                </div>
+            </div>
+        );
+        
+        const ContactView = ({ setIsModalOpen }) => (
+            <section className="py-16 md:py-24 text-center">
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Let’s Talk!</h2>
+                <p className="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Thank you for your time and attention! We're excited to help you on your career journey. The conversation doesn't have to stop here.</p>
+                <div className="flex flex-col items-center mt-8">
+                    <img 
+                        src="https://api.qrserver.com/v1/create-qr-code/?data=https://ready4industry.github.io/ready4industry-app/&size=150x150" 
+                        alt="WhatsApp QR Code" 
+                        className="w-40 h-40 rounded-lg shadow-md mb-4 animate-pulse" 
+                        onClick={() => setIsModalOpen(true)}
+                    />
+                    <p className="text-lg text-slate-600 mb-6 font-semibold">Scan to message us on WhatsApp!</p>
+                </div>
+                <div className="flex justify-center space-x-6 text-4xl">
+                    <a href="https://www.youtube.com/playlist?list=PLB-uQcK3f-l9Vz3j4n6p-3f3p5Q8p-8p" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-red-500 transition-colors duration-300">
+                        <Youtube size={48} />
+                    </a>
+                    <a href="https://www.facebook.com/Ready4industry" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-blue-600 transition-colors duration-300">
+                        <Facebook size={48} />
+                    </a>
+                    <a href="https://www.instagram.com/ready4industry" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-pink-600 transition-colors duration-300">
+                        <Instagram size={48} />
+                    </a>
+                    <button onClick={() => setIsModalOpen(true)} className="text-slate-500 hover:text-green-500 transition-colors duration-300">
+                        <PhoneCall size={48} />
+                    </button>
+                    <a href="mailto:info@ready4industry.com" className="text-slate-500 hover:text-slate-700 transition-colors duration-300">
+                        <Mail size={48} />
+                    </a>
+                </div>
+                <p className="mt-4 text-xl font-semibold text-slate-900">Find us on all channels with the handle @ready4industry.</p>
+            </section>
+        );
+        
+        const LiveScansTable = ({ scans, userId }) => {
+            // Sort scans by timestamp in descending order
+            const sortedScans = [...scans].sort((a, b) => {
+                // Handle cases where timestamp might be a Firestore Timestamp object or null
+                const aTime = a.timestamp && a.timestamp.toDate ? a.timestamp.toDate() : new Date(0);
+                const bTime = b.timestamp && b.timestamp.toDate ? b.timestamp.toDate() : new Date(0);
+                return bTime - aTime;
             });
-        });
+            return (
+                <section className="py-16 md:py-24">
+                    <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 mb-8">Live Scan Data</h2>
+                    {userId && <p className="text-center text-sm text-slate-500 mb-4">Your User ID: {userId}</p>}
+                    <div className="bg-white p-8 rounded-2xl shadow-xl overflow-x-auto">
+                        <table className="w-full text-left table-auto border-collapse">
+                            <thead>
+                                <tr className="bg-slate-100 text-slate-700">
+                                    <th className="p-4 border border-slate-200 rounded-tl-xl">Name</th>
+                                    <th className="p-4 border border-slate-200">City</th>
+                                    <th className="p-4 border border-slate-200">Status</th>
+                                    <th className="p-4 border border-slate-200">Service</th>
+                                    <th className="p-4 border border-slate-200 rounded-tr-xl">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {sortedScans.length > 0 ? (
+                                    sortedScans.map((scan, index) => (
+                                        <tr key={scan.id} className="hover:bg-slate-50 transition-colors">
+                                            <td className="p-4 border border-slate-200">{scan.name}</td>
+                                            <td className="p-4 border border-slate-200">{scan.city}</td>
+                                            <td className="p-4 border border-slate-200">{scan.status}</td>
+                                            <td className="p-4 border border-slate-200">{scan.service}</td>
+                                            <td className="p-4 border border-slate-200">{scan.timestamp && scan.timestamp.toDate ? scan.timestamp.toDate().toLocaleString() : 'N/A'}</td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="5" className="text-center p-4 text-slate-500">No inquiries yet. Fill out the form to see data appear here.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            );
+        };
+        
+        const Modal = ({ isOpen, onClose, onSubmit }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center p-4 z-[1000]">
+                    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full relative transform scale-100 transition-transform duration-300">
+                        <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-800 transition-colors">
+                            <X size={24} />
+                        </button>
+                        <h3 className="text-3xl font-bold text-slate-900 mb-4 text-center">Let's Get Started!</h3>
+                        <p className="text-slate-600 mb-6 text-center">Please provide a few details to help us understand your needs.</p>
+                        <form onSubmit={onSubmit} className="space-y-6">
+                            <div>
+                                <label htmlFor="name" className="block text-sm font-medium text-slate-600">Your Name</label>
+                                <input type="text" id="name" name="name" required className="mt-1 block w-full rounded-lg border-slate-300 shadow-sm p-3 focus:ring-teal-500 focus:border-teal-500" />
+                            </div>
+                            <div>
+                                <label htmlFor="city" className="block text-sm font-medium text-slate-600">City of Residence</label>
+                                <input type="text" id="city" name="city" required className="mt-1 block w-full rounded-lg border-slate-300 shadow-sm p-3 focus:ring-teal-500 focus:border-teal-500" />
+                            </div>
+                            <div>
+                                <label htmlFor="status" className="block text-sm font-medium text-slate-600">Are you a student or a professional?</label>
+                                <select id="status" name="status" required className="mt-1 block w-full rounded-lg border-slate-300 shadow-sm p-3 focus:ring-teal-500 focus:border-teal-500">
+                                    <option value="">Select...</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Professional">Professional</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="service" className="block text-sm font-medium text-slate-600">Which service are you looking for?</label>
+                                <select id="service" name="service" required className="mt-1 block w-full rounded-lg border-slate-300 shadow-sm p-3 focus:ring-teal-500 focus:border-teal-500">
+                                    <option value="">Select...</option>
+                                    <option value="Mentoring">Mentoring</option>
+                                    <option value="1-on-1 Mentorship">1-on-1 Mentorship</option>
+                                    <option value="Group Coaching">Group Coaching</option>
+                                    <option value="College Workshops">College Workshops</option>
+                                    <option value="Real-World Projects">Real-World Projects</option>
+                                    <option value="Resume Building">Resume Building</option>
+                                    <option value="LinkedIn Profile">LinkedIn Profile</option>
+                                    <option value="Mock Interviews">Mock Interviews</option>
+                                    <option value="Skills Development">Skills Development</option>
+                                    <option value="General Inquiry">General Inquiry</option>
+                                </select>
+                            </div>
+                            <button type="submit" className="w-full bg-teal-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-teal-700 transition-colors duration-300 transform hover:scale-105">
+                                Send Inquiry via WhatsApp
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+        
+        const Footer = () => (
+            <footer className="bg-slate-900 text-slate-400 py-12 mt-24">
+                <div className="container mx-auto px-4 text-center">
+                    <p className="text-lg font-semibold">&copy; 2025 Ready4Industry. All rights reserved.</p>
+                    <p className="mt-2 text-sm">Empowering the next generation of innovators.</p>
+                </div>
+            </footer>
+        );
+        
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </body>
 </html>
