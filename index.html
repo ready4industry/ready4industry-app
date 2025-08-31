@@ -25,32 +25,41 @@
             transform: translateY(-8px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+        .pricing-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
     <!-- Header with smooth transition -->
-    <header class="bg-white shadow-lg sticky top-0 z-50 transition-all duration-300">
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <span class="text-3xl font-extrabold text-teal-700 tracking-tight transition-colors hover:text-teal-600">
+            <span class="text-3xl font-extrabold text-emerald-400 tracking-tight transition-colors hover:text-teal-600">
                 Ready4Industry
             </span>
             <nav class="space-x-6 text-sm font-medium hidden md:block">
-                <a href="#mission" class="text-slate-600 hover:text-teal-700 transition-colors">Our Mission</a>
-                <a href="#offerings" class="text-slate-600 hover:text-teal-700 transition-colors">Offerings</a>
-                <a href="#journey" class="text-slate-600 hover:text-teal-700 transition-colors">The Journey</a>
-                <a href="#contact" class="text-slate-600 hover:text-teal-700 transition-colors">Contact</a>
+                <a href="#mission" class="text-white hover:text-teal-400 transition-colors">Our Mission</a>
+                <a href="#offerings" class="text-white hover:text-teal-400 transition-colors">Offerings</a>
+                <a href="#pricing" class="text-white hover:text-teal-400 transition-colors">Pricing</a>
+                <a href="#journey" class="text-white hover:text-teal-400 transition-colors">The Journey</a>
+                <a href="#contact" class="text-white hover:text-teal-400 transition-colors">Contact</a>
             </nav>
         </div>
     </header>
 
     <main>
         <!-- Hero Section: Welcome -->
-        <section id="welcome" class="bg-slate-900 text-white py-24 md:py-32 px-6">
-            <div class="container mx-auto text-center">
-                <h1 class="text-4xl md:text-6xl font-extrabold text-emerald-400 tracking-tight leading-tight animate-fade-in-up">
+        <section id="welcome" class="relative py-24 md:py-32 px-6 bg-cover bg-center bg-no-repeat" style="background-image: url('https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Gemini_Generated_Image_a23e800d922941.width-1000.png');">
+            <div class="absolute inset-0 bg-slate-900/60"></div>
+            <div class="container mx-auto text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight animate-fade-in-up">
                     Beyond the Degree: Launch Your Engineering Career
                 </h1>
-                <p class="mt-6 text-lg md:text-xl text-slate-300 max-w-4xl mx-auto opacity-0 animate-fade-in" style="animation-delay: 0.5s;">
+                <p class="mt-6 text-lg md:text-xl text-white max-w-4xl mx-auto opacity-0 animate-fade-in" style="animation-delay: 0.5s;">
                     Are you ready to turn your academic knowledge into a successful career? We're here to give you the unfair advantage in the job market.
                 </p>
                 <a href="#offerings" class="inline-block mt-10 px-8 py-4 bg-teal-600 text-white font-bold rounded-full shadow-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105">
@@ -156,6 +165,108 @@
                         <i class="fas fa-lightbulb text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">Skills Development</h3>
                         <p class="text-slate-600">Master in-demand technical skills like Cloud Computing and AI, and hone soft skills like teamwork and problem-solving.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-20 px-6 bg-slate-900 text-white">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-extrabold text-emerald-400">Choose Your Path to Success</h2>
+                <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">
+                    Select the plan that best fits your career goals and get started with our expert guidance.
+                </p>
+                <div class="mt-12 grid md:grid-cols-3 gap-8 items-stretch">
+                    <!-- Bronze Plan -->
+                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-slate-400">
+                        <h3 class="text-3xl font-bold text-slate-900">Bronze</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">Foundational Skills</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            The perfect start for building your professional brand.
+                        </p>
+                        <p class="mt-8 text-4xl font-bold text-slate-900">₹4,999</p>
+                        <p class="text-sm text-slate-600">one-time fee</p>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Resume Building</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>LinkedIn Profile</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Core Skills Development</span>
+                            </li>
+                        </ul>
+                        <div class="mt-8 flex-grow"></div>
+                        <a href="#contact" class="mt-8 px-6 py-3 bg-slate-800 text-white font-bold rounded-full hover:bg-slate-700 transition-colors">
+                            Get Started
+                        </a>
+                    </div>
+
+                    <!-- Silver Plan -->
+                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-teal-600 transform scale-105">
+                        <h3 class="text-3xl font-bold text-slate-900">Silver</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">Interview Ready</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            Build on the basics with practical experience and interview preparation.
+                        </p>
+                        <p class="mt-8 text-4xl font-bold text-slate-900">₹14,999</p>
+                        <p class="text-sm text-slate-600">for 3 months</p>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Everything in Bronze</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Collaborative Group Coaching</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Skills Development & Workshops</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Mock Interviews</span>
+                            </li>
+                        </ul>
+                        <div class="mt-8 flex-grow"></div>
+                        <a href="#contact" class="mt-8 px-6 py-3 bg-teal-600 text-white font-bold rounded-full hover:bg-teal-700 transition-colors">
+                            Get Started
+                        </a>
+                    </div>
+
+                    <!-- Gold Plan -->
+                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-amber-500">
+                        <h3 class="text-3xl font-bold text-slate-900">Gold</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">The Complete Package</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            Get the ultimate career launch with personalized and project-based learning.
+                        </p>
+                        <p class="mt-8 text-4xl font-bold text-slate-900">₹49,999</p>
+                        <p class="text-sm text-slate-600">for 6 months</p>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Everything in Silver</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Personalized 1-on-1 Mentorship</span>
+                            </li>
+                            <li class="flex items-center space-x-2">
+                                <i class="fas fa-check-circle text-teal-500"></i>
+                                <span>Real-World Projects</span>
+                            </li>
+                        </ul>
+                        <div class="mt-8 flex-grow"></div>
+                        <a href="#contact" class="mt-8 px-6 py-3 bg-slate-800 text-white font-bold rounded-full hover:bg-slate-700 transition-colors">
+                            Get Started
+                        </a>
                     </div>
                 </div>
             </div>
