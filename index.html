@@ -1,3 +1,10 @@
+<!-- Chosen Palette: Warm Neutrals with Subtle Accents -->
+<!-- Application Structure Plan: The application is structured as a single-page interactive experience with a top navigation bar for non-linear access to key sections. The layout follows a logical flow: an engaging hero section, a "Mission" section detailing the company's background, a core "Offerings" section with an interactive card-based design, a visual "Journey" timeline, and a "Contact" section. This structure was chosen to allow users to quickly jump to areas of interest (e.g., "Our Offerings") without scrolling through the entire report, making the information more digestible and discoverable. -->
+<!-- Visualization & Content Choices:
+- **Report Info:** Our offerings (Mentoring, Projects, etc.) -> **Goal:** Inform & Encourage exploration -> **Viz/Presentation Method:** Interactive cards. Clicking a card reveals detailed text content -> **Interaction:** Clickable cards update a central text block -> **Justification:** Prevents information overload on the main page. Creates an engaging "explore and discover" user flow. -> **Library/Method:** Vanilla JS for event listeners and state management.
+- **Report Info:** Career progress and skill development -> **Goal:** Show potential growth -> **Viz/Presentation Method:** Line Chart -> **Interaction:** None (static visualization) -> **Justification:** Visually represents the abstract concept of career growth, making the value proposition more tangible. -> **Library/Method:** Chart.js.
+- **Report Info:** The Ready4Industry Journey -> **Goal:** Show the process/flow -> **Viz/Presentation Method:** Timeline -> **Interaction:** None -> **Justification:** Organizes the a complex process into a simple, easy-to-follow visual narrative. -> **Library/Method:** Pure HTML/CSS with Tailwind classes.
+- **CRITICAL CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -156,7 +163,11 @@
         <section id="contact" class="container py-16 md:py-24 text-center">
             <h2 class="text-3xl md:text-4xl font-bold text-[#3b3a30]">Let’s Talk!</h2>
             <p class="mt-4 text-lg text-[#5c5c50] max-w-3xl mx-auto">Thank you for your time and attention! We're excited to help you on your career journey. The conversation doesn't have to stop here.</p>
-            <div class="mt-8 flex justify-center space-x-6 text-4xl">
+            <div class="flex justify-center items-center flex-col mt-8">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://wa.me/917680973409&size=150x150" alt="WhatsApp QR Code" class="w-36 h-36 rounded-lg shadow-md mb-4">
+                <p class="text-lg text-[#5c5c50] mb-6">Scan to message us on WhatsApp!</p>
+            </div>
+            <div class="flex justify-center space-x-6 text-4xl">
                 <a href="https://www.youtube.com/playlist?list=PLB-uQcK3f-l9Vz3j4n6p-3f3p5Q8p-8p" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
                     <i class="fa-brands fa-youtube"></i>
                 </a>
