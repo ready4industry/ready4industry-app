@@ -9,6 +9,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase libraries loaded via CDN for global access -->
+    <!-- The Firebase scripts have been moved here to ensure they load before your app code. -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body {
@@ -22,13 +29,13 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // The `import` statements below were causing the error.
         // We are now using a different approach that loads the libraries globally.
+        // The import statements below are not compatible with this environment.
         // import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         // import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         // import { getFirestore, collection, addDoc, onSnapshot, query, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Load Firebase libraries via CDN links for global access
+        // Access the Firebase global objects created by the CDN scripts
         const firebaseApp = window.firebase.initializeApp;
         const firebaseAuth = window.firebase.auth;
         const firestore = window.firebase.firestore;
@@ -47,7 +54,7 @@
         const db = firestore(app);
         
         // Enable debug logging for Firebase
-        db.settings({ experimentalForceLongPolling: true });
+        firestore.setLogLevel('debug');
         
         // Chart.js is imported via CDN in the HTML head.
         const Chart = window.Chart;
@@ -546,8 +553,5 @@
         
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </body>
 </html>
