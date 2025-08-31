@@ -32,6 +32,30 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 15px rgba(0,0,0,0.1);
         }
+        /* Styles for the modal */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #f7f3ed;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -164,7 +188,7 @@
             <h2 class="text-3xl md:text-4xl font-bold text-[#3b3a30]">Let’s Talk!</h2>
             <p class="mt-4 text-lg text-[#5c5c50] max-w-3xl mx-auto">Thank you for your time and attention! We're excited to help you on your career journey. The conversation doesn't have to stop here.</p>
             <div class="flex justify-center items-center flex-col mt-8">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://wa.me/917680973409?text=Hello%2C%20I%27m%20interested%20in%20Ready4Industry%27s%20services.%20Can%20you%20tell%20me%20more%20about%20your%20offerings%2C%20such%20as%20Mentoring%2C%20Real-World%20Projects%2C%20Resume%20Building%2C%20or%20Mock%20Interviews%3F&size=150x150" alt="WhatsApp QR Code" class="w-36 h-36 rounded-lg shadow-md mb-4" onclick="trackScan()">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://ready4industry.com&size=150x150" alt="WhatsApp QR Code" class="w-36 h-36 rounded-lg shadow-md mb-4" onclick="openWhatsAppModal()">
                 <p class="text-lg text-[#5c5c50] mb-6">Scan to message us on WhatsApp!</p>
             </div>
             <div class="flex justify-center space-x-6 text-4xl">
@@ -177,7 +201,7 @@
                 <a href="https://www.instagram.com/ready4industry" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
                     <i class="fa-brands fa-instagram"></i>
                 </a>
-                <a href="https://wa.me/917680973409?text=Hello%2C%20I%27m%20interested%20in%20Ready4Industry%27s%20services.%20Can%20you%20tell%20me%20more%20about%20your%20offerings%2C%20such%20as%20Mentoring%2C%20Real-World%20Projects%2C%20Resume%20Building%2C%20or%20Mock%20Interviews%3F" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300" onclick="trackScan()">
+                <a href="javascript:void(0)" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300" onclick="openWhatsAppModal()">
                     <i class="fa-brands fa-whatsapp"></i>
                 </a>
                 <a href="mailto:info@ready4industry.com" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
@@ -193,17 +217,60 @@
             <div class="bg-white p-8 rounded-lg shadow-md">
                 <ul id="scans-list" class="space-y-4 text-[#5c5c50]">
                     <!-- Scan data will be populated here by JavaScript -->
-                    <li class="text-center">No scans yet. Scan the QR code or click the WhatsApp link to see data appear here.</li>
+                    <li class="text-center">No inquiries yet. Fill out the form or click the WhatsApp link to see data appear here.</li>
                 </ul>
             </div>
         </section>
         
     </main>
 
+    <!-- WhatsApp Inquiry Modal -->
+    <div id="inquiryModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold text-[#3b3a30] mb-4 text-center">Let's Get Started!</h3>
+            <p class="text-[#5c5c50] mb-6 text-center">Please provide a few details to help us understand your needs.</p>
+            <form id="inquiryForm" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-[#5c5c50]">Your Name</label>
+                    <input type="text" id="name" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#8a8a7a] focus:ring focus:ring-[#8a8a7a] focus:ring-opacity-50 bg-white p-2">
+                </div>
+                <div>
+                    <label for="city" class="block text-sm font-medium text-[#5c5c50]">City of Residence</label>
+                    <input type="text" id="city" name="city" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#8a8a7a] focus:ring focus:ring-[#8a8a7a] focus:ring-opacity-50 bg-white p-2">
+                </div>
+                <div>
+                    <label for="status" class="block text-sm font-medium text-[#5c5c50]">Are you a student or a professional?</label>
+                    <select id="status" name="status" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#8a8a7a] focus:ring focus:ring-[#8a8a7a] focus:ring-opacity-50 bg-white p-2">
+                        <option value="">Select...</option>
+                        <option value="Student">Student</option>
+                        <option value="Professional">Professional</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="service" class="block text-sm font-medium text-[#5c5c50]">Which service are you looking for?</label>
+                    <select id="service" name="service" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#8a8a7a] focus:ring focus:ring-[#8a8a7a] focus:ring-opacity-50 bg-white p-2">
+                        <option value="">Select...</option>
+                        <option value="Mentoring">Mentoring</option>
+                        <option value="Real-World Projects">Real-World Projects</option>
+                        <option value="Resume Building">Resume Building</option>
+                        <option value="LinkedIn Profile">LinkedIn Profile</option>
+                        <option value="Mock Interviews">Mock Interviews</option>
+                        <option value="Skills Development">Skills Development</option>
+                        <option value="General Inquiry">General Inquiry</option>
+                    </select>
+                </div>
+                <div class="flex justify-center">
+                    <button type="submit" class="w-full bg-[#8a8a7a] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-[#7a7a6a] transition-colors duration-300 mt-4">Send Inquiry via WhatsApp</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // IMPORTANT: These global variables are provided by the canvas environment.
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -216,47 +283,78 @@
         const auth = getAuth(app);
         
         // This is a Firestore path for public data, allowing any authenticated user to read and write.
-        const scansCollection = collection(db, `artifacts/${appId}/public/data/scans`);
+        const inquiriesCollection = collection(db, `artifacts/${appId}/public/data/inquiries`);
 
         // Enable debug logging for Firebase services.
         setLogLevel('debug');
 
-        // Function to add a new scan document to Firestore
-        window.trackScan = async () => {
-            const scanData = {
-                timestamp: new Date(),
-                message: "Hello, I'm interested in Ready4Industry's services. Can you tell me more about your offerings, such as Mentoring, Real-World Projects, Resume Building, or Mock Interviews?",
-                scanId: Math.floor(Math.random() * 10000000)
+        // Get modal elements
+        const inquiryModal = document.getElementById('inquiryModal');
+        const inquiryForm = document.getElementById('inquiryForm');
+
+        // Function to open the modal
+        window.openWhatsAppModal = () => {
+            inquiryModal.style.display = 'flex';
+        };
+
+        // Function to handle form submission
+        inquiryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const city = document.getElementById('city').value;
+            const status = document.getElementById('status').value;
+            const service = document.getElementById('service').value;
+
+            const whatsappMessage = `Hello, I'm interested in Ready4Industry's services. My name is ${name} from ${city}. I am a ${status} and I am interested in your ${service} service. Can you please tell me more?`;
+
+            const inquiryData = {
+                name: name,
+                city: city,
+                status: status,
+                service: service,
+                timestamp: serverTimestamp(),
+                message: whatsappMessage
             };
+
             try {
                 // Ensure a user is authenticated before attempting to add a document.
                 if (auth.currentUser) {
-                    await addDoc(scansCollection, scanData);
-                    console.log("Scan data successfully added to Firestore!");
+                    await addDoc(inquiriesCollection, inquiryData);
+                    console.log("Inquiry data successfully added to Firestore!");
+                    
+                    // Construct the WhatsApp URL with the new message
+                    const whatsappUrl = `https://wa.me/917680973409?text=${encodeURIComponent(whatsappMessage)}`;
+                    window.open(whatsappUrl, '_blank');
+                    
+                    // Hide the modal after submission
+                    inquiryModal.style.display = 'none';
+
                 } else {
-                    console.error("User not authenticated. Cannot log scan data.");
+                    console.error("User not authenticated. Cannot log inquiry data.");
                 }
             } catch (e) {
                 console.error("Error adding document: ", e);
             }
-        };
+        });
 
-        // Function to listen for new scans and display them in real-time
+        // Function to listen for new inquiries and display them in real-time
         const setupRealtimeListener = () => {
             const scansList = document.getElementById('scans-list');
-            const q = query(scansCollection);
+            const q = query(inquiriesCollection);
             
             // onSnapshot will automatically handle permissions after a user is authenticated
             onSnapshot(q, (snapshot) => {
                 scansList.innerHTML = '';
                 if (snapshot.empty) {
-                    scansList.innerHTML = '<li class="text-center">No scans yet. Scan the QR code or click the WhatsApp link to see data appear here.</li>';
+                    scansList.innerHTML = '<li class="text-center">No inquiries yet. Fill out the form or click the WhatsApp link to see data appear here.</li>';
                 } else {
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         const li = document.createElement('li');
                         li.className = 'p-4 bg-[#f7f3ed] rounded-lg shadow-sm';
-                        li.textContent = `Scan ID: ${data.scanId} | Message: ${data.message} | Timestamp: ${data.timestamp.toDate()}`;
+                        const timestampText = data.timestamp ? data.timestamp.toDate().toLocaleString() : 'N/A';
+                        li.textContent = `Name: ${data.name} | City: ${data.city} | Status: ${data.status} | Service: ${data.service} | Timestamp: ${timestampText}`;
                         scansList.appendChild(li);
                     });
                 }
@@ -392,3 +490,4 @@
     </script>
 </body>
 </html>
+
