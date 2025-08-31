@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ready4Industry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f3ed;
+            color: #3b3a30;
+        }
+        .container {
+            max-width: 96rem;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        .offer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sticky top-0 z-50 bg-[#e4dfd7] bg-opacity-90 backdrop-blur-sm shadow-md py-4 transition-all duration-300">
+        <div class="container flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold text-[#5c5c50] tracking-tight">Ready4Industry</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#mission" class="text-[#5c5c50] hover:text-[#7f7f70] transition-colors duration-300">Our Mission</a>
+                <a href="#offerings" class="text-[#5c5c50] hover:text-[#7f7f70] transition-colors duration-300">Our Offerings</a>
+                <a href="#journey" class="text-[#5c5c50] hover:text-[#7f7f70] transition-colors duration-300">The Journey</a>
+                <a href="#contact" class="text-[#5c5c50] hover:text-[#7f7f70] transition-colors duration-300">Contact</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-[#5c5c50] focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-[#e4dfd7] py-2 transition-all duration-300">
+            <a href="#mission" class="block py-2 px-4 text-[#5c5c50] hover:bg-[#d6d0c6]">Our Mission</a>
+            <a href="#offerings" class="block py-2 px-4 text-[#5c5c50] hover:bg-[#d6d0c6]">Our Offerings</a>
+            <a href="#journey" class="block py-2 px-4 text-[#5c5c50] hover:bg-[#d6d0c6]">The Journey</a>
+            <a href="#contact" class="block py-2 px-4 text-[#5c5c50] hover:bg-[#d6d0c6]">Contact</a>
+        </div>
+    </nav>
+
+    <main class="py-16">
+
+        <section id="home" class="container text-center py-24 md:py-32">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-[#3b3a30] tracking-tight">Beyond the Degree: Launch Your Engineering Career</h1>
+            <p class="mt-6 text-lg md:text-xl text-[#5c5c50] max-w-3xl mx-auto">Are you ready to turn your engineering degree into your dream job? We are here to give you the unfair advantage in the job market.</p>
+            <a href="#offerings" class="mt-10 inline-block bg-[#8a8a7a] text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-[#7a7a6a] transition-colors duration-300">Explore Our Offerings</a>
+        </section>
+
+        <section id="mission" class="container py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-[#3b3a30]">Our Mission: Your Partner in Success</h2>
+            <div class="mt-12 grid md:grid-cols-2 gap-12 items-center">
+                <div class="text-lg text-[#5c5c50]">
+                    <p class="leading-relaxed mb-4">We get it. It's tough out there. Have you ever felt lost, unsure what companies are looking for? Have you worried that your resume isn't good enough? Do you feel like you don't have enough "real-world" experience? This is where we come in. We are **Ready4Industry**.</p>
+                    <p class="leading-relaxed mb-4">With 21 years of experience in the IT world, working with tech giants like IBM, PwC, Wipro, Kyndryl, and Tech Mahindra, we've attended countless campus interviews and conducted uncountable interviews for freshers. This means we know your pain points.</p>
+                    <p class="leading-relaxed">We're not here to repeat what you already know from your textbooks. We're here to help you apply the concepts you've learned, like **Data Structures, Object-Oriented Programming, and Database Management Systems,** to real-world problems. We bridge the gap by providing the tools, experience, and guidance you need to land your first job. We're not just a service; we're your partner in building a strong foundation for your career.</p>
+                </div>
+                <div>
+                    <div class="h-64 bg-[#e4dfd7] rounded-lg flex items-center justify-center p-4">
+                        <span class="text-4xl text-[#8a8a7a]">🌱</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="offerings" class="container py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-[#3b3a30]">Our Offerings: It's All About You</h2>
+            <p class="mt-4 text-lg text-center text-[#5c5c50] max-w-3xl mx-auto">Explore how we help you succeed. Click on any offering below to learn more about how we can help you build the skills and confidence you need to land your dream job.</p>
+
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="mentoring" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
+                    <h3 class="text-xl font-semibold text-[#3b3a30]">Mentoring</h3>
+                    <p class="mt-2 text-[#5c5c50]">Find Your Dream Job Role.</p>
+                </div>
+                <div id="projects" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
+                    <h3 class="text-xl font-semibold text-[#3b3a30]">Real-World Projects</h3>
+                    <p class="mt-2 text-[#5c5c50]">Build a Portfolio That Gets Noticed.</p>
+                </div>
+                <div id="resume" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
+                    <h3 class="text-xl font-semibold text-[#3b3a30]">Resume Building</h3>
+                    <p class="mt-2 text-[#5c5c50]">Craft a Killer Resume.</p>
+                </div>
+                <div id="linkedin" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
+                    <h3 class="text-xl font-semibold text-[#3b3a30]">LinkedIn Profile</h3>
+                    <p class="mt-2 text-[#5c5c50]">Your Professional Brand on LinkedIn.</p>
+                </div>
+                <div id="mock_interviews" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
+                    <h3 class="text-xl font-semibold text-[#3b3a30]">Mock Interviews</h3>
+                    <p class="mt-2 text-[#5c5c50]">Ace Your Interview, Every Time.</p>
+                </div>
+                <div id="skills" class="offer-card cursor-pointer bg-white p-6 rounded-lg shadow-sm transition-all duration-300 hover:shadow-lg">
+                    <h3 class="text-xl font-semibold text-[#3b3a30]">Skills Development</h3>
+                    <p class="mt-2 text-[#5c5c50]">Master In-Demand Technical & Soft Skills.</p>
+                </div>
+            </div>
+
+            <div id="offer-details" class="mt-12 p-8 bg-[#e4dfd7] rounded-lg shadow-md hidden">
+                <h3 id="offer-title" class="text-2xl font-bold text-[#3b3a30] mb-4"></h3>
+                <p id="offer-content" class="text-[#5c5c50] leading-relaxed"></p>
+                <div class="mt-8 chart-container">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="journey" class="container py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-[#3b3a30]">The Ready4Industry Journey</h2>
+            <div class="mt-12 relative flex justify-center">
+                <div class="absolute inset-0 flex justify-center">
+                    <div class="w-1 bg-[#8a8a7a] rounded-full"></div>
+                </div>
+                <div class="relative z-10 w-full max-w-2xl">
+                    <div class="flex items-center mb-16 relative">
+                        <div class="flex-shrink-0 w-12 h-12 bg-[#8a8a7a] rounded-full flex items-center justify-center text-white font-bold text-xl">1</div>
+                        <div class="ml-6 p-4 bg-white rounded-lg shadow-md flex-grow">
+                            <h4 class="font-semibold text-[#3b3a30]">Mentoring & Skills Development</h4>
+                            <p class="text-sm text-[#5c5c50] mt-1">We start with personalized guidance and mastering in-demand topics.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center mb-16 relative md:flex-row-reverse">
+                        <div class="flex-shrink-0 w-12 h-12 bg-[#8a8a7a] rounded-full flex items-center justify-center text-white font-bold text-xl">2</div>
+                        <div class="mr-6 p-4 bg-white rounded-lg shadow-md flex-grow">
+                            <h4 class="font-semibold text-[#3b3a30]">Project-Based Learning</h4>
+                            <p class="text-sm text-[#5c5c50] mt-1">Move to real-world projects to build your portfolio.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center mb-16 relative">
+                        <div class="flex-shrink-0 w-12 h-12 bg-[#8a8a7a] rounded-full flex items-center justify-center text-white font-bold text-xl">3</div>
+                        <div class="ml-6 p-4 bg-white rounded-lg shadow-md flex-grow">
+                            <h4 class="font-semibold text-[#3b3a30]">Resume & LinkedIn Updates</h4>
+                            <p class="text-sm text-[#5c5c50] mt-1">Craft your professional brand to attract opportunities.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center relative md:flex-row-reverse">
+                        <div class="flex-shrink-0 w-12 h-12 bg-[#8a8a7a] rounded-full flex items-center justify-center text-white font-bold text-xl">4</div>
+                        <div class="mr-6 p-4 bg-white rounded-lg shadow-md flex-grow">
+                            <h4 class="font-semibold text-[#3b3a30]">Mock Interviews</h4>
+                            <p class="text-sm text-[#5c5c50] mt-1">Prepare for success and ace your interviews with confidence.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="container py-16 md:py-24 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-[#3b3a30]">Let’s Talk!</h2>
+            <p class="mt-4 text-lg text-[#5c5c50] max-w-3xl mx-auto">Thank you for your time and attention! We're excited to help you on your career journey. The conversation doesn't have to stop here.</p>
+            <div class="mt-8 flex justify-center space-x-6 text-4xl">
+                <a href="#" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
+                    <span class="inline-block" style="font-size: 2rem;">▶️</span>
+                </a>
+                <a href="#" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
+                    <span class="inline-block" style="font-size: 2rem;">👍</span>
+                </a>
+                <a href="#" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
+                    <span class="inline-block" style="font-size: 2rem;">📷</span>
+                </a>
+                <a href="#" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
+                    <span class="inline-block" style="font-size: 2rem;">💬</span>
+                </a>
+                <a href="#" class="text-[#5c5c50] hover:text-[#3b3a30] transition-colors duration-300">
+                    <span class="inline-block" style="font-size: 2rem;">✉️</span>
+                </a>
+            </div>
+            <p class="mt-4 text-xl font-semibold text-[#3b3a30]">Find us on all channels with the handle @ready4industry.</p>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const offerCards = document.querySelectorAll('.offer-card');
+            const offerDetails = document.getElementById('offer-details');
+            const offerTitle = document.getElementById('offer-title');
+            const offerContent = document.getElementById('offer-content');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const offeringsData = {
+                mentoring: {
+                    title: "Mentoring: Find Your Dream Job Role",
+                    content: "Think of this as personalized career navigation. We pair you with industry experts who have been in your shoes. They’ll help you define your career goals and create a clear roadmap to get there. This isn't about general advice; it's about specific, actionable steps for you."
+                },
+                projects: {
+                    title: "Real-World Projects: Build a Portfolio That Gets Noticed",
+                    content: "Companies don't just want to see your grades; they want to see what you can do. We give you the opportunity to work on projects that solve real-world industry problems. Imagine building a cloud application on AWS or creating a data dashboard with Power BI! This hands-on experience is what will set you apart from other applicants."
+                },
+                resume: {
+                    title: "Resume Building: Craft a Killer Resume",
+                    content: "Your resume is your first impression. We go beyond basic formatting to help you create a powerful document that highlights your skills, projects, and potential. Learn how to use keywords that get past automated screening systems and catch the eye of recruiters."
+                },
+                linkedin: {
+                    title: "LinkedIn Profile: Your Professional Brand on LinkedIn",
+                    content: "In today's world, your LinkedIn profile is as important as your resume. We'll guide you on how to optimize your profile to attract opportunities. Learn the secrets to networking and building a strong online brand that gets you noticed."
+                },
+                mock_interviews: {
+                    title: "Mock Interviews: Ace Your Interview, Every Time",
+                    content: "Interviews can be nerve-wracking. We'll help you prepare. Practice in a safe environment with constructive feedback from professionals. Learn how to answer tough technical questions and behavioral questions with confidence."
+                },
+                skills: {
+                    title: "Skills Development: Master In-Demand Technical & Soft Skills",
+                    content: "We'll help you dive into hot topics like Cloud Computing, AWS, Power BI, and the many use cases of AI. Whether you're a top student looking to specialize or you need a little push to get started, we'll give you the guidance to become a top-tier candidate. Soft Skills: Communication, teamwork, problem-solving—these are just as important as your technical abilities. We'll show you how to hone them. This is about making you a well-rounded and highly valuable candidate."
+                }
+            };
+
+            offerCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const id = card.id;
+                    const data = offeringsData[id];
+
+                    if (data) {
+                        offerTitle.textContent = data.title;
+                        offerContent.textContent = data.content;
+                        offerDetails.classList.remove('hidden');
+                        
+                        document.querySelectorAll('.offer-card').forEach(c => c.classList.remove('ring-2', 'ring-[#8a8a7a]'));
+                        card.classList.add('ring-2', 'ring-[#8a8a7a]');
+
+                        const chartContainer = document.querySelector('.chart-container');
+                        chartContainer.style.display = id === 'skills' || id === 'mentoring' ? 'block' : 'none';
+
+                        if (id === 'skills' || id === 'mentoring') {
+                            const ctx = document.getElementById('growthChart').getContext('2d');
+                            new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: ['Week 1', 'Week 4', 'Week 8', 'Week 12'],
+                                    datasets: [{
+                                        label: 'Student Growth Score',
+                                        data: [30, 60, 85, 95],
+                                        borderColor: '#8a8a7a',
+                                        tension: 0.4,
+                                        fill: false,
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 100
+                                        }
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            callbacks: {
+                                                title: function(context) {
+                                                    const label = context[0].label || '';
+                                                    return 'Progress over ' + label.split(' ')[1];
+                                                },
+                                                label: function(context) {
+                                                    const value = context.parsed.y;
+                                                    return 'Growth Score: ' + value + '%';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    offerDetails.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
