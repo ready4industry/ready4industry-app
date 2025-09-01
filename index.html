@@ -337,18 +337,29 @@
 </section>
 
 <!-- YouTube Promo Marquee -->
-<section class="bg-slate-900 text-white py-4 overflow-hidden relative">
-  <div class="whitespace-nowrap flex animate-marquee text-lg font-semibold tracking-wide">
+<!-- YouTube Promo Marquee (Zig-Zag) -->
+<section class="bg-slate-900 text-white py-6 overflow-hidden relative space-y-4">
+
+  <!-- Row 1 (left to right) -->
+  <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">AWS Series</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Classroom to Career</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cloud Computing</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Azure Series</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">GCP Series</a>
+  </div>
+
+  <!-- Row 2 (right to left) -->
+  <div class="whitespace-nowrap flex animate-marquee-right text-lg font-semibold tracking-wide">
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power BI</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power Automate</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">DevOps</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cybersecurity</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">ITIL</a>
+  </div>
+
+  <!-- Row 3 (left to right) -->
+  <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Project Management</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Agile</a>
     <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">All About AI</a>
@@ -357,16 +368,24 @@
   </div>
 </section>
 
-<!-- Tailwind Custom Animation -->
+<!-- Tailwind Custom Animations -->
 <style>
-@keyframes marquee {
+@keyframes marquee-left {
   0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
-.animate-marquee {
-  animation: marquee 40s linear infinite;
+@keyframes marquee-right {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.animate-marquee-left {
+  animation: marquee-left 35s linear infinite;
+}
+.animate-marquee-right {
+  animation: marquee-right 35s linear infinite;
 }
 </style>
+
 
 <!-- Footer -->
 <footer class="bg-slate-900 text-slate-400 py-8 text-center">
@@ -375,6 +394,7 @@
   </div>
 </footer>
 </body> </html>
+
 
 
 
