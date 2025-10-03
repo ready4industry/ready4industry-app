@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ready4Industry: A Premier Web Presence</title>
-    <!-- Use Tailwind CSS for easy, modern styling. -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" xintegrity="sha512-z3gLPD7yF4gB8WwL7S4Tz4WpG8w4vF2M/4jD/6z9+1gL8M8T7B1g3J5jG2x9z3N8w5t+7b9+6B2fG+6C9d6G+8Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLPD7yF4gB8WwL7S4Tz4WpG8wL7S4Tz4WpG8w4vF2M/4jD/6z9+1gL8M8T7B1g3J5jG2x9z3N8w5t+7b9+6B2fG+6C9d6G+8Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -32,18 +34,31 @@
             transform: translateY(-8px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
+        @keyframes marquee-left {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes marquee-right {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .animate-marquee-left {
+            animation: marquee-left 35s linear infinite;
+        }
+        .animate-marquee-right {
+            animation: marquee-right 35s linear infinite;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
-    <!-- Header with smooth transition -->
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 transition-all duration-300">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="flex items-center space-x-3">
-  <img src="logo.png" alt="Ready4Industry Logo" class="h-10 w-auto bg-white rounded p-1">
-  <span class="text-3xl font-extrabold text-emerald-400 tracking-tight transition-colors hover:text-teal-600">
-    Ready4Industry
-  </span>
-</a>
+                <img src="logo.png" alt="Ready4Industry Logo" class="h-10 w-auto bg-white rounded p-1">
+                <span class="text-3xl font-extrabold text-emerald-400 tracking-tight transition-colors hover:text-teal-600">
+                    Ready4Industry
+                </span>
+            </a>
             <nav class="space-x-6 text-sm font-medium hidden md:block">
                 <a href="#mission" class="text-white hover:text-teal-400 transition-colors">Our Mission</a>
                 <a href="#offerings" class="text-white hover:text-teal-400 transition-colors">Offerings</a>
@@ -55,7 +70,6 @@
     </header>
 
     <main>
-        <!-- Hero Section: Welcome -->
         <section id="welcome" class="relative py-24 md:py-32 px-6 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
             <div class="absolute inset-0 bg-slate-900/60"></div>
             <div class="container mx-auto text-center relative z-10">
@@ -71,7 +85,6 @@
             </div>
         </section>
 
-        <!-- The Challenge Section -->
         <section id="challenge" class="py-20 px-6">
             <div class="container mx-auto text-center">
                 <h2 class="text-4xl font-extrabold text-slate-900">The Gap Between Campus and Career</h2>
@@ -95,7 +108,6 @@
             </div>
         </section>
 
-        <!-- Our Mission Section -->
         <section id="mission" class="bg-white py-20 px-6">
             <div class="container mx-auto grid md:grid-cols-2 gap-16 items-center">
                 <div>
@@ -113,7 +125,6 @@
             </div>
         </section>
         
-        <!-- Our Offerings Section -->
         <section id="offerings" class="py-20 px-6 bg-slate-100">
             <div class="container mx-auto text-center">
                 <h2 class="text-4xl font-extrabold text-slate-900">Our Offerings</h2>
@@ -121,49 +132,41 @@
                     We offer flexible and focused guidance tailored to your specific needs.
                 </p>
                 <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Personalized 1-on-1 Mentorship -->
                     <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
                         <i class="fas fa-user-friends text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">Personalized 1-on-1 Mentorship</h3>
                         <p class="text-slate-600">Get a personalized roadmap to your dream job. We pair you with an industry expert for private sessions to define your goals and develop a clear career path.</p>
                     </div>
-                    <!-- Collaborative Group Coaching -->
                     <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
                         <i class="fas fa-users text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">Collaborative Group Coaching</h3>
                         <p class="text-slate-600">Learn and grow with your peers. Our small-group coaching sessions provide a supportive environment for collaborative learning and shared insights from professionals.</p>
                     </div>
-                    <!-- On-Campus Workshops -->
                     <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
                         <i class="fas fa-university text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">On-Campus Workshops</h3>
                         <p class="text-slate-600">Bring the future to your campus. We can run an intensive, two-week workshop right at your college, giving students a hands-on, immersive learning experience.</p>
                     </div>
-                    <!-- Real-World Projects -->
                     <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
                         <i class="fas fa-code-branch text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">Real-World Projects</h3>
                         <p class="text-slate-600">Build a portfolio that gets noticed. Work on projects that solve real industry problems with technologies like AWS and Power BI.</p>
                     </div>
-                    <!-- Resume Building -->
                     <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
                         <i class="fas fa-file-alt text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">Resume Building</h3>
                         <p class="text-slate-600">Craft a killer resume that uses keywords to get past automated screening systems and catches the eye of recruiters.</p>
                     </div>
-                    <!-- LinkedIn Profile -->
                     <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
                         <i class="fab fa-linkedin text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">LinkedIn Profile</h3>
                         <p class="text-slate-600">Build your professional brand. Learn how to optimize your profile to attract opportunities and master the secrets of networking.</p>
                     </div>
-                    <!-- Mock Interviews -->
                     <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
                         <i class="fas fa-user-tie text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">Mock Interviews</h3>
                         <p class="text-slate-600">Ace your interview, every time. Practice in a safe environment and learn to answer tough technical and behavioral questions with confidence.</p>
                     </div>
-                    <!-- Skills Development -->
                     <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
                         <i class="fas fa-lightbulb text-5xl text-teal-600"></i>
                         <h3 class="text-2xl font-bold text-slate-900">Skills Development</h3>
@@ -173,7 +176,6 @@
             </div>
         </section>
 
-        <!-- Pricing Section -->
         <section id="pricing" class="py-20 px-6 bg-slate-900 text-white">
             <div class="container mx-auto text-center">
                 <h2 class="text-4xl font-extrabold text-emerald-400">Choose Your Path to Success</h2>
@@ -181,80 +183,76 @@
                     Select the plan that best fits your career goals and get started with our expert guidance.
                 </p>
                 <div class="mt-12 grid md:grid-cols-3 gap-8 items-stretch">
-                    <!-- Bronze Plan -->
-                   <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-slate-400">
-    <h3 class="text-3xl font-bold text-slate-900">Bronze</h3>
-    <p class="mt-2 text-xl font-semibold text-teal-600">Foundational Skills</p>
-    <p class="mt-4 text-sm text-slate-500">
-        The perfect start for building your professional brand.
-    </p>
-    <div class="mt-8 flex flex-col items-center flex-grow">
-        <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdG6f1yT19g3rkq0JJyES_hNvWuqNk-iYBJ6ge09vb3MhBrPQ/viewform?usp=header" 
-           target="_blank" rel="noopener noreferrer" 
-           class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
-           Open Registration Form
-        </a>
-    </div>
-    <ul class="mt-6 text-left space-y-3 w-full">
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Resume Building</span></li>
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>LinkedIn Profile</span></li>
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Core Skills Development</span></li>
-    </ul>
-</div>
-                    <!-- Silver Plan -->
+                    
+                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-slate-400">
+                        <h3 class="text-3xl font-bold text-slate-900">Bronze</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">Foundational Skills</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            The perfect start for building your professional brand.
+                        </p>
+                        <div class="mt-8 flex flex-col items-center flex-grow">
+                            <p class="text-xl font-semibold text-slate-900 mb-4">Start with a FREE Assessment</p>
+                            <button onclick="openRegistration('Bronze Foundational Skills Check', 0, false)"
+                                class="mt-4 text-white bg-green-600 hover:bg-green-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
+                                Start FREE Registration
+                            </button>
+                        </div>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Resume Building</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>LinkedIn Profile</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Core Skills Development</span></li>
+                        </ul>
+                    </div>
+
                     <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-teal-600">
-    <h3 class="text-3xl font-bold text-slate-900">Silver</h3>
-    <p class="mt-2 text-xl font-semibold text-teal-600">Interview Ready</p>
-    <p class="mt-4 text-sm text-slate-500">
-        Build on the basics with practical experience and interview preparation.
-    </p>
-    <div class="mt-8 flex flex-col items-center flex-grow">
-        <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSejh1vS9QtzgSlrwUxh0l-q8V-3kcLU40AICBp6tAzpH9optQ/viewform?usp=header" 
-           target="_blank" rel="noopener noreferrer" 
-           class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
-           Open Registration Form
-        </a>
-    </div>
-    <ul class="mt-6 text-left space-y-3 w-full">
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Everything in Bronze</span></li>
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Collaborative Group Coaching</span></li>
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Skills Development & Workshops</span></li>
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Mock Interviews</span></li>
-    </ul>
-</div>
+                        <h3 class="text-3xl font-bold text-slate-900">Silver</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">Interview Ready</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            Build on the basics with practical experience and interview preparation.
+                        </p>
+                        <div class="mt-8 flex flex-col items-center flex-grow">
+                            <p class="text-xl font-semibold text-slate-900 mb-4">Register & Access Paid Assessment</p>
+                            <button onclick="openRegistration('Silver Interview Ready Assessment', 100, true)"
+                                class="mt-4 text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
+                                Register & Pay ₹100
+                            </button>
+                        </div>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Everything in Bronze</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Collaborative Group Coaching</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Skills Development & Workshops</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Mock Interviews</span></li>
+                        </ul>
+                    </div>
 
-                    <!-- Gold Plan -->
-                   <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-amber-500">
-    <h3 class="text-3xl font-bold text-slate-900">Gold</h3>
-    <p class="mt-2 text-xl font-semibold text-teal-600">The Complete Package</p>
-    <p class="mt-4 text-sm text-slate-500">
-        Get the ultimate career launch with personalized and project-based learning.
-    </p>
-    <div class="mt-8 flex flex-col items-center flex-grow">
-        <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdhwSx6WOBO0QaoGVrnq7PBJB-Z7Z7mLs7w3XUinCTs_-5brA/viewform?usp=header" 
-           target="_blank" rel="noopener noreferrer" 
-           class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
-           Open Registration Form
-        </a>
-    </div>
-    <ul class="mt-6 text-left space-y-3 w-full">
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Everything in Silver</span></li>
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Personalized 1-on-1 Mentorship</span></li>
-        <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Real-World Projects</span></li>
-    </ul>
-</div>
+                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-amber-500">
+                        <h3 class="text-3xl font-bold text-slate-900">Gold</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">The Complete Package</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            Get the ultimate career launch with personalized and project-based learning.
+                        </p>
+                        <div class="mt-8 flex flex-col items-center flex-grow">
+                            <p class="text-xl font-semibold text-slate-900 mb-4">Register & Access Premium Assessment</p>
+                            <button onclick="openRegistration('Gold Premium Mentorship Assessment', 200, true)"
+                                class="mt-4 text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
+                                Register & Pay ₹200
+                            </button>
+                        </div>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Everything in Silver</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Personalized 1-on-1 Mentorship</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Real-World Projects</span></li>
+                        </ul>
+                    </div>
 
+                </div>
+            </div>
         </section>
 
-        <!-- The Journey Section -->
         <section id="journey" class="py-20 px-6">
             <div class="container mx-auto text-center">
                 <h2 class="text-4xl font-extrabold text-slate-900">The Ready4Industry Journey</h2>
                 <div class="mt-12 relative flex flex-col items-center">
-                    <!-- Journey Step 1 -->
                     <div class="flex items-center space-x-6 md:space-x-12 mb-12">
                         <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">1</div>
                         <div class="text-left">
@@ -264,7 +262,6 @@
                     </div>
                     <div class="w-1 bg-teal-300 h-20"></div>
 
-                    <!-- Journey Step 2 -->
                     <div class="flex items-center space-x-6 md:space-x-12 mb-12">
                         <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">2</div>
                         <div class="text-left">
@@ -274,7 +271,6 @@
                     </div>
                     <div class="w-1 bg-teal-300 h-20"></div>
                     
-                    <!-- Journey Step 3 -->
                     <div class="flex items-center space-x-6 md:space-x-12 mb-12">
                         <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">3</div>
                         <div class="text-left">
@@ -284,7 +280,6 @@
                     </div>
                     <div class="w-1 bg-teal-300 h-20"></div>
                     
-                    <!-- Journey Step 4 -->
                     <div class="flex items-center space-x-6 md:space-x-12">
                         <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">4</div>
                         <div class="text-left">
@@ -296,127 +291,237 @@
             </div>
         </section>
 
-        <!-- Call to Action Section -->
-                    <!-- Call to Action Section -->
-<section id="get-started" class="bg-slate-900 text-white py-20 px-6 text-center">
-  <h2 class="text-4xl font-extrabold text-emerald-400">Your Future Starts Today</h2>
-  <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">
-    What's the first step? Let's connect and get you started on your career journey.
-  </p>
-  <div class="mt-12 flex flex-col md:flex-row items-center justify-center">
-    <!-- QR code -->
-    <a href="https://wa.me/919160131770?text=Hello%20Ready4Industry!" class="block">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://wa.me/919160131770?text=Hello%20Ready4Industry!&size=150x150"
-           alt="QR code to our WhatsApp chat" 
-           class="w-40 h-40 rounded-lg shadow-md mb-2 mx-auto">
-      <p class="text-sm text-slate-400">Scan to connect with us on WhatsApp</p>
-    </a>
-    
-    <!-- Text link -->
-    <div class="mt-6 md:mt-0 md:ml-8 text-center md:text-left">
-      <p class="text-lg font-bold text-white">Prefer to click?</p>
-      <a href="https://wa.me/919160131770?text=Hello!%20I'm%20interested%20in%20personalized%20guidance%20from%20Ready4Industry..."
-         class="mt-2 text-teal-400 font-medium hover:text-teal-300 transition-colors duration-300">
-        Click here to send a detailed message
-      </a>
-    </div>
-  </div>
-</section>
+        <section id="get-started" class="bg-slate-900 text-white py-20 px-6 text-center">
+            <h2 class="text-4xl font-extrabold text-emerald-400">Your Future Starts Today</h2>
+            <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">
+                What's the first step? Let's connect and get you started on your career journey.
+            </p>
+            <div class="mt-12 flex flex-col md:flex-row items-center justify-center">
+                <a href="https://wa.me/919160131770?text=Hello%20Ready4Industry!" class="block">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://wa.me/919160131770?text=Hello%20Ready4Industry!&size=150x150"
+                        alt="QR code to our WhatsApp chat" 
+                        class="w-40 h-40 rounded-lg shadow-md mb-2 mx-auto">
+                    <p class="text-sm text-slate-400">Scan to connect with us on WhatsApp</p>
+                </a>
+                
+                <div class="mt-6 md:mt-0 md:ml-8 text-center md:text-left">
+                    <p class="text-lg font-bold text-white">Prefer to click?</p>
+                    <a href="https://wa.me/919160131770?text=Hello!%20I'm%20interested%20in%20personalized%20guidance%20from%20Ready4Industry..."
+                        class="mt-2 text-teal-400 font-medium hover:text-teal-300 transition-colors duration-300">
+                        Click here to send a detailed message
+                    </a>
+                </div>
+            </div>
+        </section>
 
-<!-- Contact Section -->
-<section id="contact" class="py-20 px-6">
-  <div class="container mx-auto text-center">
-    <h2 class="text-4xl font-extrabold text-slate-900">Let's Talk!</h2>
-    <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
-      Thank you for your time and attention. We're excited to help you on your career journey. The conversation doesn't have to stop here.
-    </p>
-    <div class="mt-8 flex justify-center space-x-6 text-4xl">
-      <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="text-red-600 hover:text-red-800"><i class="fab fa-youtube"></i></a>
-      <a href="https://www.facebook.com/profile.php?id=61579121846664" target="_blank" class="text-blue-600 hover:text-blue-800">
-  <i class="fab fa-facebook"></i>
-</a>
- <!-- X (Twitter) -->
-      <a href="https://x.com/ready4industry" target="_blank" class="text-black hover:text-gray-700">
-  <i class="fa-brands fa-x-twitter"></i>
-</a>
-      <a href="https://www.instagram.com/ready4industry" target="_blank" class="text-pink-600 hover:text-pink-800"><i class="fab fa-instagram"></i></a>
-      <a href="mailto:ready4industry@gmail.com" class="text-red-600 hover:text-red-800"><i class="fas fa-envelope"></i></a>
-    </div>
-  </div>
-</section>
+        <section id="contact" class="py-20 px-6">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-extrabold text-slate-900">Let's Talk!</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+                    Thank you for your time and attention. We're excited to help you on your career journey. The conversation doesn't have to stop here.
+                </p>
+                <div class="mt-8 flex justify-center space-x-6 text-4xl">
+                    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="text-red-600 hover:text-red-800"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=61579121846664" target="_blank" class="text-blue-600 hover:text-blue-800">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="https://x.com/ready4industry" target="_blank" class="text-black hover:text-gray-700">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="https://www.instagram.com/ready4industry" target="_blank" class="text-pink-600 hover:text-pink-800"><i class="fab fa-instagram"></i></a>
+                    <a href="mailto:ready4industry@gmail.com" class="text-red-600 hover:text-red-800"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </section>
 
-<!-- YouTube Promo Marquee -->
-<!-- YouTube Promo Marquee (Zig-Zag) -->
-<section class="bg-slate-900 text-white py-6 overflow-hidden relative space-y-4">
+        <section class="bg-slate-900 text-white py-6 overflow-hidden relative space-y-4">
+            <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">AWS Series</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Classroom to Career</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cloud Computing</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Azure Series</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">GCP Series</a>
+            </div>
 
-  <!-- Row 1 (left to right) -->
-  <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">AWS Series</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Classroom to Career</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cloud Computing</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Azure Series</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">GCP Series</a>
-  </div>
+            <div class="whitespace-nowrap flex animate-marquee-right text-lg font-semibold tracking-wide">
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power BI</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power Automate</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">DevOps</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cybersecurity</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">ITIL</a>
+            </div>
 
-  <!-- Row 2 (right to left) -->
-  <div class="whitespace-nowrap flex animate-marquee-right text-lg font-semibold tracking-wide">
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power BI</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power Automate</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">DevOps</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cybersecurity</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">ITIL</a>
-  </div>
-
-  <!-- Row 3 (left to right) -->
-  <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Project Management</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Agile</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">All About AI</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">FinOps</a>
-    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Oracle Cloud</a>
-  </div>
-</section>
-
-<!-- Tailwind Custom Animations -->
-<style>
-@keyframes marquee-left {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-@keyframes marquee-right {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-.animate-marquee-left {
-  animation: marquee-left 35s linear infinite;
-}
-.animate-marquee-right {
-  animation: marquee-right 35s linear infinite;
-}
-</style>
+            <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Project Management</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Agile</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">All About AI</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">FinOps</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Oracle Cloud</a>
+            </div>
+        </section>
 
 
-<!-- Footer -->
-<footer class="bg-slate-900 text-slate-400 py-8 text-center">
-  <div class="container mx-auto px-6">
-    <p class="text-sm">&copy; 2025 Ready4Industry. All rights reserved.</p>
-  </div>
-</footer>
-</body> </html>
+        <div id="registrationModal" class="fixed inset-0 bg-slate-900 bg-opacity-75 z-[100] hidden flex items-center justify-center p-4 transition-opacity duration-300">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative transform transition-transform duration-300 scale-95" role="dialog" aria-modal="true">
+                <button onclick="closeRegistration()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+                
+                <h3 class="text-3xl font-bold text-slate-900 mb-2">Register for Assessment</h3>
+                
+                <div id="assessmentInfo" class="text-lg font-semibold text-teal-600 mt-4 mb-4"></div>
+                <div id="paymentInfo" class="text-sm text-slate-600 mb-6"></div>
+
+                <form id="registrationForm" onsubmit="handleRegistration(event)">
+                    
+                    <input type="hidden" id="examName" name="examName">
+                    <input type="hidden" id="examCost" name="examCost">
+                    <input type="hidden" id="displayCost" name="displayCost">
+
+                    <div class="mb-4">
+                        <label for="fullName" class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                        <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+                    </div>
+                    
+                    <div id="paymentGatewayPlaceholder" class="mb-6 hidden">
+                        <div class="p-4 bg-yellow-50 border border-yellow-300 rounded-lg text-sm text-yellow-800 flex items-start space-x-2">
+                            <i class="fas fa-credit-card text-lg mt-1"></i>
+                            <p>You will be redirected to a secure payment gateway (e.g., Razorpay/Stripe) to complete your transaction of ₹<span id="costDisplay"></span>.</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="registerButton" class="w-full px-4 py-3 bg-teal-600 text-white font-bold rounded-lg shadow-md hover:bg-teal-700 transition-colors duration-300 flex items-center justify-center">
+                        <i class="fas fa-arrow-right mr-2"></i> Register & Proceed
+                    </button>
+                </form>
+                <p class="mt-4 text-center text-xs text-slate-400">Your details are safe and secured by Supabase and RLS.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center">
+        <div class="container mx-auto px-6">
+            <p class="text-sm">&copy; 2025 Ready4Industry. All rights reserved.</p>
+        </div>
+    </footer>
 
 
+    <script>
+        // ✅ 1. SUPABASE CLIENT INITIALIZATION ✅
+        const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8'; 
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ✅ 2. DOM ELEMENT REFERENCES ✅
+        const modal = document.getElementById('registrationModal');
+        const assessmentInfo = document.getElementById('assessmentInfo');
+        const paymentInfo = document.getElementById('paymentInfo');
+        const examNameInput = document.getElementById('examName');
+        const examCostInput = document.getElementById('examCost');
+        const paymentGatewayPlaceholder = document.getElementById('paymentGatewayPlaceholder');
+        const costDisplay = document.getElementById('costDisplay');
+        const registerButton = document.getElementById('registerButton');
+        const registrationForm = document.getElementById('registrationForm');
 
 
+        // ✅ 3. MODAL CONTROL FUNCTIONS ✅
+        function openRegistration(name, cost, isPaid) {
+            // Set values to hidden inputs
+            examNameInput.value = name;
+            examCostInput.value = cost;
+            
+            assessmentInfo.textContent = `Assessment Selected: ${name}`;
+            
+            // Dynamic UI based on payment status
+            if (isPaid) {
+                paymentInfo.innerHTML = `This is a **Paid Assessment**. Fee: <span class="text-red-600 font-bold">₹${cost}</span>.`;
+                costDisplay.textContent = cost; // Sets cost in the placeholder alert
+                paymentGatewayPlaceholder.classList.remove('hidden');
+                
+                // Adjust button style for paid assessment
+                registerButton.textContent = `Pay ₹${cost} & Proceed`;
+                registerButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+                registerButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            } else {
+                paymentInfo.innerHTML = 'This assessment is **100% Free**. No payment required.';
+                paymentGatewayPlaceholder.classList.add('hidden');
+                
+                // Adjust button style for free assessment
+                registerButton.textContent = 'Register & Start Free Exam';
+                registerButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                registerButton.classList.add('bg-green-600', 'hover:bg-green-700');
+            }
+            
+            // Show the modal
+            modal.classList.remove('hidden');
+        }
 
+        function closeRegistration() {
+            modal.classList.add('hidden');
+            registrationForm.reset(); // Clear the form on close
+        }
 
+        // ✅ 4. CORE LOGIC: HANDLES REGISTRATION AND DATABASE INSERT ✅
+        async function handleRegistration(event) {
+            event.preventDefault();
+            
+            // Disable button to prevent double-click
+            registerButton.disabled = true;
+            registerButton.textContent = 'Processing...';
 
+            // Capture Form Data
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const examName = examNameInput.value;
+            const examCost = parseInt(examCostInput.value);
 
+            // 1. INSERT DATA INTO SUPABASE
+            const { error } = await supabase
+                .from('registration_') // ⚠️ DOUBLE CHECK THIS NAME: registration_ or registrations
+                .insert([
+                    { 
+                        full_name: fullName, 
+                        email: email, 
+                        exam_name: examName, 
+                        exam_cost: examCost 
+                    },
+                ]);
 
+            if (error) {
+                console.error('Supabase Error:', error.message);
+                alert(`A database error occurred. Please try again later. Error: ${error.message}`);
+                registerButton.textContent = (examCost > 0) ? `Pay ₹${examCost} & Proceed` : 'Register & Start Free Exam';
+                registerButton.disabled = false;
+                return;
+            }
 
+            // 2. SUCCESS HANDLING
+            closeRegistration();
+            
+            if (examCost > 0) {
+                // PAID ASSESSMENT FLOW: Initiate Payment (Placeholder)
+                alert(`Success! We've stored your details. Now initiating payment for ₹${examCost}. (Next step: Integrate your payment gateway API)`);
+                
+                // Redirect to a payment page or trigger the payment gateway API
+                window.location.href = '/payment-initiate.html'; 
 
+            } else {
+                // FREE ASSESSMENT FLOW: Start Exam
+                alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
+                
+                // Redirect to the assessment start page
+                window.location.href = '/assessment-start.html'; 
+            }
 
-
-
-
-
-
+            // Reset button state
+            registerButton.disabled = false;
+        }
+    </script>
+</body>
+</html>
