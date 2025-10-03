@@ -452,119 +452,121 @@
             <p class="text-sm">&copy; 2025 Ready4Industry. All rights reserved.</p>
         </div>
     </footer>
+<script>
+    // ✅ 1. SUPABASE CLIENT INITIALIZATION (FIXED VARIABLE NAME) ✅
+    const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8'; 
+
+    // FIX: Using supabaseClient instead of supabase to avoid conflict with the global Supabase object.
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ✅ 2. DOM ELEMENT REFERENCES ✅
+    const modal = document.getElementById('registrationModal');
+    const assessmentInfo = document.getElementById('assessmentInfo');
+    const paymentInfo = document.getElementById('paymentInfo');
+    const examNameInput = document.getElementById('examName');
+    const examCostInput = document.getElementById('examCost');
+    const paymentGatewayPlaceholder = document.getElementById('paymentGatewayPlaceholder');
+    const costDisplay = document.getElementById('costDisplay');
+    const registerButton = document.getElementById('registerButton');
+    const registrationForm = document.getElementById('registrationForm');
 
 
-    <script>
-        // ✅ 1. SUPABASE CLIENT INITIALIZATION ✅
-        const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8'; 
-
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // ✅ 2. DOM ELEMENT REFERENCES ✅
-        const modal = document.getElementById('registrationModal');
-        const assessmentInfo = document.getElementById('assessmentInfo');
-        const paymentInfo = document.getElementById('paymentInfo');
-        const examNameInput = document.getElementById('examName');
-        const examCostInput = document.getElementById('examCost');
-        const paymentGatewayPlaceholder = document.getElementById('paymentGatewayPlaceholder');
-        const costDisplay = document.getElementById('costDisplay');
-        const registerButton = document.getElementById('registerButton');
-        const registrationForm = document.getElementById('registrationForm');
-
-
-        // ✅ 3. MODAL CONTROL FUNCTIONS ✅
-        function openRegistration(name, cost, isPaid) {
-            // Set values to hidden inputs
-            examNameInput.value = name;
-            examCostInput.value = cost;
+    // ✅ 3. MODAL CONTROL FUNCTIONS ✅
+    function openRegistration(name, cost, isPaid) {
+        // Set values to hidden inputs
+        examNameInput.value = name;
+        examCostInput.value = cost;
+        
+        assessmentInfo.textContent = `Assessment Selected: ${name}`;
+        
+        // Dynamic UI based on payment status
+        if (isPaid) {
+            paymentInfo.innerHTML = `This is a **Paid Assessment**. Fee: <span class="text-red-600 font-bold">₹${cost}</span>.`;
+            costDisplay.textContent = cost; // Sets cost in the placeholder alert
+            paymentGatewayPlaceholder.classList.remove('hidden');
             
-            assessmentInfo.textContent = `Assessment Selected: ${name}`;
+            // Adjust button style for paid assessment
+            registerButton.textContent = `Pay ₹${cost} & Proceed`;
+            registerButton.classList.remove('bg-green-600', 'hover:bg-green-700');
+            registerButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+        } else {
+            paymentInfo.innerHTML = 'This assessment is **100% Free**. No payment required.';
+            paymentGatewayPlaceholder.classList.add('hidden');
             
-            // Dynamic UI based on payment status
-            if (isPaid) {
-                paymentInfo.innerHTML = `This is a **Paid Assessment**. Fee: <span class="text-red-600 font-bold">₹${cost}</span>.`;
-                costDisplay.textContent = cost; // Sets cost in the placeholder alert
-                paymentGatewayPlaceholder.classList.remove('hidden');
-                
-                // Adjust button style for paid assessment
-                registerButton.textContent = `Pay ₹${cost} & Proceed`;
-                registerButton.classList.remove('bg-green-600', 'hover:bg-green-700');
-                registerButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
-            } else {
-                paymentInfo.innerHTML = 'This assessment is **100% Free**. No payment required.';
-                paymentGatewayPlaceholder.classList.add('hidden');
-                
-                // Adjust button style for free assessment
-                registerButton.textContent = 'Register & Start Free Exam';
-                registerButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
-                registerButton.classList.add('bg-green-600', 'hover:bg-green-700');
-            }
-            
-            // Show the modal
-            modal.classList.remove('hidden');
+            // Adjust button style for free assessment
+            registerButton.textContent = 'Register & Start Free Exam';
+            registerButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+            registerButton.classList.add('bg-green-600', 'hover:bg-green-700');
         }
+        
+        // Show the modal
+        modal.classList.remove('hidden');
+    }
 
-        function closeRegistration() {
-            modal.classList.add('hidden');
-            registrationForm.reset(); // Clear the form on close
-        }
+    function closeRegistration() {
+        modal.classList.add('hidden');
+        registrationForm.reset(); // Clear the form on close
+    }
 
-        // ✅ 4. CORE LOGIC: HANDLES REGISTRATION AND DATABASE INSERT ✅
-        async function handleRegistration(event) {
-            event.preventDefault();
-            
-            // Disable button to prevent double-click
-            registerButton.disabled = true;
-            registerButton.textContent = 'Processing...';
+    // ✅ 4. CORE LOGIC: HANDLES REGISTRATION AND DATABASE INSERT ✅
+    async function handleRegistration(event) {
+        event.preventDefault();
+        
+        // Disable button to prevent double-click
+        registerButton.disabled = true;
+        registerButton.textContent = 'Processing...';
 
-            // Capture Form Data
-            const fullName = document.getElementById('fullName').value;
-            const email = document.getElementById('email').value;
-            const examName = examNameInput.value;
-            const examCost = parseInt(examCostInput.value);
+        // Capture Form Data
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const examName = examNameInput.value;
+        const examCost = parseInt(examCostInput.value);
 
-            // 1. INSERT DATA INTO SUPABASE
-            const { error } = await supabase
-                .from('registration_') // ⚠️ DOUBLE CHECK THIS NAME: registration_ or registrations
-                .insert([
-                    { 
-                        full_name: fullName, 
-                        email: email, 
-                        exam_name: examName, 
-                        exam_cost: examCost 
-                    },
-                ]);
+        // 1. INSERT DATA INTO SUPABASE (USING THE FIXED supabaseClient VARIABLE)
+        const { error } = await supabaseClient
+            .from('registration_') // ⚠️ DOUBLE CHECK THIS NAME: registration_ or registrations
+            .insert([
+                { 
+                    full_name: fullName, 
+                    email: email, 
+                    exam_name: examName, 
+                    exam_cost: examCost 
+                },
+            ]);
 
-            if (error) {
-                console.error('Supabase Error:', error.message);
-                alert(`A database error occurred. Please try again later. Error: ${error.message}`);
-                registerButton.textContent = (examCost > 0) ? `Pay ₹${examCost} & Proceed` : 'Register & Start Free Exam';
-                registerButton.disabled = false;
-                return;
-            }
-
-            // 2. SUCCESS HANDLING
-            closeRegistration();
-            
-            if (examCost > 0) {
-                // PAID ASSESSMENT FLOW: Initiate Payment (Placeholder)
-                alert(`Success! We've stored your details. Now initiating payment for ₹${examCost}. (Next step: Integrate your payment gateway API)`);
-                
-                // Redirect to a payment page or trigger the payment gateway API
-                window.location.href = '/payment-initiate.html'; 
-
-            } else {
-                // FREE ASSESSMENT FLOW: Start Exam
-                alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
-                
-                // Redirect to the assessment start page
-                window.location.href = '/assessment-start.html'; 
-            }
-
-            // Reset button state
+        if (error) {
+            console.error('Supabase Error:', error.message);
+            alert(`A database error occurred. Please try again later. Error: ${error.message}`);
+            registerButton.textContent = (examCost > 0) ? `Pay ₹${examCost} & Proceed` : 'Register & Start Free Exam';
             registerButton.disabled = false;
+            return;
         }
-    </script>
+
+        // 2. SUCCESS HANDLING
+        closeRegistration();
+        
+        if (examCost > 0) {
+            // PAID ASSESSMENT FLOW: Initiate Payment (Placeholder)
+            alert(`Success! We've stored your details. Now initiating payment for ₹${examCost}. (Next step: Integrate your payment gateway API)`);
+            
+            // Redirect to a payment page or trigger the payment gateway API
+            window.location.href = '/payment-initiate.html'; 
+
+        } else {
+            // FREE ASSESSMENT FLOW: Start Exam
+            alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
+            
+            // Redirect to the assessment start page
+            window.location.href = '/assessment-start.html'; 
+        }
+
+        // Reset button state
+        registerButton.disabled = false;
+    }
+</script>
+
+   
 </body>
 </html>
+
