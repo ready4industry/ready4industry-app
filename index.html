@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLPD7yF4gB8WwL7S4Tz4WpG8wL7S4Tz4WpG8w4vF2M/4jD/6z9+1gL8M8T7B1g3J5jG2x9z3N8w5t+7b9+6B2fG+6C9d6G+8Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+    
     <script src="https://accounts.google.com/gsi/client" async defer></script> 
     
     <script src="https://unpkg.com/jwt-decode@4.0.0/build/jwt-decode.js"></script> 
@@ -263,40 +264,27 @@
                     Ready to test your knowledge? Choose a certification below to get instant access. Your details will be saved for your report card.
                 </p>
                 <div class="mt-12 grid md:grid-cols-3 gap-8 items-stretch">
-                    <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-green-500 space-y-6">
+                    <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-green-500 space-y-6"> 
                         <h3 class="text-3xl font-bold text-slate-900">Core Concepts Check</h3>
                         <p class="text-xl font-semibold text-green-600">FREE</p>
-                       <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-green-500 space-y-6">
-    <h3 class="text-3xl font-bold text-slate-900">Core Concepts Check</h3>
-    <p class="text-xl font-semibold text-green-600">FREE</p>
-    <p class="text-slate-600">Test your foundational knowledge in Data Structures, OOP, and DBMS.</p>
-    
-    <p class="text-sm text-slate-500 mt-4">Sign in to start your free exam:</p>
-    <div id="g_id_onload"
-        data-client_id="79189521547-hr8kjvbj1ginajbg74leomf8mge2i5cq.apps.googleusercontent.com" 
-        data-callback="handleCredentialResponse"
-        data-auto_prompt="false">
-    </div>
-    <div class="g_id_signin"
-        data-type="standard"
-        data-size="large"
-        data-theme="outline"
-        data-text="continue_with"
-        data-shape="rectangular"
-        data-locale="en-IN"
-        data-logo_alignment="left">
-    </div>
-    </div>
-
-<div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-indigo-600 space-y-6">
-    <h3 class="text-3xl font-bold text-slate-900">Cloud Fundamentals</h3>
-    <p class="text-xl font-semibold text-indigo-600">₹99</p>
-    <p class="text-slate-600">A comprehensive test on AWS, Azure, and GCP basic concepts.</p>
-    <button onclick="openRegistration('Cloud Fundamentals Assessment', 99, true)"
-        class="w-full mt-4 text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300 rounded-lg px-6 py-3 font-bold shadow-md">
-        Register & Pay ₹99
-    </button>
-</div>
+                        <p class="text-slate-600">Test your foundational knowledge in Data Structures, OOP, and DBMS.</p>
+                        
+                        <p class="text-sm text-slate-500 mt-4">Sign in to start your free exam:</p>
+                        <div id="g_id_onload"
+                            data-client_id="79189521547-hr8kjvbj1ginajbg74leomf8mge2i5cq.apps.googleusercontent.com" 
+                            data-callback="handleCredentialResponse"
+                            data-auto_prompt="false">
+                        </div>
+                        <div class="g_id_signin"
+                            data-type="standard"
+                            data-size="large"
+                            data-theme="outline"
+                            data-text="continue_with"
+                            data-shape="rectangular"
+                            data-locale="en-IN"
+                            data-logo_alignment="left">
+                        </div>
+                    </div>
 
                     <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-indigo-600 space-y-6">
                         <h3 class="text-3xl font-bold text-slate-900">Cloud Fundamentals</h3>
@@ -320,6 +308,7 @@
                 </div>
             </div>
         </section>
+        
         <section id="journey" class="py-20 px-6">
             <div class="container mx-auto text-center">
                 <h2 class="text-4xl font-extrabold text-slate-900">The Ready4Industry Journey</h2>
@@ -431,175 +420,154 @@
             </div>
         </section>
 
-
-        <div id="registrationModal" class="fixed inset-0 bg-slate-900 bg-opacity-75 z-[100] hidden flex items-center justify-center p-4 transition-opacity duration-300">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative transform transition-transform duration-300 scale-95" role="dialog" aria-modal="true">
-                <button onclick="closeRegistration()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 transition-colors">
-                    <i class="fas fa-times text-2xl"></i>
-                </button>
-                
-                <h3 class="text-3xl font-bold text-slate-900 mb-2">Register for Assessment</h3>
-                
-                <div id="assessmentInfo" class="text-lg font-semibold text-teal-600 mt-4 mb-4"></div>
-                <div id="paymentInfo" class="text-sm text-slate-600 mb-6"></div>
-
-                <form id="registrationForm" onsubmit="handleRegistration(event)">
-                    
-                    <input type="hidden" id="examName" name="examName">
-                    <input type="hidden" id="examCost" name="examCost">
-                    <input type="hidden" id="displayCost" name="displayCost">
-
-                    <div class="mb-4">
-                        <label for="fullName" class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
-                        <input type="text" id="fullName" name="fullName" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
-                    </div>
-                    
-                    <div class="mb-6">
-                        <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                        <input type="email" id="email" name="email" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
-                    </div>
-                    
-                    <div id="paymentGatewayPlaceholder" class="mb-6 hidden">
-                        <div class="p-4 bg-yellow-50 border border-yellow-300 rounded-lg text-sm text-yellow-800 flex items-start space-x-2">
-                            <i class="fas fa-credit-card text-lg mt-1"></i>
-                            <p>You will be redirected to a secure payment gateway (e.g., Razorpay/Stripe) to complete your transaction of ₹<span id="costDisplay"></span>.</p>
-                        </div>
-                    </div>
-
-                    <button type="submit" id="registerButton" class="w-full px-4 py-3 bg-teal-600 text-white font-bold rounded-lg shadow-md hover:bg-teal-700 transition-colors duration-300 flex items-center justify-center">
-                        <i class="fas fa-arrow-right mr-2"></i> Register & Proceed
-                    </button>
-                </form>
-                <p class="mt-4 text-center text-xs text-slate-400">Your details are safe and secured by Supabase and RLS.</p>
-            </div>
-        </div>
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-8 text-center">
-        <div class="container mx-auto px-6">
-            <p class="text-sm">&copy; 2025 Ready4Industry. All rights reserved.</p>
+    <div id="registrationModal" class="fixed inset-0 bg-slate-900 bg-opacity-75 z-[100] hidden flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative transform transition-transform duration-300 scale-95" role="dialog" aria-modal="true">
+            <button onclick="closeRegistration()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 transition-colors">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <h3 class="text-2xl font-bold text-slate-900 mb-4" id="modalTitle">Register for Assessment</h3>
+            <p class="text-slate-600 mb-6" id="modalText">Please provide your details to register for the assessment.</p>
+            
+            <form id="registrationForm">
+                <div class="mb-4">
+                    <label for="fullName" class="block text-sm font-medium text-slate-700">Full Name</label>
+                    <input type="text" id="fullName" class="mt-1 block w-full border border-slate-300 rounded-lg p-3 focus:ring-teal-500 focus:border-teal-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="email" class="block text-sm font-medium text-slate-700">Email Address</label>
+                    <input type="email" id="email" class="mt-1 block w-full border border-slate-300 rounded-lg p-3 focus:ring-teal-500 focus:border-teal-500" required>
+                </div>
+                
+                <input type="hidden" id="examName">
+                <input type="hidden" id="examCost">
+                <input type="hidden" id="isPaid">
+
+                <button type="submit" id="submitButton" class="w-full text-white bg-teal-600 hover:bg-teal-700 transition-colors duration-300 rounded-lg px-6 py-3 font-bold shadow-md">
+                    Proceed to Payment
+                </button>
+            </form>
         </div>
-    </footer>
-<script>
-    // ✅ 1. SUPABASE CLIENT INITIALIZATION (FIXED VARIABLE NAME) ✅
-    const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8'; 
+    </div>
+    <script>
+        // 🛑 IMPORTANT: REPLACE THESE PLACEHOLDERS WITH YOUR ACTUAL SUPABASE KEYS 🛑
+        const SUPABASE_URL = https://glskwkzzkhhwftzddqmo.supabase.co; 
+        const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8;
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // -----------------------------------------------------------------------------------
 
-    // FIX: Using supabaseClient instead of supabase to avoid conflict with the global Supabase object.
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const registrationModal = document.getElementById('registrationModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const examNameInput = document.getElementById('examName');
+        const examCostInput = document.getElementById('examCost');
+        const isPaidInput = document.getElementById('isPaid');
+        const submitButton = document.getElementById('submitButton');
 
-    // ✅ 2. DOM ELEMENT REFERENCES ✅
-    const modal = document.getElementById('registrationModal');
-    const assessmentInfo = document.getElementById('assessmentInfo');
-    const paymentInfo = document.getElementById('paymentInfo');
-    const examNameInput = document.getElementById('examName');
-    const examCostInput = document.getElementById('examCost');
-    const paymentGatewayPlaceholder = document.getElementById('paymentGatewayPlaceholder');
-    const costDisplay = document.getElementById('costDisplay');
-    const registerButton = document.getElementById('registerButton');
-    const registrationForm = document.getElementById('registrationForm');
+        function openRegistration(examName, examCost, isPaid) {
+            examNameInput.value = examName;
+            examCostInput.value = examCost;
+            isPaidInput.value = isPaid;
 
+            modalTitle.textContent = `Register for: ${examName}`;
+            modalText.textContent = isPaid ? 
+                `The cost is ₹${examCost}. Enter your details to proceed to payment.` :
+                `This assessment is FREE. Enter your details to start the exam.`;
+            submitButton.textContent = isPaid ? 'Proceed to Payment' : 'Start FREE Exam';
 
-    // ✅ 3. MODAL CONTROL FUNCTIONS ✅
-    function openRegistration(name, cost, isPaid) {
-        // ... (Modal logic remains the same) ...
-        
-        // Set values to hidden inputs
-        examNameInput.value = name;
-        examCostInput.value = cost;
-        
-        assessmentInfo.textContent = `Assessment Selected: ${name}`;
-        
-        // Dynamic UI based on payment status
-        if (isPaid) {
-            paymentInfo.innerHTML = `This is a **Paid Assessment**. Fee: <span class="text-red-600 font-bold">₹${cost}</span>.`;
-            costDisplay.textContent = cost; // Sets cost in the placeholder alert
-            paymentGatewayPlaceholder.classList.remove('hidden');
-            
-            // Adjust button style for paid assessment
-            registerButton.textContent = `Pay ₹${cost} & Proceed`;
-            registerButton.classList.remove('bg-green-600', 'hover:bg-green-700');
-            registerButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
-        } else {
-            paymentInfo.innerHTML = 'This assessment is **100% Free**. No payment required.';
-            paymentGatewayPlaceholder.classList.add('hidden');
-            
-            // Adjust button style for free assessment
-            registerButton.textContent = 'Register & Start Free Exam';
-            registerButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
-            registerButton.classList.add('bg-green-600', 'hover:bg-green-700');
-        }
-        
-        // Show the modal
-        modal.classList.remove('hidden');
-    }
-
-    function closeRegistration() {
-        modal.classList.add('hidden');
-        registrationForm.reset(); // Clear the form on close
-    }
-
-    // ✅ 4. CORE LOGIC: HANDLES REGISTRATION AND DATABASE INSERT ✅
-    async function handleRegistration(event) {
-        event.preventDefault();
-        
-        // Disable button to prevent double-click
-        registerButton.disabled = true;
-        registerButton.textContent = 'Processing...';
-
-        // Capture Form Data
-        const fullName = document.getElementById('fullName').value;
-        const email = document.getElementById('email').value;
-        const examName = examNameInput.value;
-        const examCost = parseInt(examCostInput.value);
-
-        // 1. INSERT DATA INTO SUPABASE (USING THE FIXED supabaseClient VARIABLE)
-        const { error } = await supabaseClient
-            .from('registration_') // ⚠️ DOUBLE CHECK THIS NAME: registration_ or registrations
-            .insert([
-                { 
-                    full_name: fullName, 
-                    email: email, 
-                    exam_name: examName, 
-                    exam_cost: examCost 
-                },
-            ]);
-
-        if (error) {
-            console.error('Supabase Error:', error.message);
-            alert(`A database error occurred. Please try again later. Error: ${error.message}`);
-            registerButton.textContent = (examCost > 0) ? `Pay ₹${examCost} & Proceed` : 'Register & Start Free Exam';
-            registerButton.disabled = false;
-            return;
+            registrationModal.classList.remove('hidden');
         }
 
-        // 2. SUCCESS HANDLING
-        closeRegistration();
-        
-        if (examCost > 0) {
-            // PAID ASSESSMENT FLOW: Initiate Payment (Placeholder)
-            alert(`Success! We've stored your details. Now initiating payment for ₹${examCost}.`);
-            
-            // 💡 FIX: Using reliable relative path './' instead of absolute root path '/'
-            window.location.href = './payment-initiate.html'; 
-
-        } else {
-            // FREE ASSESSMENT FLOW: Start Exam
-            alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
-            
-            // 💡 FIX: Using reliable relative path './' instead of absolute root path '/'
-            window.location.href = './assessment-start.html'; 
+        function closeRegistration() {
+            registrationModal.classList.add('hidden');
         }
 
-        // Reset button state
-        registerButton.disabled = false;
-    }
-</script>
+        async function handleRegistration(event) {
+            event.preventDefault();
 
-   
+            const fullName = fullNameInput.value;
+            const email = emailInput.value;
+            const examName = examNameInput.value;
+            const examCost = parseFloat(examCostInput.value);
+            const isPaid = isPaidInput.value === 'true'; // Convert string back to boolean
+
+            // 1. Insert data into Supabase
+            const { error } = await supabaseClient 
+                .from('registration_') // Ensure this is your correct table name
+                .insert([
+                    { 
+                        full_name: fullName, 
+                        email: email, 
+                        exam_name: examName, 
+                        exam_cost: examCost,
+                        login_type: 'Manual' // Tracks registration type
+                    },
+                ]);
+
+            if (error) {
+                console.error('Supabase Error:', error.message);
+                alert(`A database error occurred. Please try again. Error: ${error.message}`);
+                return;
+            }
+            
+            // 2. Success Handling
+            if (isPaid) {
+                alert(`Thank you, ${fullName}! You are registered. Next, you would be redirected to the payment page.`);
+                // In a real application, you would add a redirect to a payment gateway here
+            } else {
+                alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
+                window.location.href = './assessment-start.html'; // Redirect to the exam page
+            }
+            
+            closeRegistration();
+            document.getElementById('registrationForm').reset();
+        }
+
+        // Attach the manual registration handler
+        document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
+        
+        // GOOGLE SIGN-IN CALLBACK FUNCTION (Used for the FREE assessment)
+        async function handleCredentialResponse(response) {
+            if (response.credential) {
+                // Decode the JWT token to get user details
+                const user = jwt_decode(response.credential);
+                const fullName = user.name;
+                const email = user.email;
+                const examName = 'Free Core Concepts Check'; 
+                const examCost = 0;
+
+                // 1. INSERT DATA INTO SUPABASE
+                const { error } = await supabaseClient 
+                    .from('registration_') // Ensure this is your correct table name
+                    .insert([
+                        { 
+                            full_name: fullName, 
+                            email: email, 
+                            exam_name: examName, 
+                            exam_cost: examCost,
+                            login_type: 'Google' // Tracks registration type
+                        },
+                    ]);
+
+                if (error) {
+                    console.error('Supabase Error:', error.message);
+                    alert(`A database error occurred. Please try again. Error: ${error.message}`);
+                    return;
+                }
+
+                // 2. SUCCESS HANDLING: Redirect to the Assessment Start page
+                alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
+                window.location.href = './assessment-start.html'; 
+
+            } else {
+                alert("Google Sign-In failed. Please try again.");
+            }
+        }
+    </script>
+
 </body>
 </html>
-
-
-
-
