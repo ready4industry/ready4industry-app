@@ -474,6 +474,8 @@
 
     // ✅ 3. MODAL CONTROL FUNCTIONS ✅
     function openRegistration(name, cost, isPaid) {
+        // ... (Modal logic remains the same) ...
+        
         // Set values to hidden inputs
         examNameInput.value = name;
         examCostInput.value = cost;
@@ -548,17 +550,17 @@
         
         if (examCost > 0) {
             // PAID ASSESSMENT FLOW: Initiate Payment (Placeholder)
-            alert(`Success! We've stored your details. Now initiating payment for ₹${examCost}. (Next step: Integrate your payment gateway API)`);
+            alert(`Success! We've stored your details. Now initiating payment for ₹${examCost}.`);
             
-            // Redirect to a payment page or trigger the payment gateway API
-            window.location.href = '/payment-initiate.html'; 
+            // 💡 FIX: Using reliable relative path './' instead of absolute root path '/'
+            window.location.href = './payment-initiate.html'; 
 
         } else {
             // FREE ASSESSMENT FLOW: Start Exam
             alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
             
-            // Redirect to the assessment start page
-            window.location.href = '/assessment-start.html'; 
+            // 💡 FIX: Using reliable relative path './' instead of absolute root path '/'
+            window.location.href = './assessment-start.html'; 
         }
 
         // Reset button state
@@ -569,4 +571,5 @@
    
 </body>
 </html>
+
 
