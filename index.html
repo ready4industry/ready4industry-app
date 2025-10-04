@@ -1,605 +1,573 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B.Tech Assessment Platform</title>
+    <title>Ready4Industry: A Premier Web Presence</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLPD7yF4gB8WwL7S4Tz4WpG8wL7S4Tz4WpG8w4vF2M/4jD/6z9+1gL8M8T7B1g3J5jG2x9z3N8w5t+7b9+6B2fG+6C9d6G+8Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script> 
+    
+    <script src="https://unpkg.com/jwt-decode@4.0.0/build/jwt-decode.js"></script> 
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        /* Simple utility for hiding screens */
-        .hidden-screen { display: none; }
-        /* Custom styles for table/history */
-        .history-table th { background-color: #f1f5f9; text-align: left; padding: 12px 16px; border-bottom: 2px solid #e2e8f0; }
-        .history-table td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
-        .history-table tr:hover { background-color: #fafafa; }
-        /* Input focus style */
-        input:focus { border-color: #4f46e5; box-shadow: 0 0 0 1px #4f46e5; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-gradient-header {
+            background-image: linear-gradient(to right, #104e4e, #2c776b);
+        }
+        .bg-gradient-offers {
+            background-image: linear-gradient(to bottom, #d9f99d, #bfef7a);
+        }
+        .offer-card {
+            transition: all 0.3s ease-in-out;
+        }
+        .offer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .pricing-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        @keyframes marquee-left {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes marquee-right {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .animate-marquee-left {
+            animation: marquee-left 35s linear infinite;
+        }
+        .animate-marquee-right {
+            animation: marquee-right 35s linear infinite;
+        }
     </style>
-    <!-- Supabase JS CDN for client library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col items-center p-4">
+<body class="bg-slate-50 text-slate-800">
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center space-x-3">
+                <img src="logo.png" alt="Ready4Industry Logo" class="h-10 w-auto bg-white rounded p-1">
+                <span class="text-3xl font-extrabold text-emerald-400 tracking-tight transition-colors hover:text-teal-600">
+                    Ready4Industry
+                </span>
+            </a>
+            <nav class="space-x-6 text-sm font-medium hidden md:block">
+                <a href="#mission" class="text-white hover:text-teal-400 transition-colors">Our Mission</a>
+                <a href="#offerings" class="text-white hover:text-teal-400 transition-colors">Offerings</a>
+                <a href="#pricing" class="text-white hover:text-teal-400 transition-colors">Pricing</a>
+                <a href="#assessments" class="text-white hover:text-teal-400 transition-colors font-bold">Assessments</a> 
+                <a href="#journey" class="text-white hover:text-teal-400 transition-colors">The Journey</a>
+                <a href="#contact" class="text-white hover:text-teal-400 transition-colors">Contact</a>
+            </nav>
+        </div>
+    </header>
 
-    <!-- Main Application Container -->
-    <div class="w-full max-w-4xl bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-8 mt-10">
-
-        <!-- Header / Status -->
-        <header class="text-center space-y-2">
-            <h1 class="text-4xl font-extrabold text-indigo-700">Student Assessment Hub</h1>
-            <p id="status-message" class="text-sm text-gray-500 font-medium h-6">
-                Please sign in to view assessments.
-            </p>
-            <div id="user-display" class="hidden text-sm text-gray-700 p-2 bg-indigo-50 rounded-lg flex justify-between items-center">
-                <p>Welcome, <span id="user-email-display" class="font-semibold"></span>!</p>
-                <button id="sign-out" class="py-1 px-3 text-xs bg-indigo-200 text-indigo-800 font-medium rounded-lg hover:bg-indigo-300 transition duration-150">Sign Out</button>
+    <main>
+        <section id="welcome" class="relative py-24 md:py-32 px-6 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
+            <div class="absolute inset-0 bg-slate-900/60"></div>
+            <div class="container mx-auto text-center relative z-10">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight animate-fade-in-up">
+                    Beyond the Degree: Launch Your Engineering Career
+                </h1>
+                <p class="mt-6 text-lg md:text-xl text-white max-w-4xl mx-auto opacity-0 animate-fade-in" style="animation-delay: 0.5s;">
+                    Are you ready to turn your academic knowledge into a successful career? We're here to give you the unfair advantage in the job market.
+                </p>
+                <a href="#offerings" class="inline-block mt-10 px-8 py-4 bg-teal-600 text-white font-bold rounded-full shadow-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105">
+                    Explore Our Offerings
+                </a>
             </div>
-        </header>
+        </section>
 
-        <!-- Screens Container -->
-        <main id="screens-container">
-            
-            <!-- 1. LOGIN SCREEN -->
-            <section id="login-screen" class="space-y-6 flex flex-col items-center justify-center min-h-[300px]">
-                <div class="text-center space-y-2">
-                    <h2 class="text-2xl font-bold text-gray-800">Start Your Assessment Journey</h2>
-                    <p class="text-gray-600">Use your Google Profile to register and proceed.</p>
-                </div>
-                
-                <!-- Google Sign-In Button -->
-                <button id="google-sign-in"
-                    class="w-full max-w-xs flex items-center justify-center px-6 py-3 border border-gray-300 rounded-xl shadow-md text-base font-semibold text-gray-700 bg-white hover:bg-indigo-50 transition duration-150 ease-in-out focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500">
-                    <svg class="w-6 h-6 mr-3" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.007 8-11.303 8c-6.627 0-12-5.373-12-12c0-6.627 5.373-12 12-12c3.059 0 5.842 1.158 7.96 3.03l5.657-5.657C34.046 6.053 29.043 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"></path>
-                        <path fill="#FF3D00" d="M6.306 14.693l6.577 4.816C14.655 15.108 18.9 12 24 12c5.361 0 9.845 3.32 11.83 8.083l6.096-4.472C38.078 8.448 31.424 4 24 4C16.634 4 10.05 7.425 6.306 12.693z"></path>
-                        <path fill="#4CAF50" d="M24 44c5.21 0 9.873-1.657 13.886-4.832l-6.208-4.706C29.613 36.88 27.054 37 24 37c-5.228 0-9.882-3.351-11.841-8.083L5.035 34.482C8.751 39.52 15.9 44 24 44z"></path>
-                        <path fill="#1976D2" d="M43.611 20.083c0-1.341-.138-2.65-.389-3.917H24v8h11.303a12.043 12.043 0 00-1.649 4.657H24v7.417c8.1 0 14.757-5.048 17.57-12.215c.251-1.267.389-2.576.389-3.917z"></path>
-                    </svg>
-                    Sign in with Google
-                </button>
-                <p id="supabase-error" class="text-xs text-red-500 hidden">Supabase initialization failed. Check console for details.</p>
-            </section>
-
-            <!-- 2. ASSESSMENT DASHBOARD SCREEN (Landing Page / LMS Sections) -->
-            <section id="assessment-dashboard" class="hidden-screen space-y-8">
-                <div class="border-b pb-4">
-                    <h2 class="text-3xl font-bold text-gray-800">Select Your Assessment (All Free)</h2>
-                    <p class="text-gray-600 text-sm mt-1">Choose one of the three 20-question, AI-generated tests below.</p>
-                </div>
-                
-                <!-- Assessment Cards (The 3 Sections) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <!-- 1. Technical Assessment Card (FREE) -->
-                    <div class="bg-white border-2 border-green-400 rounded-xl p-6 shadow-lg hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1">
-                        <h3 class="text-xl font-bold text-green-600 mb-2">1. Technical Fundamentals</h3>
-                        <p class="text-sm text-gray-600 mb-4">Core B.Tech syllabus topics (DS, OS, DBMS, Networking).</p>
-                        <button id="start-technical" class="w-full py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-150">
-                            Start Assessment
-                        </button>
+        <section id="challenge" class="py-20 px-6">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-extrabold text-slate-900">The Gap Between Campus and Career</h2>
+                <div class="mt-8 grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div class="p-6 bg-white rounded-xl shadow-lg border-t-4 border-teal-600 space-y-3 offer-card">
+                        <i class="fas fa-question-circle text-4xl text-teal-600"></i>
+                        <h3 class="text-xl font-bold">Feeling Lost?</h3>
+                        <p class="text-sm text-slate-600">Unsure what companies are truly looking for or what skills you need to succeed?</p>
                     </div>
-
-                    <!-- 2. Aptitude Test Card (FREE) -->
-                    <div class="bg-white border-2 border-indigo-400 rounded-xl p-6 shadow-lg hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1">
-                        <h3 class="text-xl font-bold text-indigo-600 mb-2">2. Aptitude & Reasoning</h3>
-                        <p class="text-sm text-gray-600 mb-4">Logical reasoning, quantitative analysis, and data interpretation.</p>
-                        <button id="start-aptitude" class="w-full py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition duration-150">
-                            Start Assessment
-                        </button>
+                    <div class="p-6 bg-white rounded-xl shadow-lg border-t-4 border-teal-600 space-y-3 offer-card">
+                        <i class="fas fa-file-alt text-4xl text-teal-600"></i>
+                        <h3 class="text-xl font-bold">Resume Woes?</h3>
+                        <p class="text-sm text-slate-600">Worried that your resume isn't good enough to get you past automated screening systems?</p>
                     </div>
-
-                    <!-- 3. Behavioral Skills Card (FREE) -->
-                    <div class="bg-white border-2 border-red-400 rounded-xl p-6 shadow-lg hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1">
-                        <h3 class="text-xl font-bold text-red-600 mb-2">3. Behavioral Skills</h3>
-                        <p class="text-sm text-gray-600 mb-4">Assesses communication, teamwork, and problem-solving scenarios.</p>
-                        <button id="start-behavioral" class="w-full py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-150">
-                            Start Assessment
-                        </button>
+                    <div class="p-6 bg-white rounded-xl shadow-lg border-t-4 border-teal-600 space-y-3 offer-card">
+                        <i class="fas fa-hammer text-4xl text-teal-600"></i>
+                        <h3 class="text-xl font-bold">Lack of Experience?</h3>
+                        <p class="text-sm text-slate-600">Do you feel like you don't have enough "real-world" experience to stand out from the crowd?</p>
                     </div>
                 </div>
+            </div>
+        </section>
 
-                <!-- Assessment History (LMS Feature) -->
-                <div class="pt-6 border-t">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Your Assessment History</h3>
-                    <div id="history-loading" class="text-gray-500 text-center py-4">
-                         <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-400 inline-block mr-2"></div> Loading history...
-                    </div>
-                    <div id="assessment-history" class="overflow-x-auto shadow-md rounded-lg">
-                        <!-- History table will be injected here -->
-                    </div>
+        <section id="mission" class="bg-white py-20 px-6">
+            <div class="container mx-auto grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-4xl font-extrabold text-slate-900">Your Partner in Success</h2>
+                    <p class="mt-6 text-lg text-slate-600 leading-relaxed">
+                        This is where we come in. We are Ready4Industry. With over 21 years of experience in the IT world, we've worked with tech giants like IBM, PwC, and Wipro. We've attended countless campus interviews and know your pain points.
+                    </p>
+                    <p class="mt-4 text-lg text-slate-600 leading-relaxed">
+                        We're here to help you apply your syllabus core concepts like Data Structures, Object-Oriented Programming, and Database Management Systems to real-world problems. We bridge the gap by providing the tools, experience, and guidance you need to land your first job.
+                    </p>
                 </div>
-
-            </section>
-
-            <!-- 3. ASSESSMENT IN PROGRESS SCREEN -->
-            <section id="assessment-in-progress" class="hidden-screen p-6 bg-indigo-50 border border-indigo-200 rounded-xl">
-                 <h2 id="quiz-title" class="text-2xl font-bold text-indigo-700 mb-4"></h2>
-                 <div id="loader" class="flex items-center space-x-2">
-                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-500"></div>
-                    <p id="assessment-status" class="text-sm text-indigo-600">Please wait while the AI prepares your 20-question test.</p>
-                 </div>
-                 <form id="quiz-form">
-                    <div id="quiz-content" class="mt-6">
-                        <!-- Quiz questions will be rendered here -->
-                    </div>
-                 </form>
-            </section>
-
-             <!-- 4. ASSESSMENT RESULTS SCREEN (Score hidden, CTA shown) -->
-            <section id="assessment-results" class="hidden-screen p-6 bg-white border border-gray-200 rounded-xl shadow-lg">
-                <h2 class="text-3xl font-bold text-indigo-700 mb-4">Assessment Complete!</h2>
-                <div class="space-y-6">
-                    <p class="text-xl text-gray-700 text-center">Thank you for taking the <span id="results-topic" class="font-bold text-indigo-600"></span> assessment.</p>
-                    
-                    <!-- New CTA Box - Replacing the score display -->
-                    <div class="p-6 bg-yellow-50 border-2 border-yellow-300 rounded-xl shadow-md space-y-3 text-center">
-                        <h3 class="text-2xl font-extrabold text-yellow-800">Unlock Your Detailed Analysis</h3>
-                        <p class="text-gray-700 text-lg font-medium">
-                            Your performance is recorded. To receive a detailed breakdown of your results, including:
-                        </p>
-                        <ul class="text-left list-disc list-inside text-gray-600 space-y-1 max-w-sm mx-auto">
-                            <li>Your exact score and ranking.</li>
-                            <li>Specific areas that need improvement.</li>
-                            <li>Personalized study recommendations.</li>
-                        </ul>
-                        <p class="text-2xl font-bold text-red-600 pt-2">
-                            Pay ₹200 for Analysis
-                        </p>
-                        <p class="text-sm text-gray-500">
-                            Please contact the administrator at <a href="mailto:admin@example.com" class="text-indigo-500 hover:underline font-semibold">admin@example.com</a> to finalize payment and receive your report.
-                        </p>
-                    </div>
-
-                    <button id="results-back-to-dashboard" class="w-full py-3 bg-gray-700 text-white font-semibold rounded-xl hover:bg-gray-800 transition duration-150 mt-4">
-                        Back to Assessments
-                    </button>
+                <div class="relative w-full h-80 rounded-xl overflow-hidden shadow-2xl">
+                    <img src="https://placehold.co/900x1600/D4D4D8/334155?text=Ready4Industry%0AMission" alt="Team members collaborating" class="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110">
                 </div>
-            </section>
-        </main>
-
-    </div>
-
-    <!-- Supabase and LLM Logic -->
-    <script type="module">
-        // --- 1. SUPABASE CONFIGURATION (Using provided credentials) ---
-        const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X0X1idGNpD0zEBhMhX8RZ1PLH5R8';
+            </div>
+        </section>
         
-        let supabase;
-        try {
-            // Uses the imported createClient function from the CDN
-            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch (error) {
-            console.error("Supabase initialization failed:", error);
-            document.getElementById('supabase-error').classList.remove('hidden');
+        <section id="offerings" class="py-20 px-6 bg-slate-100">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-extrabold text-slate-900">Our Offerings</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+                    We offer flexible and focused guidance tailored to your specific needs.
+                </p>
+                <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
+                        <i class="fas fa-user-friends text-5xl text-teal-600"></i>
+                        <h3 class="text-2xl font-bold text-slate-900">Personalized 1-on-1 Mentorship</h3>
+                        <p class="text-slate-600">Get a personalized roadmap to your dream job. We pair you with an industry expert for private sessions to define your goals and develop a clear career path.</p>
+                    </div>
+                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
+                        <i class="fas fa-users text-5xl text-teal-600"></i>
+                        <h3 class="text-2xl font-bold text-slate-900">Collaborative Group Coaching</h3>
+                        <p class="text-slate-600">Learn and grow with your peers. Our small-group coaching sessions provide a supportive environment for collaborative learning and shared insights from professionals.</p>
+                    </div>
+                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
+                        <i class="fas fa-university text-5xl text-teal-600"></i>
+                        <h3 class="text-2xl font-bold text-slate-900">On-Campus Workshops</h3>
+                        <p class="text-slate-600">Bring the future to your campus. We can run an intensive, two-week workshop right at your college, giving students a hands-on, immersive learning experience.</p>
+                    </div>
+                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
+                        <i class="fas fa-code-branch text-5xl text-teal-600"></i>
+                        <h3 class="text-2xl font-bold text-slate-900">Real-World Projects</h3>
+                        <p class="text-slate-600">Build a portfolio that gets noticed. Work on projects that solve real industry problems with technologies like AWS and Power BI.</p>
+                    </div>
+                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
+                        <i class="fas fa-file-alt text-5xl text-teal-600"></i>
+                        <h3 class="text-2xl font-bold text-slate-900">Resume Building</h3>
+                        <p class="text-slate-600">Craft a killer resume that uses keywords to get past automated screening systems and catches the eye of recruiters.</p>
+                    </div>
+                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
+                        <i class="fab fa-linkedin text-5xl text-teal-600"></i>
+                        <h3 class="text-2xl font-bold text-slate-900">LinkedIn Profile</h3>
+                        <p class="text-slate-600">Build your professional brand. Learn how to optimize your profile to attract opportunities and master the secrets of networking.</p>
+                    </div>
+                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
+                        <i class="fas fa-user-tie text-5xl text-teal-600"></i>
+                        <h3 class="text-2xl font-bold text-slate-900">Mock Interviews</h3>
+                        <p class="text-slate-600">Ace your interview, every time. Practice in a safe environment and learn to answer tough technical and behavioral questions with confidence.</p>
+                    </div>
+                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
+                        <i class="fas fa-lightbulb text-5xl text-teal-600"></i>
+                        <h3 class="text-2xl font-bold text-slate-900">Skills Development</h3>
+                        <p class="text-slate-600">Master in-demand technical skills like Cloud Computing and AI/ML/Agentic AI, and hone soft skills like teamwork and problem-solving.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="py-20 px-6 bg-slate-900 text-white">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-extrabold text-emerald-400">Choose Your Path to Success</h2>
+                <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">
+                    Select the plan that best fits your career goals and get started with our expert guidance.
+                </p>
+                <div class="mt-12 grid md:grid-cols-3 gap-8 items-stretch">
+                    
+                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-slate-400">
+                        <h3 class="text-3xl font-bold text-slate-900">Bronze</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">Foundational Skills</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            The perfect start for building your professional brand.
+                        </p>
+                        <div class="mt-8 flex flex-col items-center flex-grow">
+                            <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdG6f1yT19g3rkq0JJyES_hNvWuqNk-iYBJ6ge09vb3MhBrPQ/viewform?usp=header" 
+                                target="_blank" rel="noopener noreferrer" 
+                                class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
+                                Open Registration Form
+                            </a>
+                        </div>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Resume Building</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>LinkedIn Profile</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Core Skills Development</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-teal-600">
+                        <h3 class="text-3xl font-bold text-slate-900">Silver</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">Interview Ready</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            Build on the basics with practical experience and interview preparation.
+                        </p>
+                        <div class="mt-8 flex flex-col items-center flex-grow">
+                            <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSejh1vS9QtzgSlrwUxh0l-q8V-3kcLU40AICBp6tAzpH9optQ/viewform?usp=header" 
+                                target="_blank" rel="noopener noreferrer" 
+                                class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
+                                Open Registration Form
+                            </a>
+                        </div>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Everything in Bronze</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Collaborative Group Coaching</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Skills Development & Workshops</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Mock Interviews</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-amber-500">
+                        <h3 class="text-3xl font-bold text-slate-900">Gold</h3>
+                        <p class="mt-2 text-xl font-semibold text-teal-600">The Complete Package</p>
+                        <p class="mt-4 text-sm text-slate-500">
+                            Get the ultimate career launch with personalized and project-based learning.
+                        </p>
+                        <div class="mt-8 flex flex-col items-center flex-grow">
+                            <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
+                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdhwSx6WOBO0QaoGVrnq7PBJB-Z7Z7mLs7w3XUinCTs_-5brA/viewform?usp=header" 
+                                target="_blank" rel="noopener noreferrer" 
+                                class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
+                                Open Registration Form
+                            </a>
+                        </div>
+                        <ul class="mt-6 text-left space-y-3 w-full">
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Everything in Silver</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Personalized 1-on-1 Mentorship</span></li>
+                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Real-World Projects</span></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="assessments" class="py-20 px-6 bg-slate-100">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-extrabold text-slate-900">Take a Quick Skill Assessment</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+                    Ready to test your knowledge? Choose a certification below to get instant access. Your details will be saved for your report card.
+                </p>
+                <div class="mt-12 grid md:grid-cols-3 gap-8 items-stretch">
+                    <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-green-500 space-y-6"> 
+                        <h3 class="text-3xl font-bold text-slate-900">Core Concepts Check</h3>
+                        <p class="text-xl font-semibold text-green-600">FREE</p>
+                        <p class="text-slate-600">Test your foundational knowledge in Data Structures, OOP, and DBMS.</p>
+                        
+                        <p class="text-sm text-slate-500 mt-4">Sign in to start your free exam:</p>
+                        <div id="g_id_onload"
+                            data-client_id="79189521547-hr8kjvbj1ginajbg74leomf8mge2i5cq.apps.googleusercontent.com" 
+                            data-callback="handleCredentialResponse"
+                            data-auto_prompt="false">
+                        </div>
+                        <div class="g_id_signin"
+                            data-type="standard"
+                            data-size="large"
+                            data-theme="outline"
+                            data-text="continue_with"
+                            data-shape="rectangular"
+                            data-locale="en-IN"
+                            data-logo_alignment="left">
+                        </div>
+                    </div>
+
+                    <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-indigo-600 space-y-6">
+                        <h3 class="text-3xl font-bold text-slate-900">Cloud Fundamentals</h3>
+                        <p class="text-xl font-semibold text-indigo-600">₹99</p>
+                        <p class="text-slate-600">A comprehensive test on AWS, Azure, and GCP basic concepts.</p>
+                        <button onclick="openRegistration('Cloud Fundamentals Assessment', 99, true)"
+                            class="w-full mt-4 text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300 rounded-lg px-6 py-3 font-bold shadow-md">
+                            Register & Pay ₹99
+                        </button>
+                    </div>
+
+                    <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-red-500 space-y-6">
+                        <h3 class="text-3xl font-bold text-slate-900">Advanced DevOps</h3>
+                        <p class="text-xl font-semibold text-red-600">₹199</p>
+                        <p class="text-slate-600">Deep dive into CI/CD, Containers (Docker/K8s), and infrastructure as code.</p>
+                        <button onclick="openRegistration('Advanced DevOps Assessment', 199, true)"
+                            class="w-full mt-4 text-white bg-red-600 hover:bg-red-700 transition-colors duration-300 rounded-lg px-6 py-3 font-bold shadow-md">
+                            Register & Pay ₹199
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="journey" class="py-20 px-6">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-extrabold text-slate-900">The Ready4Industry Journey</h2>
+                <div class="mt-12 relative flex flex-col items-center">
+                    <div class="flex items-center space-x-6 md:space-x-12 mb-12">
+                        <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">1</div>
+                        <div class="text-left">
+                            <h3 class="text-xl font-bold text-slate-900">Personalized Guidance & Skills Development</h3>
+                            <p class="text-slate-600">The first step to defining your path and building a strong foundation.</p>
+                        </div>
+                    </div>
+                    <div class="w-1 bg-teal-300 h-20"></div>
+
+                    <div class="flex items-center space-x-6 md:space-x-12 mb-12">
+                        <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">2</div>
+                        <div class="text-left">
+                            <h3 class="text-xl font-bold text-slate-900">Project-Based Learning</h3>
+                            <p class="text-slate-600">Move on to real-world projects to build a portfolio that stands out.</p>
+                        </div>
+                    </div>
+                    <div class="w-1 bg-teal-300 h-20"></div>
+                    
+                    <div class="flex items-center space-x-6 md:space-x-12 mb-12">
+                        <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">3</div>
+                        <div class="text-left">
+                            <h3 class="text-xl font-bold text-slate-900">Resume Building & LinkedIn Updates</h3>
+                            <p class="text-slate-600">Perfect your professional brand to attract opportunities and get noticed.</p>
+                        </div>
+                    </div>
+                    <div class="w-1 bg-teal-300 h-20"></div>
+                    
+                    <div class="flex items-center space-x-6 md:space-x-12">
+                        <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">4</div>
+                        <div class="text-left">
+                            <h3 class="text-xl font-bold text-slate-900">Mock Interviews</h3>
+                            <p class="text-slate-600">Prepare for success and ace your interviews with confidence.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="get-started" class="bg-slate-900 text-white py-20 px-6 text-center">
+            <h2 class="text-4xl font-extrabold text-emerald-400">Your Future Starts Today</h2>
+            <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">
+                What's the first step? Let's connect and get you started on your career journey.
+            </p>
+            <div class="mt-12 flex flex-col md:flex-row items-center justify-center">
+                <a href="https://wa.me/919160131770?text=Hello%20Ready4Industry!" class="block">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://wa.me/919160131770?text=Hello%20Ready4Industry!&size=150x150"
+                        alt="QR code to our WhatsApp chat" 
+                        class="w-40 h-40 rounded-lg shadow-md mb-2 mx-auto">
+                    <p class="text-sm text-slate-400">Scan to connect with us on WhatsApp</p>
+                </a>
+                
+                <div class="mt-6 md:mt-0 md:ml-8 text-center md:text-left">
+                    <p class="text-lg font-bold text-white">Prefer to click?</p>
+                    <a href="https://wa.me/919160131770?text=Hello!%20I'm%20interested%20in%20personalized%20guidance%20from%20Ready4Industry..."
+                        class="mt-2 text-teal-400 font-medium hover:text-teal-300 transition-colors duration-300">
+                        Click here to send a detailed message
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-20 px-6">
+            <div class="container mx-auto text-center">
+                <h2 class="text-4xl font-extrabold text-slate-900">Let's Talk!</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+                    Thank you for your time and attention. We're excited to help you on your career journey. The conversation doesn't have to stop here.
+                </p>
+                <div class="mt-8 flex justify-center space-x-6 text-4xl">
+                    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="text-red-600 hover:text-red-800"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.facebook.com/profile.php?id=61579121846664" target="_blank" class="text-blue-600 hover:text-blue-800">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="https://x.com/ready4industry" target="_blank" class="text-black hover:text-gray-700">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="https://www.instagram.com/ready4industry" target="_blank" class="text-pink-600 hover:text-pink-800"><i class="fab fa-instagram"></i></a>
+                    <a href="mailto:ready4industry@gmail.com" class="text-red-600 hover:text-red-800"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-slate-900 text-white py-6 overflow-hidden relative space-y-4">
+            <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">AWS Series</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Classroom to Career</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cloud Computing</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Azure Series</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">GCP Series</a>
+            </div>
+
+            <div class="whitespace-nowrap flex animate-marquee-right text-lg font-semibold tracking-wide">
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power BI</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power Automate</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">DevOps</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cybersecurity</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">ITIL</a>
+            </div>
+
+            <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Project Management</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Agile</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">All About AI</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">FinOps</a>
+                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Oracle Cloud</a>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="registrationModal" class="fixed inset-0 bg-slate-900 bg-opacity-75 z-[100] hidden flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative transform transition-transform duration-300 scale-95" role="dialog" aria-modal="true">
+            <button onclick="closeRegistration()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 transition-colors">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <h3 class="text-2xl font-bold text-slate-900 mb-4" id="modalTitle">Register for Assessment</h3>
+            <p class="text-slate-600 mb-6" id="modalText">Please provide your details to register for the assessment.</p>
+            
+            <form id="registrationForm">
+                <div class="mb-4">
+                    <label for="fullName" class="block text-sm font-medium text-slate-700">Full Name</label>
+                    <input type="text" id="fullName" class="mt-1 block w-full border border-slate-300 rounded-lg p-3 focus:ring-teal-500 focus:border-teal-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="email" class="block text-sm font-medium text-slate-700">Email Address</label>
+                    <input type="email" id="email" class="mt-1 block w-full border border-slate-300 rounded-lg p-3 focus:ring-teal-500 focus:border-teal-500" required>
+                </div>
+                
+                <input type="hidden" id="examName">
+                <input type="hidden" id="examCost">
+                <input type="hidden" id="isPaid">
+
+                <button type="submit" id="submitButton" class="w-full text-white bg-teal-600 hover:bg-teal-700 transition-colors duration-300 rounded-lg px-6 py-3 font-bold shadow-md">
+                    Proceed to Payment
+                </button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // 🛑 IMPORTANT: REPLACE THESE PLACEHOLDERS WITH YOUR ACTUAL SUPABASE KEYS 🛑
+        const SUPABASE_URL = https://glskwkzzkhhwftzddqmo.supabase.co; 
+        const SUPABASE_ANON_KEY = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8;
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // -----------------------------------------------------------------------------------
+
+        const registrationModal = document.getElementById('registrationModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const examNameInput = document.getElementById('examName');
+        const examCostInput = document.getElementById('examCost');
+        const isPaidInput = document.getElementById('isPaid');
+        const submitButton = document.getElementById('submitButton');
+
+        function openRegistration(examName, examCost, isPaid) {
+            examNameInput.value = examName;
+            examCostInput.value = examCost;
+            isPaidInput.value = isPaid;
+
+            modalTitle.textContent = `Register for: ${examName}`;
+            modalText.textContent = isPaid ? 
+                `The cost is ₹${examCost}. Enter your details to proceed to payment.` :
+                `This assessment is FREE. Enter your details to start the exam.`;
+            submitButton.textContent = isPaid ? 'Proceed to Payment' : 'Start FREE Exam';
+
+            registrationModal.classList.remove('hidden');
         }
 
-        // --- 2. UI ELEMENT REFERENCES ---
-        const statusMessage = document.getElementById('status-message');
-        const loginScreen = document.getElementById('login-screen');
-        const assessmentDashboard = document.getElementById('assessment-dashboard');
-        const assessmentInProgress = document.getElementById('assessment-in-progress');
-        const assessmentResults = document.getElementById('assessment-results');
-        const userEmailDisplay = document.getElementById('user-email-display');
-        const userDisplay = document.getElementById('user-display');
-        const googleSignInButton = document.getElementById('google-sign-in');
-        const signOutButton = document.getElementById('sign-out');
-        const quizForm = document.getElementById('quiz-form');
-        const quizTitle = document.getElementById('quiz-title');
-        const historyLoading = document.getElementById('history-loading');
-        const assessmentHistoryDiv = document.getElementById('assessment-history');
+        function closeRegistration() {
+            registrationModal.classList.add('hidden');
+        }
 
+        async function handleRegistration(event) {
+            event.preventDefault();
 
-        let currentQuizData = []; // Store the generated questions and answers
-        let currentTopic = ''; // Store the current topic being assessed
+            const fullName = fullNameInput.value;
+            const email = emailInput.value;
+            const examName = examNameInput.value;
+            const examCost = parseFloat(examCostInput.value);
+            const isPaid = isPaidInput.value === 'true'; // Convert string back to boolean
 
-        /**
-         * Switches the active screen based on the user's logged-in status.
-         * @param {object | null} user - The Supabase user object or null.
-         * @param {string} activeScreenId - The ID of the screen to show ('login', 'dashboard', 'quiz', 'results').
-         */
-        const renderScreen = (user, activeScreenId = 'dashboard') => {
-            const screens = {
-                'login': loginScreen,
-                'dashboard': assessmentDashboard,
-                'quiz': assessmentInProgress,
-                'results': assessmentResults,
-            };
-
-            // Hide all screens initially
-            Object.values(screens).forEach(screen => screen.classList.add('hidden-screen'));
-
-            // Check if the user is authenticated (Supabase user object exists)
-            const isAuthenticated = user && user.id;
-
-            // Update Header Display
-            userDisplay.classList.add('hidden');
-            
-            if (isAuthenticated) {
-                userEmailDisplay.textContent = user.email || 'N/A';
-                userDisplay.classList.remove('hidden');
-                
-                // Show the requested screen
-                screens[activeScreenId].classList.remove('hidden-screen');
-                
-                let message = 'Ready to begin your assessment.';
-
-                if (activeScreenId === 'quiz') {
-                    message = 'Assessment is loading...';
-                } else if (activeScreenId === 'results') {
-                    message = 'Assessment complete. See analysis options below.';
-                } else if (activeScreenId === 'dashboard') {
-                    loadAssessmentHistory(user.id); // Load history on dashboard view
-                }
-
-                statusMessage.textContent = message;
-
-            } else {
-                // Not signed in, show login
-                screens['login'].classList.remove('hidden-screen');
-                statusMessage.textContent = 'Please sign in to view assessments.';
-            }
-        };
-
-
-        // --- 3. SUPABASE AUTH HANDLERS ---
-        
-        const signInWithGoogle = async () => {
-            if (!supabase) return;
-            statusMessage.textContent = 'Redirecting to Google for sign-in...';
-            try {
-                const { error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: { redirectTo: window.location.origin },
-                });
-                if (error) throw error;
-            } catch (error) {
-                console.error("Sign-in redirect error:", error);
-                statusMessage.textContent = `Sign-in failed: ${error.message}`;
-            }
-        };
-
-        const handleSignOut = async () => {
-            if (!supabase) return;
-            try {
-                const { error } = await supabase.auth.signOut();
-                if (error) throw error;
-                statusMessage.textContent = 'Signed out. Thank you for visiting.';
-            } catch (error) {
-                console.error("Sign-out error:", error);
-                statusMessage.textContent = `Sign-out failed: ${error.message}`;
-            }
-        };
-
-        // --- 4. SUPABASE DATA PERSISTENCE (LMS Feature) ---
-
-        /**
-         * Saves the assessment result to the Supabase database.
-         * The price is set to the cost of the Detailed Analysis (200 Rs).
-         */
-        async function saveAssessmentResult(userId, topic, score, maxScore) {
-            if (!supabase || !userId) {
-                console.error("Supabase not initialized or user not logged in.");
-                return;
-            }
-            
-            const ANALYSIS_PRICE = 200; // Cost for detailed analysis report
-            
-            // NOTE: 'assessments' is the table you need to create in your Supabase project.
-            const { data, error } = await supabase
-                .from('assessments') 
+            // 1. Insert data into Supabase
+            const { error } = await supabaseClient 
+                .from('registration_') // Ensure this is your correct table name
                 .insert([
-                    // Score is saved privately to the database (for the owner)
-                    { user_id: userId, topic: topic, score: score, max_score: maxScore, price: ANALYSIS_PRICE }
+                    { 
+                        full_name: fullName, 
+                        email: email, 
+                        exam_name: examName, 
+                        exam_cost: examCost,
+                        login_type: 'Manual' // Tracks registration type
+                    },
                 ]);
 
             if (error) {
-                console.error("Error saving assessment result:", error);
-            } else {
-                console.log("Assessment result saved successfully:", data);
-            }
-        }
-
-        /**
-         * Loads and displays the user's past assessment history.
-         * Score is hidden, Analysis CTA is shown.
-         */
-        async function loadAssessmentHistory(userId) {
-            if (!supabase || !userId) return;
-
-            historyLoading.classList.remove('hidden');
-            assessmentHistoryDiv.innerHTML = '';
-
-            const { data: history, error } = await supabase
-                .from('assessments')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false });
-
-            historyLoading.classList.add('hidden');
-
-            if (error) {
-                console.error("Error loading history:", error);
-                assessmentHistoryDiv.innerHTML = `<p class="text-red-500 text-center">Could not load history. Have you created the 'assessments' table (with 'price' column) in Supabase?</p>`;
+                console.error('Supabase Error:', error.message);
+                alert(`A database error occurred. Please try again. Error: ${error.message}`);
                 return;
             }
-
-            if (history.length === 0) {
-                assessmentHistoryDiv.innerHTML = '<p class="text-gray-500 text-center py-4">No assessments completed yet. Start a test above!</p>';
-                return;
-            }
-
-            // Render the history table
-            let tableHtml = `
-                <table class="history-table min-w-full divide-y divide-gray-200">
-                    <thead>
-                        <tr>
-                            <th class="rounded-tl-lg">Assessment Topic</th>
-                            <th>Status</th>
-                            <th>Analysis Cost</th>
-                            <th class="rounded-tr-lg">Date Completed</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-            `;
             
-            history.forEach(item => {
-                const date = new Date(item.created_at).toLocaleDateString();
-                const time = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                // Score is not displayed, only status
-                const statusText = '<span class="text-green-600 font-medium">Completed</span>';
-                
-                // Display the analysis cost
-                const analysisCostText = item.price > 0 ? `₹${item.price}` : 'FREE';
-
-                tableHtml += `
-                    <tr>
-                        <td class="font-medium text-gray-800">${item.topic}</td>
-                        <td class="text-gray-600">${statusText}</td>
-                        <td class="text-red-600 font-semibold">${analysisCostText}</td>
-                        <td class="text-gray-500 text-sm">${date} at ${time}</td>
-                    </tr>
-                `;
-            });
-
-            tableHtml += `
-                    </tbody>
-                </table>
-            `;
-            assessmentHistoryDiv.innerHTML = tableHtml;
+            // 2. Success Handling
+            if (isPaid) {
+                alert(`Thank you, ${fullName}! You are registered. Next, you would be redirected to the payment page.`);
+                // In a real application, you would add a redirect to a payment gateway here
+            } else {
+                alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
+                window.location.href = './assessment-start.html'; // Redirect to the exam page
+            }
+            
+            closeRegistration();
+            document.getElementById('registrationForm').reset();
         }
 
-
-        // --- 5. LLM QUESTION GENERATION LOGIC (Unchanged) ---
+        // Attach the manual registration handler
+        document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
         
-        // Define the JSON schema for 20 questions
-        const quizSchema = {
-            type: "ARRAY",
-            items: {
-                type: "OBJECT",
-                properties: {
-                    "question": { "type": "STRING", "description": "The main text of the multiple-choice question." },
-                    "options": { 
-                        "type": "OBJECT", 
-                        "properties": {
-                            "A": { "type": "STRING" },
-                            "B": { "type": "STRING" },
-                            "C": { "type": "STRING" },
-                            "D": { "type": "STRING" },
+        // GOOGLE SIGN-IN CALLBACK FUNCTION (Used for the FREE assessment)
+        async function handleCredentialResponse(response) {
+            if (response.credential) {
+                // Decode the JWT token to get user details
+                const user = jwt_decode(response.credential);
+                const fullName = user.name;
+                const email = user.email;
+                const examName = 'Free Core Concepts Check'; 
+                const examCost = 0;
+
+                // 1. INSERT DATA INTO SUPABASE
+                const { error } = await supabaseClient 
+                    .from('registration_') // Ensure this is your correct table name
+                    .insert([
+                        { 
+                            full_name: fullName, 
+                            email: email, 
+                            exam_name: examName, 
+                            exam_cost: examCost,
+                            login_type: 'Google' // Tracks registration type
                         },
-                        "required": ["A", "B", "C", "D"],
-                        "description": "The four options for the multiple-choice question."
-                    },
-                    "answerKey": { 
-                        "type": "STRING", 
-                        "description": "The correct option key (A, B, C, or D)."
-                    }
-                },
-                "required": ["question", "options", "answerKey"]
-            }
-        };
+                    ]);
 
-        // LLM API call function with exponential backoff
-        async function generateQuiz(topic, attempts = 0) {
-            currentTopic = topic;
-            const session = await supabase.auth.getSession();
-            const user = session.data.session?.user || null;
+                if (error) {
+                    console.error('Supabase Error:', error.message);
+                    alert(`A database error occurred. Please try again. Error: ${error.message}`);
+                    return;
+                }
 
-            if (!user) {
-                statusMessage.textContent = 'Error: Please sign in again.';
-                renderScreen(null, 'login');
-                return;
-            }
+                // 2. SUCCESS HANDLING: Redirect to the Assessment Start page
+                alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
+                window.location.href = './assessment-start.html'; 
 
-            renderScreen(user, 'quiz');
-            quizTitle.textContent = `${topic} Assessment`;
-            document.getElementById('loader').classList.remove('hidden');
-            document.getElementById('assessment-status').textContent = `Please wait while the AI prepares your 20-question ${topic} test.`;
-            document.getElementById('quiz-content').innerHTML = '';
-
-            const systemPrompt = `You are an expert B.Tech course instructor. Generate exactly 20 challenging, fundamental multiple-choice questions (MCQs) for a ${topic} assessment. The questions must be appropriate for a university-level B.Tech student. Ensure the JSON output strictly follows the provided schema and contains exactly 20 items.`;
-            
-            let userQuery = '';
-            if (topic.includes('Technical')) {
-                userQuery = 'Generate 20 MCQs for the Technical Fundamentals assessment, covering core B.Tech syllabus concepts like Data Structures, Operating Systems, DBMS, and basic Networking.';
-            } else if (topic.includes('Aptitude')) {
-                userQuery = 'Generate 20 MCQs for the Aptitude & Reasoning test, covering logical deduction, quantitative analysis, number series, and spatial reasoning.';
-            } else if (topic.includes('Behavioral')) {
-                 userQuery = 'Generate 20 MCQs for the Behavioral Skills assessment focused on workplace scenarios related to communication, teamwork, conflict resolution, time management, and ethical decision-making.';
             } else {
-                userQuery = `Generate 20 MCQs for the ${topic} assessment.`;
-            }
-
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: quizSchema,
-                }
-            };
-            
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!jsonText) throw new Error("API response text was empty.");
-                
-                const questions = JSON.parse(jsonText);
-                
-                if (questions.length < 15) throw new Error(`Received too few questions (${questions.length}).`);
-                
-                currentQuizData = questions.slice(0, 20); // Always use at most 20 questions
-                
-                renderQuiz();
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('assessment-status').textContent = `Test ready! Submit when finished.`;
-                
-            } catch (error) {
-                console.error("Question generation failed:", error);
-                
-                if (attempts < 3) {
-                    const delay = Math.pow(2, attempts) * 1000;
-                    console.log(`Retrying in ${delay / 1000} seconds...`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return generateQuiz(topic, attempts + 1);
-                }
-
-                document.getElementById('assessment-status').textContent = `Error: Could not generate test questions after several retries.`;
-                document.getElementById('loader').classList.add('hidden');
-                // Send user back to dashboard on failure
-                renderScreen(user, 'dashboard');
+                alert("Google Sign-In failed. Please try again.");
             }
         }
-        
-        /**
-         * Renders the generated quiz questions onto the screen. (Unchanged)
-         */
-        function renderQuiz() {
-            const quizContent = document.getElementById('quiz-content');
-            quizContent.innerHTML = '';
-            
-            if (currentQuizData.length === 0) {
-                quizContent.innerHTML = '<p class="text-red-500">No questions loaded.</p>';
-                return;
-            }
-
-            currentQuizData.forEach((item, index) => {
-                const questionNumber = index + 1;
-                const radioGroupName = `q${questionNumber}`; 
-                
-                const questionHtml = `
-                    <div class="mb-8 p-4 border border-gray-100 bg-white rounded-lg shadow-md">
-                        <p class="font-semibold text-lg mb-4 text-gray-800">Q${questionNumber}: ${item.question}</p>
-                        <div class="space-y-2">
-                            ${Object.keys(item.options).map(key => `
-                                <label class="flex items-center p-3 rounded-md border border-gray-200 hover:bg-indigo-50 cursor-pointer transition duration-150">
-                                    <input type="radio" name="${radioGroupName}" value="${key}" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 mr-3" required>
-                                    <span class="text-gray-700 font-medium">${key}: ${item.options[key]}</span>
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                quizContent.insertAdjacentHTML('beforeend', questionHtml);
-            });
-            
-            // Add submit and cancel buttons at the end
-            quizContent.insertAdjacentHTML('beforeend', `
-                <div class="mt-8 text-center">
-                    <button type="submit" id="submit-quiz" class="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition duration-300">
-                        Submit ${currentTopic} Assessment
-                    </button>
-                    <button type="button" id="back-to-dashboard-quiz" class="ml-4 px-4 py-3 bg-gray-300 text-gray-800 font-semibold rounded-xl hover:bg-gray-400 transition duration-300">
-                        Cancel & Back
-                    </button>
-                </div>
-            `);
-            
-            document.getElementById('back-to-dashboard-quiz').addEventListener('click', () => {
-                supabase.auth.getSession().then(({ data: { session } }) => {
-                    renderScreen(session?.user, 'dashboard');
-                });
-            });
-        }
-        
-        /**
-         * Calculates the score, saves the result (without displaying it), and displays the results screen with CTA.
-         */
-        async function handleSubmitQuiz(event) {
-            event.preventDefault();
-            const session = await supabase.auth.getSession();
-            const user = session.data.session?.user || null;
-            if (!user) return;
-
-            let correctAnswers = 0;
-            const form = event.target;
-            const MAX_SCORE = currentQuizData.length;
-
-            currentQuizData.forEach((question, index) => {
-                const questionNumber = index + 1;
-                const selectedOption = form.querySelector(`input[name="q${questionNumber}"]:checked`)?.value;
-                
-                if (selectedOption && selectedOption === question.answerKey) {
-                    correctAnswers++;
-                }
-            });
-
-            // 1. SAVE RESULT TO SUPABASE (Score is saved to the DB for the owner's review)
-            await saveAssessmentResult(user.id, currentTopic, correctAnswers, MAX_SCORE);
-
-            // 2. Display Results Screen (only topic name, no score)
-            document.getElementById('results-topic').textContent = currentTopic;
-
-            // 3. Render Results Screen
-            renderScreen(user, 'results');
-        }
-
-
-        // --- 6. INITIALIZATION AND EVENT LISTENERS (Unchanged flow) ---
-        
-        // Supabase Auth State Listener
-        if (supabase) {
-            supabase.auth.onAuthStateChange((event, session) => {
-                const user = session?.user || null;
-                // If a user is present, render the dashboard (the landing page).
-                renderScreen(user, 'dashboard'); 
-            });
-        }
-        
-        // Button Event Listeners
-        googleSignInButton.addEventListener('click', signInWithGoogle);
-        signOutButton.addEventListener('click', handleSignOut);
-        
-        // All three tests now start immediately with a click
-        document.getElementById('start-technical').addEventListener('click', () => generateQuiz('Technical Fundamentals'));
-        document.getElementById('start-aptitude').addEventListener('click', () => generateQuiz('Aptitude & Reasoning'));
-        document.getElementById('start-behavioral').addEventListener('click', () => generateQuiz('Behavioral Skills'));
-        
-        // Quiz form submission listener (Uses event delegation on the static form element)
-        quizForm.addEventListener('submit', handleSubmitQuiz);
-        
-        // Results screen listener
-        document.getElementById('results-back-to-dashboard').addEventListener('click', () => {
-            supabase.auth.getSession().then(({ data: { session } }) => {
-                renderScreen(session?.user, 'dashboard');
-            });
-        });
-
     </script>
+
 </body>
 </html>
