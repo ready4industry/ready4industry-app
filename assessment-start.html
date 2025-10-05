@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Updated Title to be more catchy -->
     <title>Your Career Launchpad: Skills Challenge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -23,28 +22,27 @@
         .module-button {
             transition: all 0.2s ease-in-out;
             background-image: linear-gradient(135deg, var(--tw-gradient-stops));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         .module-button:hover:not(:disabled) {
             transform: scale(1.02);
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
         }
-        /* Crucial fix: Ensure the disabled background is neutral and fully visible */
+        /* Ensure the disabled button has a visible, flat background */
         .module-button:disabled {
             cursor: not-allowed;
             opacity: 1; 
             background-image: none;
-            background-color: #d1d5db; /* Slightly darker gray for better visibility */
+            background-color: #d1d5db; /* Light gray for completed */
             box-shadow: none;
         }
-        /* Custom class for high-contrast white text on gradients */
-        .text-on-gradient {
-            color: white !important; /* Force white */
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); /* Stronger shadow */
+        /* Style for guaranteed text visibility on active buttons */
+        .active-text-shadow {
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
         }
-        /* Custom class for high-contrast black text on completed modules */
-        .text-on-completed {
-            color: #1f2937 !important; /* Force dark gray/black */
-        }
+
         .quiz-container {
             border: 1px solid #e5e7eb;
             padding: 1.5rem;
@@ -252,47 +250,44 @@
             
             const allCompleted = Object.keys(MODULES).every(key => state[key]);
 
-            let moduleHtml = Object.entries(MODULES).map(([key, name], index) => {
+            let moduleHtml = Object.entries(MODULES).map(([key, name]) => {
                 const isCompleted = state[key] === true;
                 const disabled = isCompleted ? 'disabled' : '';
-                const status = isCompleted ? '(Completed)' : 'Start Challenge';
+                const statusText = isCompleted ? 'Completed' : 'Start Challenge';
                 
-                let colorClass;
+                let colorClass; // Tailwind gradient classes
+                let textColorClass; // Tailwind text color class
 
-                if (key === 'technical') {
-                    colorClass = 'from-blue-500 to-indigo-600';
-                } else if (key === 'aptitude') {
-                    colorClass = 'from-green-500 to-teal-600';
-                } else if (key === 'behavioural') {
-                    colorClass = 'from-purple-500 to-pink-600';
+                if (isCompleted) {
+                    // Completed module: light gray background, dark text
+                    colorClass = ''; 
+                    textColorClass = 'text-gray-800';
+                } else {
+                    // Active module: specific gradient, white text
+                    textColorClass = 'text-white';
+                    if (key === 'technical') {
+                        colorClass = 'from-blue-500 to-indigo-600';
+                    } else if (key === 'aptitude') {
+                        colorClass = 'from-green-500 to-teal-600';
+                    } else if (key === 'behavioural') {
+                        colorClass = 'from-purple-500 to-pink-600';
+                    }
                 }
-
-                // If disabled, we override the color class with a neutral background class
-                const finalColorClass = isCompleted ? '' : colorClass;
                 
-                // Use custom CSS classes for guaranteed visibility
-                const textClass = isCompleted ? 'text-on-completed' : 'text-on-gradient'; 
+                // Active modules get the text shadow CSS class for visibility
+                const textShadowClass = isCompleted ? '' : 'active-text-shadow';
+                // Status pill styling
+                const statusPillClass = isCompleted ? 'bg-gray-400 text-gray-800' : 'bg-white bg-opacity-20 text-white';
 
                 return `
                     <button 
                         onclick="startAssessment('${key}', '${name}')" 
-                        class="module-button w-full text-left p-8 rounded-2xl font-extrabold text-xl shadow-xl transition duration-300 ${finalColorClass} ${disabled} ${textClass}"
+                        class="module-button w-full text-center p-6 rounded-xl font-extrabold text-lg shadow-lg ${colorClass} ${disabled} ${textColorClass}"
                         style="--tw-gradient-stops: var(--tw-gradient-from) var(--tw-gradient-to);"
                         ${disabled}
                     >
-                        <div class="flex flex-col">
-                            <!-- Index number. Ensure it uses the textClass for guaranteed color. -->
-                            <span class="text-4xl mb-2 ${isCompleted ? 'opacity-80' : 'opacity-75'}">${index + 1}.</span>
-                            <span class="text-2xl">${name}</span>
-                            <div class="flex justify-between items-center mt-3 pt-3 border-t ${isCompleted ? 'border-opacity-100 border-gray-500' : 'border-white border-opacity-30'}">
-                                <!-- Status pill: use high contrast for both states -->
-                                <span class="text-sm font-semibold tracking-wider ${isCompleted ? 'bg-gray-400 text-gray-800' : 'bg-white bg-opacity-20 text-white'} py-1 px-3 rounded-full">${status}</span>
-                                <!-- Time/Review text. Ensure it uses the textClass for guaranteed color. -->
-                                ${isCompleted 
-                                    ? '<span class="text-sm font-light opacity-90">Review complete.</span>' 
-                                    : `<span class="text-sm font-light opacity-90">15 Questions | 15 min</span>`}
-                            </div>
-                        </div>
+                        <span class="${textShadowClass} text-xl">${name}</span>
+                        <span class="text-sm font-semibold tracking-wider py-1 px-3 rounded-full ${statusPillClass}">${statusText}</span>
                     </button>
                 `;
             }).join('');
@@ -308,28 +303,28 @@
             
             // --- Upbeat Welcome Section ---
             const welcomeSection = `
-                <div class="bg-indigo-600 text-white p-8 rounded-xl mb-8 shadow-2xl">
-                    <h1 class="text-4xl font-extrabold mb-1">Your Career Launchpad: Skills Challenge</h1>
-                    <p class="text-xl font-medium opacity-90">Welcome, ${userEmail}! Conquer these challenges to unlock your potential.</p>
+                <div class="bg-indigo-600 text-white p-6 rounded-xl mb-6 shadow-2xl">
+                    <h1 class="text-3xl font-extrabold mb-1">Skills Challenge Dashboard</h1>
+                    <p class="text-lg font-medium opacity-90">Welcome, ${userEmail}! Select a module to begin.</p>
                 </div>
             `;
 
             app.innerHTML = `
                 ${welcomeSection}
                 
-                <h2 class="text-2xl font-bold text-gray-700 mb-6 border-b pb-3">Modules Awaiting Your Brilliance:</h2>
+                <h2 class="text-2xl font-bold text-gray-700 mb-6 border-b pb-3">Assessment Modules:</h2>
                 
-                <div class="grid md:grid-cols-3 gap-6">
+                <div class="space-y-4">
                     ${moduleHtml}
                 </div>
                 
                 ${allCompleted ? `
-                    <div class="mt-12 p-8 bg-yellow-50 border-4 border-yellow-300 rounded-xl text-center shadow-2xl">
-                        <p class="text-2xl font-extrabold text-yellow-800 mb-4">Challenge Complete! Victory Achieved!</p>
-                        <p class="text-lg text-gray-700 mb-8">You have successfully finished all modules. It's time to see your detailed performance report and unlock personalized feedback.</p>
+                    <div class="mt-8 p-6 bg-yellow-50 border-4 border-yellow-300 rounded-xl text-center shadow-2xl">
+                        <p class="text-xl font-extrabold text-yellow-800 mb-4">Challenge Complete! Victory Achieved!</p>
+                        <p class="text-md text-gray-700 mb-6">All modules are finished. Unlock your detailed performance report and personalized feedback now.</p>
                         <button 
                             onclick="showPaymentModal()" 
-                            class="w-full md:w-3/5 px-10 py-4 bg-red-600 text-white rounded-lg font-extrabold text-xl hover:bg-red-700 transition duration-200 shadow-2xl transform hover:scale-[1.05]"
+                            class="w-full md:w-3/5 px-8 py-3 bg-red-600 text-white rounded-lg font-extrabold text-lg hover:bg-red-700 transition duration-200 shadow-2xl transform hover:scale-[1.05]"
                         >
                             Get Final Result: Pay ₹99
                         </button>
