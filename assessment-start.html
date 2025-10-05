@@ -1,17 +1,260 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessment Start</title>
+    <title>Core Concepts Check | Ready4Industry</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .font-inter { font-family: 'Inter', sans-serif; }
+        /* Custom radio button appearance for LMS feel */
+        input[type="radio"]:checked + label {
+            background-color: #10B981; /* Tailwind green-500 */
+            color: white;
+            border-color: #059669; /* Tailwind green-600 */
+            font-weight: 600;
+        }
+        .assessment-container { min-height: 80vh; }
+    </style>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen">
-    <div class="max-w-xl p-8 bg-white rounded-xl shadow-2xl text-center">
-        <h1 class="text-4xl font-extrabold text-green-600 mb-4">Registration Successful!</h1>
-        <p class="text-xl text-slate-700 mb-6">You are now ready to begin the **FREE Core Concepts Check** assessment.</p>
-        <p class="text-md text-slate-500 mb-8">Your details have been securely logged. The actual exam content will go on this page.</p>
-        <a href="index.html" class="inline-block px-6 py-3 bg-teal-600 text-white font-bold rounded-lg hover:bg-teal-700 transition-colors">Return to Home Page</a>
+<body class="bg-gray-50 font-inter">
+
+    <div class="container mx-auto p-4 md:p-10 assessment-container flex flex-col items-center">
+
+        <header class="w-full max-w-4xl text-center py-6">
+            <h1 class="text-3xl font-extrabold text-gray-900">Core Concepts Check</h1>
+            <p id="assessment-status" class="text-lg text-gray-600 mt-2">Loading assessment and verifying user...</p>
+        </header>
+
+        <main id="assessment-area" class="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 md:p-10 mt-4 hidden">
+            
+            <div class="flex justify-between items-center pb-4 mb-6 border-b border-gray-200">
+                <span class="text-xl font-semibold text-blue-600">Technical Fundamentals (20 Qs)</span>
+                <span id="timer" class="text-lg font-bold text-red-600">Time: 15:00</span>
+            </div>
+
+            <form id="assessment-form">
+                </form>
+
+            <div class="mt-10 pt-6 border-t border-gray-200">
+                <button 
+                    id="submit-button"
+                    type="button" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50"
+                    onclick="submitAssessment()"
+                >
+                    Submit Assessment
+                </button>
+            </div>
+        </main>
+
+        <div id="result-area" class="w-full max-w-xl text-center bg-white shadow-2xl rounded-lg p-8 md:p-12 mt-10 hidden">
+            </div>
+
+        <div id="loading-spinner" class="mt-10">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+
     </div>
+
+    <script>
+        // --- CLIENT-SIDE SECRETS (Anon Key is fine for client) ---
+        const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8';
+        const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/assessment-api`; // Calls the backend function for Perplexity
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let userEmail = null;
+        let assessmentTimer;
+        let submittedAnswers = {};
+        
+        // --- Core Authentication and Flow Control ---
+
+        async function checkAuthentication() {
+            // Checks for a valid session after Google Sign-In
+            const { data: { user } } = await supabaseClient.auth.getUser();
+
+            if (!user) {
+                alert("Authentication required. Redirecting to login page.");
+                // Redirects back to your main login page
+                window.location.href = './index (2).html'; 
+                return null;
+            }
+            
+            userEmail = user.email;
+            document.getElementById('assessment-status').textContent = `Welcome, ${user.email}! Please complete the assessment within 15 minutes.`;
+            return user.email;
+        }
+
+        async function startAssessment(email) {
+            document.getElementById('loading-spinner').classList.remove('hidden');
+            
+            try {
+                // STEP 1: Calls Edge Function to generate questions via Perplexity API
+                const response = await fetch(EDGE_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'generate_questions', email })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to load questions from the server.");
+                }
+
+                const data = await response.json();
+                
+                if (data.questions.length === 0) {
+                    throw new Error("AI did not generate any questions.");
+                }
+
+                renderQuestions(data.questions);
+                document.getElementById('assessment-area').classList.remove('hidden');
+                document.getElementById('loading-spinner').classList.add('hidden');
+                startTimer(15 * 60); // 15 minutes
+            } catch (error) {
+                console.error("Assessment Start Error:", error);
+                document.getElementById('loading-spinner').classList.add('hidden');
+                document.getElementById('assessment-status').innerHTML = 'Error: Failed to load assessment. <span class="text-red-500">Check console for details and ensure backend is deployed.</span>';
+            }
+        }
+
+        function renderQuestions(questions) {
+            const form = document.getElementById('assessment-form');
+            // Random 20 questions are displayed here
+            form.innerHTML = questions.map((q, index) => `
+                <div class="mb-8 p-4 border border-gray-200 rounded-lg shadow-sm">
+                    <p class="text-lg font-semibold text-gray-800 mb-4">
+                        <span class="text-blue-600">${index + 1}. [${q.topic}]</span> ${q.question}
+                    </p>
+                    <div class="space-y-3">
+                        ${q.options.map((option, optIndex) => `
+                            <div class="flex items-center">
+                                <input 
+                                    type="radio" 
+                                    id="q${q.id}_opt${optIndex}" 
+                                    name="q${q.id}" 
+                                    value="${option}" 
+                                    class="hidden"
+                                    onchange="recordAnswer('${q.id}', this.value)"
+                                >
+                                <label 
+                                    for="q${q.id}_opt${optIndex}" 
+                                    class="w-full cursor-pointer p-3 border border-gray-300 rounded-md transition duration-150 hover:bg-gray-100"
+                                >
+                                    ${option}
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function recordAnswer(questionId, answer) {
+            submittedAnswers[questionId] = answer;
+        }
+
+        function startTimer(durationSeconds) {
+            let timerDisplay = document.getElementById('timer');
+            let timeLeft = durationSeconds;
+
+            assessmentTimer = setInterval(() => {
+                let minutes = parseInt(timeLeft / 60, 10);
+                let seconds = parseInt(timeLeft % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                timerDisplay.textContent = `Time: ${minutes}:${seconds}`;
+
+                if (--timeLeft < 0) {
+                    clearInterval(assessmentTimer);
+                    alert("Time's up! Submitting assessment automatically.");
+                    submitAssessment();
+                }
+            }, 1000);
+        }
+
+        async function submitAssessment() {
+            clearInterval(assessmentTimer);
+            document.getElementById('submit-button').disabled = true;
+            document.getElementById('assessment-status').textContent = 'Submitting and processing results securely...';
+            document.getElementById('loading-spinner').classList.remove('hidden');
+            
+            try {
+                // STEP 2: Calls Edge Function to submit answers, grade, and store in Supabase
+                const response = await fetch(EDGE_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'submit_assessment', email: userEmail, user_answers: submittedAnswers })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to record assessment on the server.");
+                }
+                
+                // Show results/offer area
+                document.getElementById('assessment-area').classList.add('hidden');
+                document.getElementById('loading-spinner').classList.add('hidden');
+                renderPostAssessmentMessage();
+
+            } catch (error) {
+                console.error("Submission Error:", error);
+                document.getElementById('loading-spinner').classList.add('hidden');
+                document.getElementById('assessment-status').textContent = 'Critical Error during submission. Please contact support.';
+            }
+        }
+
+        function renderPostAssessmentMessage() {
+            const resultArea = document.getElementById('result-area');
+            resultArea.classList.remove('hidden');
+
+            const content = `
+                <i class="fas fa-check-circle text-green-500 text-6xl mb-6"></i>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Assessment Complete!</h2>
+                <p class="text-lg text-gray-700 mb-6">Your results have been securely recorded. **The score is not immediately displayed.**</p>
+                
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 p-6 mb-6 rounded-lg text-left">
+                    <h3 class="text-xl font-bold mb-3">Unlock Your Performance Insights!</h3>
+                    <p class="mb-4">For a small fee, receive your full score, correct answers, and personalized guidance:</p>
+                    <ul class="list-disc list-inside space-y-2 font-medium">
+                        <li>💰 **Pay ₹199** to view your score and correct answers.</li>
+                        <li>🤝 **Contact the Mentor** for detailed insights, mentoring, and guidance.</li>
+                    </ul>
+                    <a href="#" class="mt-4 inline-block bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                        Pay ₹199 & Get Results
+                    </a>
+                </div>
+
+                <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-6 rounded-lg text-left">
+                    <p class="text-lg font-semibold mb-4">Thanks for taking the assessment! We hope you liked it.</p>
+                    <p class="mb-4">In case you need a **detailed and advance assessment**, we offer specialized paid checks:</p>
+                    <ul class="space-y-2">
+                        <li><span class="font-bold text-blue-600">Advanced Technical:</span> ₹299</li>
+                        <li><span class="font-bold text-blue-600">Aptitude & Reasoning:</span> ₹199</li>
+                        <li><span class="font-bold text-blue-600">Behavioral Skills:</span> ₹199 (Communication, Teamwork, Problem Solving)</li>
+                    </ul>
+                    <p class="mt-4 text-sm text-gray-500">All advanced assessments feature random, **AI-generated questions** (using the Perplexity API).</p>
+                    <a href="#" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+                        View Advanced Assessments
+                    </a>
+                </div>
+            `;
+            resultArea.innerHTML = content;
+            document.getElementById('assessment-status').textContent = 'Assessment flow completed.';
+        }
+
+        // --- Execution Start ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            const email = await checkAuthentication();
+            if (email) {
+                await startAssessment(email);
+            }
+        });
+    </script>
+
 </body>
 </html>
