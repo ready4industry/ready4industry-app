@@ -452,11 +452,10 @@
         </div>
     </div>
     <script>
-        // --- CORRECTED SUPABASE CONFIGURATION ---
-        // Both values are now correctly enclosed in single quotes (')
-        const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+       // MUST BE QUOTED FOR JAVASCRIPT TO WORK
+const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // -----------------------------------------------------------------------------------
 
         const registrationModal = document.getElementById('registrationModal');
@@ -572,4 +571,5 @@
 
 </body>
 </html>
+
 
