@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
     
     <script src="https://accounts.google.com/gsi/client" async defer></script> 
-    
+    google-sign-in-button
     <script src="https://unpkg.com/jwt-decode@4.0.0/build/jwt-decode.js"></script> 
     
     <style>
@@ -452,10 +452,11 @@
         </div>
     </div>
     <script>
-       // MUST BE QUOTED FOR JAVASCRIPT TO WORK
+       // // ✅ YOU MUST ENSURE THESE SINGLE QUOTES ARE PRESENT
 const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// If this block is not 100% correct, the redirection will fail.
         // -----------------------------------------------------------------------------------
 
         const registrationModal = document.getElementById('registrationModal');
@@ -571,5 +572,6 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 </body>
 </html>
+
 
 
