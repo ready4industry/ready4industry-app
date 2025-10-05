@@ -37,7 +37,7 @@
             </div>
 
             <form id="assessment-form">
-                </form>
+            </form>
 
             <div class="mt-10 pt-6 border-t border-gray-200">
                 <button 
@@ -52,7 +52,7 @@
         </main>
 
         <div id="result-area" class="w-full max-w-xl text-center bg-white shadow-2xl rounded-lg p-8 md:p-12 mt-10 hidden">
-            </div>
+        </div>
 
         <div id="loading-spinner" class="mt-10">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -60,7 +60,6 @@
 
     </div>
 
-    <script>
     <script>
     // --- CLIENT-SIDE SECRETS (Anon Key is fine for client) ---
     const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
@@ -88,7 +87,7 @@
         userEmail = user.email;
         document.getElementById('assessment-status').textContent = `Welcome, ${user.email}! Please complete the assessment within 15 minutes.`;
         
-        // 🔑 CRITICAL FIX: Get the session token to use for the secure Edge Function call
+        // CRITICAL FIX: Get the session token to use for the secure Edge Function call
         const { data: { session } } = await supabaseClient.auth.getSession();
         return { email: user.email, token: session?.access_token }; // <-- NOW RETURNS TOKEN
     }
@@ -107,7 +106,7 @@
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
-                    // 🔑 CRITICAL FIX: Add the Authorization header
+                    // CRITICAL FIX: Add the Authorization header
                     'Authorization': `Bearer ${token}` 
                 },
                 body: JSON.stringify({ action: 'generate_questions', email })
@@ -282,7 +281,6 @@
             await startAssessment(authData); // Passes the required auth object
         }
     });
-</script>
     </script>
 
 </body>
