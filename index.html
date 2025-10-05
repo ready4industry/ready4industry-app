@@ -446,116 +446,108 @@
             </form>
         </div>
     </div>
-    <script>
-       // // ✅ YOU MUST ENSURE THESE SINGLE QUOTES ARE PRESENT
-const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8';
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-// If this block is not 100% correct, the redirection will fail.
-        // -----------------------------------------------------------------------------------
+   <script>
+    // --- SUPABASE CONFIGURATION ---
+    const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ------------------------------
 
-        const registrationModal = document.getElementById('registrationModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalText = document.getElementById('modalText');
-        const fullNameInput = document.getElementById('fullName');
-        const emailInput = document.getElementById('email');
-        const examNameInput = document.getElementById('examName');
-        const examCostInput = document.getElementById('examCost');
-        const isPaidInput = document.getElementById('isPaid');
-        const submitButton = document.getElementById('submitButton');
+    const registrationModal = document.getElementById('registrationModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const fullNameInput = document.getElementById('fullName');
+    const emailInput = document.getElementById('email');
+    const examNameInput = document.getElementById('examName');
+    const examCostInput = document.getElementById('examCost');
+    const isPaidInput = document.getElementById('isPaid');
+    const submitButton = document.getElementById('submitButton');
 
-        function openRegistration(examName, examCost, isPaid) {
-            examNameInput.value = examName;
-            examCostInput.value = examCost;
-            isPaidInput.value = isPaid;
+    function openRegistration(examName, examCost, isPaid) {
+        examNameInput.value = examName;
+        examCostInput.value = examCost;
+        isPaidInput.value = isPaid;
 
-            modalTitle.textContent = `Register for: ${examName}`;
-            modalText.textContent = isPaid ? 
-                `The cost is ₹${examCost}. Enter your details to proceed to payment.` :
-                `This assessment is FREE. Enter your details to start the exam.`;
-            submitButton.textContent = isPaid ? 'Proceed to Payment' : 'Start FREE Exam';
+        modalTitle.textContent = `Register for: ${examName}`;
+        modalText.textContent = isPaid ? 
+            `The cost is ₹${examCost}. Enter your details to proceed to payment.` :
+            `This assessment is FREE. Enter your details to start the exam.`;
+        submitButton.textContent = isPaid ? 'Proceed to Payment' : 'Start FREE Exam';
 
-            registrationModal.classList.remove('hidden');
-        }
-
-        function closeRegistration() {
-            registrationModal.classList.add('hidden');
-        }
-
-        async function handleRegistration(event) {
-            event.preventDefault();
-
-            const fullName = fullNameInput.value;
-            const email = emailInput.value;
-            const examName = examNameInput.value;
-            const examCost = parseFloat(examCostInput.value);
-            const isPaid = isPaidInput.value === 'true'; // Convert string back to boolean
-
-            // 1. Insert data into Supabase
-            const { error } = await supabaseClient 
-                .from('registration_') // Ensure this is your correct table name
-                .insert([
-                    { 
-                        full_name: fullName, 
-                        email: email, 
-                        exam_name: examName, 
-                        exam_cost: examCost,
-                        login_type: 'Manual' // Tracks registration type
-                    },
-                ]);
-
-            if (error) {
-                console.error('Supabase Error:', error.message);
-                alert(`A database error occurred. Please try again. Error: ${error.message}`);
-                return;
-            }
-            
-            // 2. Success Handling
-            if (isPaid) {
-                alert(`Thank you, ${fullName}! You are registered. Next, you would be redirected to the payment page.`);
-                // In a real application, you would add a redirect to a payment gateway here
-            } else {
-                alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
-                window.location.href = './assessment-start.html'; // Redirect to the exam page
-            }
-            
-            closeRegistration();
-            document.getElementById('registrationForm').reset();
-        }
-
-        // Attach the manual registration handler
-        document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
-        
-        // NEW, ROBUST GOOGLE SIGN-IN FUNCTION (Supabase OAuth)
-async function handleGoogleSignIn() {
-    // IMPORTANT: Replace 'YOUR_PUBLIC_URL' with your actual hosted domain 
-    // (e.g., https://ready4industry.github.io). 
-    const REDIRECT_URL = 'YOUR_PUBLIC_URL/assessment-start.html'; 
-
-    const { data, error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: REDIRECT_URL, 
-        },
-    });
-
-    if (error) {
-        console.error('Supabase OAuth Error:', error.message);
-        alert(`Error logging in with Google. Ensure your Supabase Auth is configured. Error: ${error.message}`);
+        registrationModal.classList.remove('hidden');
     }
-}
-                // 2. SUCCESS HANDLING: Redirect to the Assessment Start page
-                alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
-                window.location.href = './assessment-start.html'; 
 
-            } else {
-                alert("Google Sign-In failed. Please try again.");
-            }
+    function closeRegistration() {
+        registrationModal.classList.add('hidden');
+    }
+
+    // HANDLES MANUAL REGISTRATION (FOR PAID ASSESSMENTS)
+    async function handleRegistration(event) {
+        event.preventDefault();
+
+        const fullName = fullNameInput.value;
+        const email = emailInput.value;
+        const examName = examNameInput.value;
+        const examCost = parseFloat(examCostInput.value);
+        const isPaid = isPaidInput.value === 'true'; 
+
+        // 1. Insert data into Supabase
+        const { error } = await supabaseClient 
+            .from('registration_') 
+            .insert([
+                { 
+                    full_name: fullName, 
+                    email: email, 
+                    exam_name: examName, 
+                    exam_cost: examCost,
+                    login_type: 'Manual' 
+                },
+            ]);
+
+        if (error) {
+            console.error('Supabase Error:', error.message);
+            alert(`A database error occurred. Please try again. Error: ${error.message}`);
+            return;
         }
-    </script>
+        
+        // 2. Success Handling
+        if (isPaid) {
+            alert(`Thank you, ${fullName}! You are registered. Next, you would be redirected to the payment page.`);
+            // Stripe logic will go here later
+        } else {
+            alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
+            window.location.href = './assessment-start.html'; // Redirect for free manual sign-up
+        }
+        
+        closeRegistration();
+        document.getElementById('registrationForm').reset();
+    }
+
+    // NEW, ROBUST GOOGLE SIGN-IN FUNCTION (SUPABASE NATIVE OAUTH)
+    async function handleGoogleSignIn() {
+        // This is your public URL, ensure it is added to Supabase Auth -> URL Configuration
+        const REDIRECT_URL = 'https://ready4industry.github.io/assessment-start.html'; 
+
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: REDIRECT_URL, 
+            },
+        });
+
+        if (error) {
+            console.error('Supabase OAuth Error:', error.message);
+            alert(`Error logging in with Google. Ensure your Supabase Auth is configured. Error: ${error.message}`);
+        }
+    }
+
+    // Attach the manual registration handler
+    document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
+</script>
 
 </body>
 </html>
+
 
 
 
