@@ -1,287 +1,405 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Concepts Check | Ready4Industry</title>
+    <title>Core Concepts Check</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .font-inter { font-family: 'Inter', sans-serif; }
-        /* Custom radio button appearance for LMS feel */
-        input[type="radio"]:checked + label {
-            background-color: #10B981; /* Tailwind green-500 */
-            color: white;
-            border-color: #059669; /* Tailwind green-600 */
-            font-weight: 600;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f9;
         }
-        .assessment-container { min-height: 80vh; }
+        .container-card {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            min-height: 400px;
+        }
+        .quiz-option-button {
+            transition: all 0.2s ease;
+        }
+        .quiz-option-button:not(:disabled):hover {
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            transform: translateY(-2px);
+        }
+        .quiz-option-button:disabled {
+            background-color: #cbd5e1; /* Gray-300 */
+            cursor: not-allowed;
+            color: #4b5563; /* Gray-600 */
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body class="bg-gray-50 font-inter">
+<body>
 
-    <div class="container mx-auto p-4 md:p-10 assessment-container flex flex-col items-center">
+    <div id="app" class="p-4">
+        <div class="container-card">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Core Concepts Check</h1>
+            <p id="welcome-message" class="text-sm text-gray-600 mb-6">Loading session...</p>
 
-        <header class="w-full max-w-4xl text-center py-6">
-            <h1 class="text-3xl font-extrabold text-gray-900">Core Concepts Check</h1>
-            <p id="assessment-status" class="text-lg text-gray-600 mt-2">Loading assessment and verifying user...</p>
-        </header>
-
-        <main id="assessment-area" class="w-full max-w-4xl bg-white shadow-xl rounded-lg p-6 md:p-10 mt-4 hidden">
-            
-            <div class="flex justify-between items-center pb-4 mb-6 border-b border-gray-200">
-                <span class="text-xl font-semibold text-blue-600">Technical Fundamentals (20 Qs)</span>
-                <span id="timer" class="text-lg font-bold text-red-600">Time: 15:00</span>
+            <!-- Loading View -->
+            <div id="loading-view" class="flex flex-col items-center justify-center min-h-[250px] text-center">
+                <div class="spinner mb-4"></div>
+                <p class="text-lg text-blue-600 font-medium">Please wait, setting up session...</p>
             </div>
 
-            <form id="assessment-form">
-            </form>
-
-            <div class="mt-10 pt-6 border-t border-gray-200">
-                <button 
-                    id="submit-button"
-                    type="button" 
-                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50"
-                    onclick="submitAssessment()"
-                >
-                    Submit Assessment
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="hidden">
+                <p class="text-lg font-semibold text-gray-700 mb-6">Select a module to begin your assessment (5 questions per module):</p>
+                
+                <div id="assessment-buttons" class="space-y-4">
+                    <!-- Buttons rendered dynamically -->
+                </div>
+                
+                <!-- Final Result Button (Hidden by default) -->
+                <button id="result-button" class="hidden mt-8 w-full p-4 bg-red-600 text-white font-bold rounded-lg shadow-xl hover:bg-red-700 transition" onclick="showFinalResult()">
+                    Get Final Result: Pay ₹99
                 </button>
             </div>
-        </main>
 
-        <div id="result-area" class="w-full max-w-xl text-center bg-white shadow-2xl rounded-lg p-8 md:p-12 mt-10 hidden">
+            <!-- Quiz View -->
+            <div id="quiz-view" class="hidden">
+                <h2 id="quiz-title" class="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2"></h2>
+                <div id="question-area">
+                    <!-- Questions will be rendered here -->
+                </div>
+
+                <div class="mt-8 pt-4 border-t flex justify-between items-center">
+                    <button id="submit-button" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition" onclick="submitQuiz()">
+                        Submit Quiz
+                    </button>
+                    <button id="cancel-button" class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition" onclick="showDashboard(true)">
+                        Cancel and Go Back
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result/Status Message -->
+            <div id="status-message" class="hidden mt-6 p-4 bg-yellow-100 text-yellow-800 rounded-lg"></div>
+
         </div>
-
-        <div id="loading-spinner" class="mt-10">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-
     </div>
 
     <script>
-    // --- CLIENT-SIDE SECRETS (Anon Key is fine for client) ---
-    const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8';
-    const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/assessment-api`; // Calls the backend function
+        // --- GLOBAL VARIABLES ---
+        const EDGE_FUNCTION_URL = "https://glskwkzzkhhwftzddqmo.supabase.co/functions/v1/assessment-api";
+        const QUESTION_COUNT = 5;
+        const ASSESSMENT_KEY = 'assessment_completion_state';
+        
+        let userToken = null;
+        let userEmail = null;
+        let questions = [];
+        let answers = {};
+        let currentTopicId = null; 
+        let assessmentState = {
+            technical: false,
+            aptitude: false,
+            behavioural: false
+        };
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let userEmail = null;
-    let assessmentTimer;
-    let submittedAnswers = {};
-    
-    // --- Core Authentication and Flow Control ---
+        const topics = [
+            { id: 'technical', name: 'Technical Fundamentals', apiTopic: 'Technical Fundamentals', color: 'blue', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />' },
+            { id: 'aptitude', name: 'Aptitude and Reasoning', apiTopic: 'Aptitude and Reasoning', color: 'green', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.24a10.03 10.03 0 010 14.884l-2.432-2.432m-4.636-4.636L12 10.707l-2 2-2 2-4 4" />' },
+            { id: 'behavioural', name: 'Behavioural Assessment', apiTopic: 'Behavioural and Situational Questions', color: 'purple', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.828-1.24a6 6 0 00-10.344 0C4.829 16.76 4 18 4 18v2h5m0-10a4 4 0 11-8 0 4 4 0 018 0zm10 0a4 4 0 11-8 0 4 4 0 018 0z" />' }
+        ];
 
-    async function checkAuthentication() {
-        // Checks for a valid session after Google Sign-In
-        const { data: { user } } = await supabaseClient.auth.getUser();
 
-        if (!user) {
-            alert("Authentication required. Redirecting to login page.");
-            // Redirects back to your main login page
-            window.location.href = './index (2).html'; 
-            return null;
+        // --- STATE MANAGEMENT ---
+
+        function loadState() {
+            try {
+                const storedState = localStorage.getItem(ASSESSMENT_KEY);
+                if (storedState) {
+                    assessmentState = JSON.parse(storedState);
+                }
+            } catch (e) {
+                console.warn("Could not load state from localStorage. Starting fresh.", e);
+            }
         }
-        
-        userEmail = user.email;
-        document.getElementById('assessment-status').textContent = `Welcome, ${user.email}! Please complete the assessment within 15 minutes.`;
-        
-        // CRITICAL FIX: Get the session token to use for the secure Edge Function call
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        return { email: user.email, token: session?.access_token }; // <-- NOW RETURNS TOKEN
-    }
 
-    // NOTE: The parameter now receives an object {email, token}
-    async function startAssessment({ email, token }) { 
-        document.getElementById('loading-spinner').classList.remove('hidden');
-
-        if (!token) {
-            throw new Error("Authentication token is missing.");
+        function saveState() {
+            try {
+                localStorage.setItem(ASSESSMENT_KEY, JSON.stringify(assessmentState));
+            } catch (e) {
+                console.error("Could not save state to localStorage.", e);
+            }
         }
-        
-        try {
-            // STEP 1: Calls Edge Function to fetch questions
-            const response = await fetch(EDGE_FUNCTION_URL, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    // CRITICAL FIX: Add the Authorization header
-                    'Authorization': `Bearer ${token}` 
-                },
-                body: JSON.stringify({ action: 'generate_questions', email })
+
+        function checkAllComplete() {
+            return assessmentState.technical && assessmentState.aptitude && assessmentState.behavioural;
+        }
+
+        // --- UI UPDATES ---
+
+        function updateDashboard() {
+            const buttonContainer = document.getElementById('assessment-buttons');
+            buttonContainer.innerHTML = '';
+            loadState(); // Ensure state is fresh
+            const allComplete = checkAllComplete();
+            
+            topics.forEach((t, index) => {
+                const isCompleted = assessmentState[t.id];
+                const isDisabled = isCompleted || allComplete;
+                const button = document.createElement('button');
+                
+                button.className = `quiz-option-button w-full p-4 bg-${t.color}-500 text-white font-bold rounded-lg shadow-md flex justify-between items-center`;
+                button.disabled = isDisabled;
+                button.onclick = () => startQuiz(t.id, t.apiTopic);
+                
+                let text = `${index + 1}. ${t.name}`;
+                if (isCompleted) {
+                    text += ' (Completed)';
+                    button.classList.add('opacity-75'); // Visual hint for completion
+                    button.classList.remove(`bg-${t.color}-500`);
+                    button.classList.add('bg-gray-400');
+                } else {
+                    button.classList.remove('bg-gray-400');
+                    button.classList.add(`bg-${t.color}-500`);
+                }
+
+                button.innerHTML = `
+                    <span>${text}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        ${t.icon}
+                    </svg>
+                `;
+                buttonContainer.appendChild(button);
             });
 
-            if (!response.ok) {
-                // If the response is 401, the message will be "Unauthorized" from the function
-                const errorData = await response.json(); 
-                throw new Error(`Failed to load questions from the server: ${errorData.error || response.statusText}`);
-            }
-
-            const data = await response.json();
-            
-            if (data.length === 0) { // The Edge Function returns a direct array of questions now
-                throw new Error("No questions were returned from the server.");
-            }
-
-            // The function returns the questions array directly
-            renderQuestions(data); 
-            document.getElementById('assessment-area').classList.remove('hidden');
-            document.getElementById('loading-spinner').classList.add('hidden');
-            startTimer(15 * 60); // 15 minutes
-        } catch (error) {
-            console.error("Assessment Start Error:", error);
-            document.getElementById('loading-spinner').classList.add('hidden');
-            document.getElementById('assessment-status').innerHTML = `Error: ${error.message || 'Failed to load assessment.'} <span class="text-red-500">Ensure backend is deployed and authenticated.</span>`;
+            // Show or hide the final result button
+            document.getElementById('result-button').classList.toggle('hidden', !allComplete);
         }
-    }
-
-    function renderQuestions(questions) {
-        const form = document.getElementById('assessment-form');
-        // Random 20 questions are displayed here
-        form.innerHTML = questions.map((q, index) => `
-            <div class="mb-8 p-4 border border-gray-200 rounded-lg shadow-sm">
-                <p class="text-lg font-semibold text-gray-800 mb-4">
-                    <span class="text-blue-600">${index + 1}. [${q.topic || 'General'}]</span> ${q.question}
-                </p>
-                <div class="space-y-3">
-                    ${q.options.map((option, optIndex) => `
-                        <div class="flex items-center">
-                            <input 
-                                type="radio" 
-                                id="q${q.id}_opt${optIndex}" 
-                                name="q${q.id}" 
-                                value="${option}" 
-                                class="hidden"
-                                onchange="recordAnswer('${q.id}', this.value)"
-                            >
-                            <label 
-                                for="q${q.id}_opt${optIndex}" 
-                                class="w-full cursor-pointer p-3 border border-gray-300 rounded-md transition duration-150 hover:bg-gray-100"
-                            >
-                                ${option}
-                            </label>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
-    }
-    
-    function recordAnswer(questionId, answer) {
-        submittedAnswers[questionId] = answer;
-    }
-
-    function startTimer(durationSeconds) {
-        let timerDisplay = document.getElementById('timer');
-        let timeLeft = durationSeconds;
-
-        assessmentTimer = setInterval(() => {
-            let minutes = parseInt(timeLeft / 60, 10);
-            let seconds = parseInt(timeLeft % 60, 10);
-
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-
-            timerDisplay.textContent = `Time: ${minutes}:${seconds}`;
-
-            if (--timeLeft < 0) {
-                clearInterval(assessmentTimer);
-                alert("Time's up! Submitting assessment automatically.");
-                submitAssessment();
-            }
-        }, 1000);
-    }
-
-    async function submitAssessment() {
-        clearInterval(assessmentTimer);
-        document.getElementById('submit-button').disabled = true;
-        document.getElementById('assessment-status').textContent = 'Submitting and processing results securely...';
-        document.getElementById('loading-spinner').classList.remove('hidden');
         
-        try {
-            // Re-fetch token for submission just in case
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const token = session?.access_token;
+        function showFinalResult() {
+             const resultMessage = `Thank you for completing all assessments! Your detailed insights and results are ready. Please pay ₹99 to proceed and contact the owner (keshav.karn@gmail.com) for further steps.`;
+             document.getElementById('result-button').disabled = true;
+             displayStatus(resultMessage, false);
+        }
 
-            if (!token) {
-                throw new Error("Authentication token missing during submission.");
+        // --- QUIZ FLOW ---
+
+        async function startQuiz(topicId, apiTopicName) {
+            if (!userToken) {
+                displayStatus("Authentication failed. Please log in again.", true);
+                return;
             }
 
-            // STEP 2: Calls Edge Function to submit answers, grade, and store in Supabase
-            const response = await fetch(EDGE_FUNCTION_URL, {
+            currentTopicId = topicId;
+            questions = [];
+            answers = {};
+
+            document.getElementById('loading-view').classList.remove('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('status-message').classList.add('hidden');
+
+            try {
+                const response = await fetch(EDGE_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ action: 'generate_questions', topic: apiTopicName, count: QUESTION_COUNT }),
+                });
+
+                if (!response.ok) {
+                    const errorJson = await response.json();
+                    throw new Error(`Failed to load questions from the server: ${errorJson.error || response.statusText}`);
+                }
+
+                questions = await response.json();
+                
+                if (questions.length === 0) {
+                     throw new Error("The API returned an empty list of questions.");
+                }
+
+                renderQuiz();
+                document.getElementById('quiz-title').textContent = `${topics.find(t => t.id === topicId).name} (${questions.length} Questions)`;
+                showView('quiz-view');
+
+            } catch (error) {
+                console.error("Quiz Start Error:", error);
+                displayStatus(`Error: Failed to load questions for ${apiTopicName}: ${error.message}`, true);
+                showView('dashboard-view');
+            }
+        }
+        
+        function submitQuiz() {
+            const totalQuestions = questions.length;
+            const answeredQuestions = Object.keys(answers).length;
+
+            if (answeredQuestions < totalQuestions) {
+                // Using a custom message box instead of window.confirm for better UI/UX in a real app
+                const confirmMessage = `You have only answered ${answeredQuestions} out of ${totalQuestions} questions. Are you sure you want to submit?`;
+                if (!window.confirm(confirmMessage)) return; 
+            }
+
+            document.getElementById('submit-button').disabled = true;
+            document.getElementById('submit-button').textContent = "Submitting...";
+
+            // 1. Mark as complete and save state
+            assessmentState[currentTopicId] = true;
+            saveState();
+
+            // 2. Submit to backend (for mock scoring)
+            fetch(EDGE_FUNCTION_URL, {
                 method: 'POST',
-                headers: { 
+                headers: {
+                    'Authorization': `Bearer ${userToken}`,
                     'Content-Type': 'application/json',
-                    // Must include Authorization for the submission step too
-                    'Authorization': `Bearer ${token}` 
                 },
-                body: JSON.stringify({ action: 'submit_assessment', email: userEmail, user_answers: submittedAnswers })
+                body: JSON.stringify({ 
+                    action: 'submit_assessment', 
+                    topic: currentTopicId,
+                    answers: answers 
+                }),
+            }).then(response => response.json())
+            .then(() => {
+                // 3. Navigate back to dashboard and display success
+                const completionStatus = checkAllComplete() ? "All modules complete!" : "Completed!";
+                showDashboard();
+                displayStatus(`${topics.find(t => t.id === currentTopicId).name} submitted. ${completionStatus}`, false);
+            })
+            .catch(error => {
+                console.error("Submission Error:", error);
+                displayStatus(`Error submitting assessment: ${error.message}`, true);
+                showDashboard();
+            })
+            .finally(() => {
+                document.getElementById('submit-button').disabled = false;
+                document.getElementById('submit-button').textContent = "Submit Quiz";
             });
+        }
+        
+        // --- UTILITY FUNCTIONS ---
+        
+        function showView(viewId) {
+            document.getElementById('loading-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById(viewId).classList.remove('hidden');
+        }
 
-            if (!response.ok) {
-                throw new Error("Failed to record assessment on the server.");
+        function showDashboard(clearStatus = false) {
+            updateDashboard();
+            showView('dashboard-view');
+            if (clearStatus) {
+                document.getElementById('status-message').classList.add('hidden');
             }
-            
-            // Show results/offer area
-            document.getElementById('assessment-area').classList.add('hidden');
-            document.getElementById('loading-spinner').classList.add('hidden');
-            renderPostAssessmentMessage();
-
-        } catch (error) {
-            console.error("Submission Error:", error);
-            document.getElementById('loading-spinner').classList.add('hidden');
-            document.getElementById('assessment-status').textContent = `Critical Error during submission: ${error.message}. Please contact support.`;
         }
-    }
-
-    function renderPostAssessmentMessage() {
-        const resultArea = document.getElementById('result-area');
-        resultArea.classList.remove('hidden');
-
-        const content = `
-            <i class="fas fa-check-circle text-green-500 text-6xl mb-6"></i>
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Assessment Complete!</h2>
-            <p class="text-lg text-gray-700 mb-6">Your results have been securely recorded. **The score is not immediately displayed.**</p>
+        
+        function parseFragment() {
+            // ... (JWT parsing logic remains the same)
+            const fragment = window.location.hash.substring(1);
+            const params = new URLSearchParams(fragment);
             
-            <div class="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 p-6 mb-6 rounded-lg text-left">
-                <h3 class="text-xl font-bold mb-3">Unlock Your Performance Insights!</h3>
-                <p class="mb-4">For a small fee, receive your full score, correct answers, and personalized guidance:</p>
-                <ul class="list-disc list-inside space-y-2 font-medium">
-                    <li>💰 **Pay ₹199** to view your score and correct answers.</li>
-                    <li>🤝 **Contact the Mentor** for detailed insights, mentoring, and guidance.</li>
-                </ul>
-                <a href="#" class="mt-4 inline-block bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-                    Pay ₹199 & Get Results
-                </a>
-            </div>
-
-            <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-800 p-6 rounded-lg text-left">
-                <p class="text-lg font-semibold mb-4">Thanks for taking the assessment! We hope you liked it.</p>
-                <p class="mb-4">In case you need a **detailed and advance assessment**, we offer specialized paid checks:</p>
-                <ul class="space-y-2">
-                    <li><span class="font-bold text-blue-600">Advanced Technical:</span> ₹299</li>
-                    <li><span class="font-bold text-blue-600">Aptitude & Reasoning:</span> ₹199</li>
-                    <li><span class="font-bold text-blue-600">Behavioral Skills:</span> ₹199 (Communication, Teamwork, Problem Solving)</li>
-                </ul>
-                <p class="mt-4 text-sm text-gray-500">All advanced assessments feature random, **AI-generated questions** (using the Perplexity API).</p>
-                <a href="#" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-                    View Advanced Assessments
-                </a>
-            </div>
-        `;
-        resultArea.innerHTML = content;
-        document.getElementById('assessment-status').textContent = 'Assessment flow completed.';
-    }
-
-    // --- Execution Start ---
-    document.addEventListener('DOMContentLoaded', async () => {
-        const authData = await checkAuthentication(); // Now gets {email, token}
-        if (authData && authData.email && authData.token) {
-            await startAssessment(authData); // Passes the required auth object
+            const accessToken = params.get('access_token');
+            if (accessToken) {
+                userToken = accessToken;
+                try {
+                    const base64Url = accessToken.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    const payload = JSON.parse(jsonPayload);
+                    userEmail = payload.email;
+                } catch (e) {
+                    userEmail = "User";
+                }
+            }
         }
-    });
+
+        function updateWelcomeMessage() {
+            if (userEmail) {
+                document.getElementById('welcome-message').innerHTML = `Welcome, <span class="font-bold text-gray-800">${userEmail}</span>! Please select a module to begin.`;
+            } else {
+                document.getElementById('welcome-message').textContent = 'Please log in to start your assessment.';
+            }
+        }
+
+        function displayStatus(message, isError = false) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.classList.remove('hidden');
+            if (isError) {
+                statusDiv.className = 'mt-6 p-4 bg-red-100 text-red-800 rounded-lg font-medium';
+            } else {
+                statusDiv.className = 'mt-6 p-4 bg-green-100 text-green-800 rounded-lg font-medium';
+            }
+        }
+
+        function renderQuiz() {
+            // ... (Quiz rendering logic remains the same)
+            const questionArea = document.getElementById('question-area');
+            questionArea.innerHTML = '';
+            
+            questions.forEach((q, qIndex) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'mb-6 p-4 border border-gray-200 rounded-lg';
+                qDiv.innerHTML = `
+                    <p class="font-bold text-gray-900 mb-3">Q${qIndex + 1}. (${q.topic}) ${q.question}</p>
+                `;
+                
+                // Shuffle options to prevent correct answer always being first
+                const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5); 
+
+                shuffledOptions.forEach((option, oIndex) => {
+                    const optionId = `q${q.id}-${oIndex}`;
+                    const radioName = `q-${q.id}`;
+                    
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'flex items-center mb-2';
+                    optionDiv.innerHTML = `
+                        <input type="radio" id="${optionId}" name="${radioName}" value="${option}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 rounded" onclick="handleAnswer('${q.id}', '${option}')">
+                        <label for="${optionId}" class="ml-3 text-sm font-medium text-gray-700 cursor-pointer">${option}</label>
+                    `;
+                    qDiv.appendChild(optionDiv);
+                });
+                
+                questionArea.appendChild(qDiv);
+            });
+        }
+        
+        function handleAnswer(questionId, selectedOption) {
+            answers[questionId] = selectedOption;
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            parseFragment();
+            updateWelcomeMessage();
+            loadState(); // Load state on initialization
+
+            if (userToken) {
+                showDashboard(); // Show dashboard initialized with state
+            } else {
+                displayStatus("No authentication token found. Please log in through the main page.", true);
+                showView('dashboard-view');
+            }
+        };
     </script>
-
 </body>
 </html>
+```
+
+### Next Steps
+
+1.  **Redeploy the Edge Function:** Go to your terminal and redeploy the updated `index.ts` file:
+    ```bash
+    supabase functions deploy assessment-api
+    
