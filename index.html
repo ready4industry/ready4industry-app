@@ -524,17 +524,20 @@
     }
 
     // NEW, ROBUST GOOGLE SIGN-IN FUNCTION (SUPABASE NATIVE OAUTH)
-    async function handleGoogleSignIn() {
-        // This is your public URL, ensure it is added to Supabase Auth -> URL Configuration
-        const REDIRECT_URL = 'https://ready4industry.github.io/assessment-start.html'; 
+   // --- CORRECTED REDIRECT URL IN index.html ---
+async function handleGoogleSignIn() {
+    // 🛑 CHANGE MADE HERE: Added /ready4industry-app 🛑
+    const REDIRECT_URL = 'https://ready4industry.github.io/ready4industry-app/assessment-start.html'; 
 
-        const { data, error } = await supabaseClient.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: REDIRECT_URL, 
-            },
-        });
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: REDIRECT_URL, 
+        },
+    });
 
+    // ... rest of the function
+}
         if (error) {
             console.error('Supabase OAuth Error:', error.message);
             alert(`Error logging in with Google. Ensure your Supabase Auth is configured. Error: ${error.message}`);
@@ -547,6 +550,7 @@
 
 </body>
 </html>
+
 
 
 
