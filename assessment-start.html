@@ -33,8 +33,17 @@
             cursor: not-allowed;
             opacity: 1; 
             background-image: none;
-            background-color: #e5e7eb; /* light gray background */
+            background-color: #d1d5db; /* Slightly darker gray for better visibility */
             box-shadow: none;
+        }
+        /* Custom class for high-contrast white text on gradients */
+        .text-on-gradient {
+            color: white !important; /* Force white */
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); /* Stronger shadow */
+        }
+        /* Custom class for high-contrast black text on completed modules */
+        .text-on-completed {
+            color: #1f2937 !important; /* Force dark gray/black */
         }
         .quiz-container {
             border: 1px solid #e5e7eb;
@@ -100,9 +109,11 @@
 
     <script>
         // --- GLOBAL VARIABLES & CONSTANTS ---
-        const API_ENDPOINT = 'https://[Your-Supabase-Project-Ref].supabase.co/functions/v1/assessment-api'; // REPLACE THIS
-        const QUESTIONS_PER_MODULE = 15; // New Requirement
-        const TIME_LIMIT_MINUTES = 15;  // New Requirement
+        // Placeholder for the real API endpoint. This will be replaced by the environment URL if available.
+        const PLACEHOLDER_API_ENDPOINT = 'https://[Your-Supabase-Project-Ref].supabase.co/functions/v1/assessment-api'; 
+        
+        const QUESTIONS_PER_MODULE = 15; 
+        const TIME_LIMIT_MINUTES = 15;  
         const MODULES = {
             'technical': 'Technical Fundamentals',
             'aptitude': 'Aptitude and Reasoning',
@@ -115,7 +126,8 @@
         let questions = [];
         let answers = {};
         let timerInterval = null; // Timer variable for the quiz
-        
+        let API_ENDPOINT = PLACEHOLDER_API_ENDPOINT; // Initialize with placeholder
+
         // --- CONSTANTS ---
         const MENTOR_EMAIL = 'ready4industry@gmail.com';
         
@@ -134,6 +146,26 @@
                 // Mock email for preview mode testing if no token is present
                 userEmail = 'keshav.karn@gmail.com'; 
             }
+        }
+        
+        // --- MOCK DATA GENERATOR (For testing when API is unavailable) ---
+        function generateMockQuestions(count, topic) {
+            const mockQuestions = [];
+            for (let i = 1; i <= count; i++) {
+                mockQuestions.push({
+                    id: `q-${topic}-${i}`,
+                    question: `What is the key principle of ${topic} question number ${i}?`,
+                    options: [
+                        `Option A for question ${i}`,
+                        `Option B for question ${i}`,
+                        `Option C for question ${i}`,
+                        `Option D for question ${i}`
+                    ],
+                    // In a real app, the correct answer would not be sent to the frontend
+                    correctAnswer: `Option C for question ${i}` 
+                });
+            }
+            return mockQuestions;
         }
 
         // --- TIMER LOGIC ---
@@ -238,25 +270,27 @@
                 // If disabled, we override the color class with a neutral background class
                 const finalColorClass = isCompleted ? '' : colorClass;
                 
-                // FIX: Use Tailwind classes to aggressively set the text color based on completion status
-                const textColorClass = isCompleted ? 'text-gray-900' : 'text-white'; 
+                // Use custom CSS classes for guaranteed visibility
+                const textClass = isCompleted ? 'text-on-completed' : 'text-on-gradient'; 
 
                 return `
                     <button 
                         onclick="startAssessment('${key}', '${name}')" 
-                        class="module-button w-full text-left p-8 rounded-2xl font-extrabold text-xl shadow-xl transition duration-300 ${finalColorClass} ${disabled} ${textColorClass}"
+                        class="module-button w-full text-left p-8 rounded-2xl font-extrabold text-xl shadow-xl transition duration-300 ${finalColorClass} ${disabled} ${textClass}"
                         style="--tw-gradient-stops: var(--tw-gradient-from) var(--tw-gradient-to);"
                         ${disabled}
                     >
                         <div class="flex flex-col">
-                            <!-- Index number. Dark if completed, light/subtle if active. -->
-                            <span class="text-4xl mb-2 ${isCompleted ? 'text-gray-700' : 'text-white opacity-75'}">${index + 1}.</span>
+                            <!-- Index number. Ensure it uses the textClass for guaranteed color. -->
+                            <span class="text-4xl mb-2 ${isCompleted ? 'opacity-80' : 'opacity-75'}">${index + 1}.</span>
                             <span class="text-2xl">${name}</span>
-                            <div class="flex justify-between items-center mt-3 pt-3 border-t ${isCompleted ? 'border-opacity-100 border-gray-400' : 'border-white border-opacity-30'}">
-                                <span class="text-sm font-semibold tracking-wider ${isCompleted ? 'bg-gray-300 text-gray-800' : 'bg-white bg-opacity-20 text-white'} py-1 px-3 rounded-full">${status}</span>
+                            <div class="flex justify-between items-center mt-3 pt-3 border-t ${isCompleted ? 'border-opacity-100 border-gray-500' : 'border-white border-opacity-30'}">
+                                <!-- Status pill: use high contrast for both states -->
+                                <span class="text-sm font-semibold tracking-wider ${isCompleted ? 'bg-gray-400 text-gray-800' : 'bg-white bg-opacity-20 text-white'} py-1 px-3 rounded-full">${status}</span>
+                                <!-- Time/Review text. Ensure it uses the textClass for guaranteed color. -->
                                 ${isCompleted 
-                                    ? '<span class="text-sm font-light text-gray-700">Review complete.</span>' 
-                                    : `<span class="text-sm font-light">15 Questions | 15 min</span>`}
+                                    ? '<span class="text-sm font-light opacity-90">Review complete.</span>' 
+                                    : `<span class="text-sm font-light opacity-90">15 Questions | 15 min</span>`}
                             </div>
                         </div>
                     </button>
@@ -424,7 +458,7 @@
             cleanupQuiz();
         }
         
-        // --- API CALLS ---
+        // --- API CALLS (MOCKED IF PLACEHOLDER IS USED) ---
         
         async function startAssessment(key, name) {
             currentModule = key;
@@ -432,6 +466,19 @@
             answers = {};
             renderLoading(`Gearing up for the ${name} challenge (${QUESTIONS_PER_MODULE} questions)...`);
 
+            // Check if the placeholder is still in use. If so, use mock data.
+            if (API_ENDPOINT.includes('[Your-Supabase-Project-Ref]')) {
+                console.warn("Using mock data because the API endpoint is a placeholder. Quiz flow can still be tested.");
+                
+                // Simulate network latency (2 seconds)
+                setTimeout(() => {
+                    questions = generateMockQuestions(QUESTIONS_PER_MODULE, name);
+                    displayQuiz();
+                }, 2000); 
+                return; 
+            }
+
+            // --- REAL API CALL (ONLY EXECUTED IF API_ENDPOINT IS VALID) ---
             try {
                 const response = await fetch(API_ENDPOINT, {
                     method: 'POST',
@@ -442,7 +489,6 @@
                     body: JSON.stringify({
                         action: 'generate_questions',
                         topic: name,
-                        // Sending the new 15 question count to the backend
                         count: QUESTIONS_PER_MODULE 
                     })
                 });
@@ -529,16 +575,12 @@
 
         // --- INITIALIZATION ---
         
-        // Find the Supabase API URL from the environment (or use a placeholder)
-        const __placeholder_api_url = 'http://localhost:54321/functions/v1/assessment-api'; // Fallback
-        
-        // Check if environment variables are available, otherwise use placeholder
-        const global_supabase_url = typeof __supabase_url !== 'undefined' ? __supabase_url : __placeholder_api_url.substring(0, __placeholder_api_url.indexOf('/functions'));
-        
-        // If we found the global URL, update the constant
-        if(global_supabase_url && global_supabase_url !== __placeholder_api_url.substring(0, __placeholder_api_url.indexOf('/functions'))) {
-            const endpoint_prefix = global_supabase_url.endsWith('/') ? global_supabase_url.slice(0, -1) : global_supabase_url;
-            API_ENDPOINT = `${endpoint_prefix}/functions/v1/assessment-api`;
+        // Try to get the real Supabase URL from the environment
+        if (typeof __supabase_url !== 'undefined' && __supabase_url && !__supabase_url.includes('[Your-Supabase-Project-Ref]')) {
+             const endpoint_prefix = __supabase_url.endsWith('/') ? __supabase_url.slice(0, -1) : __supabase_url;
+             API_ENDPOINT = `${endpoint_prefix}/functions/v1/assessment-api`;
+        } else {
+            console.warn("API URL not set. Using mock assessment data for testing purposes.");
         }
         
         parseFragment();
