@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+                                                                                                                                                                                                                                                                                                                                <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
     
-    <script src="https://accounts.google.com/gsi/client" async defer></script> 
+   // <script src="https://accounts.google.com/gsi/client" async defer></script> 
     google-sign-in-button
     <script src="https://unpkg.com/jwt-decode@4.0.0/build/jwt-decode.js"></script> 
     
@@ -270,20 +270,14 @@
                         <p class="text-slate-600">Test your foundational knowledge in Data Structures, OOP, and DBMS.</p>
                         
                         <p class="text-sm text-slate-500 mt-4">Sign in to start your free exam:</p>
-<div id="g_id_onload"
-    data-client_id="79189521547-hr8kjvbj1ginajbg74leomf8mge2i5cq.apps.googleusercontent.com" 
-    data-callback="handleCredentialResponse"
-    data-auto_prompt="false">
-</div>
-
-<div class="g_id_signin" 
-    data-type="standard" 
-    data-size="large"
-    data-theme="outline" 
-    data-text="continue_with"
-    data-shape="rectangular"
-    data-width="250">
-</div>
+<p class="text-sm text-slate-500 mt-4">Sign in to start your free exam:</p>
+<button 
+    onclick="handleGoogleSignIn()"
+    class="w-full mt-2 flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-lg"
+>
+    <i class="fab fa-google"></i>
+    <span>Sign In with Google</span>
+</button>
                   
                     </div>
 
@@ -532,35 +526,24 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         // Attach the manual registration handler
         document.getElementById('registrationForm').addEventListener('submit', handleRegistration);
         
-        // GOOGLE SIGN-IN CALLBACK FUNCTION (Used for the FREE assessment)
-        async function handleCredentialResponse(response) {
-            if (response.credential) {
-                // Decode the JWT token to get user details
-                const user = jwt_decode(response.credential);
-                const fullName = user.name;
-                const email = user.email;
-                const examName = 'Free Core Concepts Check'; 
-                const examCost = 0;
+        // NEW, ROBUST GOOGLE SIGN-IN FUNCTION (Supabase OAuth)
+async function handleGoogleSignIn() {
+    // IMPORTANT: Replace 'YOUR_PUBLIC_URL' with your actual hosted domain 
+    // (e.g., https://ready4industry.github.io). 
+    const REDIRECT_URL = 'YOUR_PUBLIC_URL/assessment-start.html'; 
 
-                // 1. INSERT DATA INTO SUPABASE
-                const { error } = await supabaseClient 
-                    .from('registration_') // Ensure this is your correct table name
-                    .insert([
-                        { 
-                            full_name: fullName, 
-                            email: email, 
-                            exam_name: examName, 
-                            exam_cost: examCost,
-                            login_type: 'Google' // Tracks registration type
-                        },
-                    ]);
+    const { data, error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: REDIRECT_URL, 
+        },
+    });
 
-                if (error) {
-                    console.error('Supabase Error:', error.message);
-                    alert(`A database error occurred. Please try again. Error: ${error.message}`);
-                    return;
-                }
-
+    if (error) {
+        console.error('Supabase OAuth Error:', error.message);
+        alert(`Error logging in with Google. Ensure your Supabase Auth is configured. Error: ${error.message}`);
+    }
+}
                 // 2. SUCCESS HANDLING: Redirect to the Assessment Start page
                 alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
                 window.location.href = './assessment-start.html'; 
@@ -573,6 +556,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 </body>
 </html>
+
 
 
 
