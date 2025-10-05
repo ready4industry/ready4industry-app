@@ -128,7 +128,32 @@
 
         // --- CONSTANTS ---
         const MENTOR_EMAIL = 'ready4industry@gmail.com';
+
+        // --- MOCK QUESTIONS DATA (Used when the API endpoint is a placeholder) ---
+        const MOCK_TECHNICAL_QUESTIONS = [
+            { id: 'q-tech-1', question: 'What is the primary benefit of using a Hash Map over a Linked List for data retrieval?', options: ['Guaranteed O(1) insertion time', 'Faster iteration order', 'O(1) average time complexity for lookups', 'Dynamic memory allocation'], correctAnswer: 'O(1) average time complexity for lookups' },
+            { id: 'q-tech-2', question: 'Which SQL command is used to change data in an existing table row?', options: ['SELECT', 'CREATE', 'UPDATE', 'ALTER'], correctAnswer: 'UPDATE' },
+            { id: 'q-tech-3', question: 'In Object-Oriented Programming, what principle is demonstrated by a subclass inheriting methods from a parent class?', options: ['Abstraction', 'Polymorphism', 'Encapsulation', 'Inheritance'], correctAnswer: 'Inheritance' },
+            { id: 'q-tech-4', question: 'What is the purpose of the "finally" block in a try-catch-finally construct?', options: ['To execute code only if an exception is thrown', 'To execute code regardless of whether an exception occurred', 'To handle the exception gracefully', 'To define a custom error message'], correctAnswer: 'To execute code regardless of whether an exception occurred' },
+            { id: 'q-tech-5', question: 'In web development, which HTTP method is typically idempotent (safe to repeat)?', options: ['POST', 'PUT', 'DELETE', 'GET'], correctAnswer: 'GET' },
+        ];
         
+        const MOCK_APTITUDE_QUESTIONS = [
+            { id: 'q-apt-1', question: 'If a train traveling at 60 km/h crosses a pole in 9 seconds, what is the length of the train in meters?', options: ['120m', '150m', '180m', '200m'], correctAnswer: '150m' },
+            { id: 'q-apt-2', question: 'Find the next number in the series: 3, 7, 15, 31, ?', options: ['55', '63', '67', '71'], correctAnswer: '63' },
+            { id: 'q-apt-3', question: 'A sum of money doubles itself in 5 years at simple interest. What is the rate of interest per annum?', options: ['15%', '20%', '25%', '30%'], correctAnswer: '20%' },
+            { id: 'q-apt-4', question: 'If CAT is coded as 3120, how is DOG coded?', options: ['4157', '4158', '4159', '4160'], correctAnswer: '4157' },
+            { id: 'q-apt-5', question: 'Ravi is 7th from the left end and 11th from the right end of a row of students. How many students are there in the row?', options: ['16', '17', '18', '19'], correctAnswer: '17' },
+        ];
+
+        const MOCK_BEHAVIOURAL_QUESTIONS = [
+            { id: 'q-beh-1', question: 'Describe a time you had to deal with a conflict within your team. How did you resolve it?', options: ['I reported it to my manager immediately.', 'I addressed the individuals privately to find a compromise.', 'I avoided the situation until it resolved itself.', 'I publicly sided with the most senior member.'], correctAnswer: 'I addressed the individuals privately to find a compromise.' },
+            { id: 'q-beh-2', question: 'How do you handle high-pressure deadlines or sudden changes in project scope?', options: ['I panic and request an extension.', 'I prioritize tasks and communicate the new timeline to stakeholders.', 'I focus only on my work and ignore external pressure.', 'I delegate all the difficult tasks to others.'], correctAnswer: 'I prioritize tasks and communicate the new timeline to stakeholders.' },
+            { id: 'q-beh-3', question: 'What steps do you take to ensure you are continually learning and developing new professional skills?', options: ['I wait for my employer to provide training.', 'I dedicate personal time to courses, reading industry news, and seeking feedback.', 'I believe experience is the only teacher.', 'I only learn skills directly related to my current task.'], correctAnswer: 'I dedicate personal time to courses, reading industry news, and seeking feedback.' },
+            { id: 'q-beh-4', question: 'Give an example of when you showed initiative to improve a process.', options: ['I waited for formal instruction before making a change.', 'I identified an inefficiency and proactively developed a solution to streamline it.', 'I complained about the process to my teammates.', 'I asked a colleague to fix the problem.'], correctAnswer: 'I identified an inefficiency and proactively developed a solution to streamline it.' },
+            { id: 'q-beh-5', question: 'What is your method for giving or receiving constructive criticism?', options: ['I avoid giving criticism entirely.', 'I deliver feedback privately, focusing on the action, not the person, and follow up.', 'I argue against any criticism I receive.', 'I publicly state what the person did wrong so everyone knows.'], correctAnswer: 'I deliver feedback privately, focusing on the action, not the person, and follow up.' },
+        ];
+
         // --- UTILITY FUNCTIONS ---
         
         // Function to parse the fragment for the token (Simulates Supabase Auth Redirect)
@@ -146,24 +171,43 @@
             }
         }
         
-        // --- MOCK DATA GENERATOR (For testing when API is unavailable) ---
-        function generateMockQuestions(count, topic) {
-            const mockQuestions = [];
-            for (let i = 1; i <= count; i++) {
-                mockQuestions.push({
-                    id: `q-${topic}-${i}`,
-                    question: `What is the key principle of ${topic} question number ${i}?`,
-                    options: [
-                        `Option A for question ${i}`,
-                        `Option B for question ${i}`,
-                        `Option C for question ${i}`,
-                        `Option D for question ${i}`
-                    ],
-                    // In a real app, the correct answer would not be sent to the frontend
-                    correctAnswer: `Option C for question ${i}` 
-                });
+        // --- MOCK DATA FETCHER ---
+        /**
+         * Fetches a list of structured mock questions for a given topic.
+         * Since the quiz requires 15, it repeats the small set of high-quality mock questions 
+         * to demonstrate the non-vague content.
+         */
+        function getMockQuestions(topicKey) {
+            let baseQuestions = [];
+            switch(topicKey) {
+                case 'technical':
+                    baseQuestions = MOCK_TECHNICAL_QUESTIONS;
+                    break;
+                case 'aptitude':
+                    baseQuestions = MOCK_APTITUDE_QUESTIONS;
+                    break;
+                case 'behavioural':
+                    baseQuestions = MOCK_BEHAVIOURAL_QUESTIONS;
+                    break;
+                default:
+                    return [];
             }
-            return mockQuestions;
+            
+            const finalQuestions = [];
+            const numRepeats = Math.ceil(QUESTIONS_PER_MODULE / baseQuestions.length);
+            
+            // Loop and add the base questions until we hit the required count of 15
+            for (let i = 0; i < numRepeats && finalQuestions.length < QUESTIONS_PER_MODULE; i++) {
+                for (const q of baseQuestions) {
+                    if (finalQuestions.length < QUESTIONS_PER_MODULE) {
+                        // Create a unique ID for each instance if necessary, though question content is the key fix
+                        const newQ = { ...q, id: `${q.id}-${i}` };
+                        finalQuestions.push(newQ);
+                    }
+                }
+            }
+            
+            return finalQuestions;
         }
 
         // --- TIMER LOGIC ---
@@ -260,7 +304,7 @@
 
                 if (isCompleted) {
                     // Completed module: light gray background, dark text
-                    colorClass = ''; 
+                    colorClass = 'bg-gray-300'; // Use a flat gray background
                     textColorClass = 'text-gray-800';
                 } else {
                     // Active module: specific gradient, white text
@@ -279,6 +323,7 @@
                 // Status pill styling
                 const statusPillClass = isCompleted ? 'bg-gray-400 text-gray-800' : 'bg-white bg-opacity-20 text-white';
 
+                // Use the colorClass variable correctly
                 return `
                     <button 
                         onclick="startAssessment('${key}', '${name}')" 
@@ -463,11 +508,11 @@
 
             // Check if the placeholder is still in use. If so, use mock data.
             if (API_ENDPOINT.includes('[Your-Supabase-Project-Ref]')) {
-                console.warn("Using mock data because the API endpoint is a placeholder. Quiz flow can still be tested.");
+                console.warn("Using structured mock data because the API endpoint is a placeholder. Quiz flow can still be tested.");
                 
                 // Simulate network latency (2 seconds)
                 setTimeout(() => {
-                    questions = generateMockQuestions(QUESTIONS_PER_MODULE, name);
+                    questions = getMockQuestions(key); // Use the new structured mock data
                     displayQuiz();
                 }, 2000); 
                 return; 
@@ -575,7 +620,7 @@
              const endpoint_prefix = __supabase_url.endsWith('/') ? __supabase_url.slice(0, -1) : __supabase_url;
              API_ENDPOINT = `${endpoint_prefix}/functions/v1/assessment-api`;
         } else {
-            console.warn("API URL not set. Using mock assessment data for testing purposes.");
+            console.warn("API URL not set. Using structured mock assessment data for testing purposes.");
         }
         
         parseFragment();
