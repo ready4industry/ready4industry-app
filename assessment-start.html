@@ -3,403 +3,548 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Concepts Check</title>
+    <!-- Updated Title to be more catchy -->
+    <title>Your Career Launchpad: Skills Challenge</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f4f7f9;
         }
         .container-card {
-            max-width: 600px;
+            max-width: 1100px;
             margin: 2rem auto;
-            background: white;
-            padding: 2rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border-radius: 12px;
-            min-height: 400px;
+            padding: 2.5rem;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
         }
-        .quiz-option-button {
-            transition: all 0.2s ease;
+        .module-button {
+            transition: all 0.2s ease-in-out;
+            background-image: linear-gradient(135deg, var(--tw-gradient-stops));
         }
-        .quiz-option-button:not(:disabled):hover {
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-            transform: translateY(-2px);
+        .module-button:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
         }
-        .quiz-option-button:disabled {
-            background-color: #cbd5e1; /* Gray-300 */
+        .module-button:disabled {
             cursor: not-allowed;
-            color: #4b5563; /* Gray-600 */
+            opacity: 0.5;
+            background-image: none;
+            background-color: #e5e7eb;
+            color: #6b7280;
+            box-shadow: none;
         }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #3b82f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+        .quiz-container {
+            border: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .modal {
+            transition: opacity 0.2s ease-in-out;
+        }
+        .radio-option {
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: background-color 0.15s, border-color 0.15s;
+        }
+        .radio-option:hover {
+            background-color: #f3f4f6;
+        }
+        .radio-option.selected {
+            background-color: #e0f2fe; /* Tailwind blue-100 */
+            border-color: #0b70d7; /* Tailwind blue-600 */
+            box-shadow: 0 0 5px rgba(14, 165, 233, 0.5);
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-start pt-8">
 
-    <div id="app" class="p-4">
-        <div class="container-card">
-            <h1 class="text-3xl font-bold text-gray-800 mb-2">Core Concepts Check</h1>
-            <p id="welcome-message" class="text-sm text-gray-600 mb-6">Loading session...</p>
+    <div id="app" class="container-card w-full">
+        <!-- Content will be rendered here by JavaScript -->
+    </div>
 
-            <!-- Loading View -->
-            <div id="loading-view" class="flex flex-col items-center justify-center min-h-[250px] text-center">
-                <div class="spinner mb-4"></div>
-                <p class="text-lg text-blue-600 font-medium">Please wait, setting up session...</p>
+    <!-- Payment Modal Structure (Hidden by default) -->
+    <div id="payment-modal" class="modal fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center opacity-0 pointer-events-none z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md transform scale-95 transition-transform duration-300">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-4 border-b pb-3 text-center">Unlock Your Future</h2>
+            <p class="text-gray-600 mb-6 text-center">Congratulations! You've mastered the challenge. Pay **₹99** to receive your full performance report, detailed scores, and personalized feedback from our mentors.</p>
+            
+            <div class="space-y-4">
+                <p class="font-bold text-2xl text-green-600 text-center border-b pb-2">Total Payable: ₹99</p>
+                <div class="border border-green-200 p-4 rounded-xl bg-green-50 shadow-inner">
+                    <p class="font-medium text-lg text-green-800 mb-3">Secure Payment Options:</p>
+                    <button class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-indigo-700 transition duration-150 shadow-lg transform hover:scale-[1.01]">
+                        Pay with UPI (Recommended)
+                    </button>
+                    <button class="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold mt-3 hover:bg-gray-300 transition duration-150">
+                        Credit/Debit Card / Net Banking
+                    </button>
+                </div>
             </div>
 
-            <!-- Dashboard View -->
-            <div id="dashboard-view" class="hidden">
-                <p class="text-lg font-semibold text-gray-700 mb-6">Select a module to begin your assessment (5 questions per module):</p>
-                
-                <div id="assessment-buttons" class="space-y-4">
-                    <!-- Buttons rendered dynamically -->
-                </div>
-                
-                <!-- Final Result Button (Hidden by default) -->
-                <button id="result-button" class="hidden mt-8 w-full p-4 bg-red-600 text-white font-bold rounded-lg shadow-xl hover:bg-red-700 transition" onclick="showFinalResult()">
-                    Get Final Result: Pay ₹99
+            <div class="flex justify-center mt-6">
+                <button onclick="closePaymentModal()" class="px-6 py-2 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition duration-150">
+                    Close Window
                 </button>
             </div>
-
-            <!-- Quiz View -->
-            <div id="quiz-view" class="hidden">
-                <h2 id="quiz-title" class="text-2xl font-semibold mb-4 text-gray-800 border-b pb-2"></h2>
-                <div id="question-area">
-                    <!-- Questions will be rendered here -->
-                </div>
-
-                <div class="mt-8 pt-4 border-t flex justify-between items-center">
-                    <button id="submit-button" class="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition" onclick="submitQuiz()">
-                        Submit Quiz
-                    </button>
-                    <button id="cancel-button" class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 transition" onclick="showDashboard(true)">
-                        Cancel and Go Back
-                    </button>
-                </div>
-            </div>
-
-            <!-- Result/Status Message -->
-            <div id="status-message" class="hidden mt-6 p-4 bg-yellow-100 text-yellow-800 rounded-lg"></div>
-
+            <p class="text-xs text-center text-gray-400 mt-4">Note: This is a simulated payment gateway for demonstration purposes only.</p>
         </div>
     </div>
 
     <script>
-        // --- GLOBAL VARIABLES ---
-        const EDGE_FUNCTION_URL = "https://glskwkzzkhhwftzddqmo.supabase.co/functions/v1/assessment-api";
-        const QUESTION_COUNT = 5;
-        const ASSESSMENT_KEY = 'assessment_completion_state';
-        
-        let userToken = null;
-        let userEmail = null;
-        let questions = [];
-        let answers = {};
-        let currentTopicId = null; 
-        let assessmentState = {
-            technical: false,
-            aptitude: false,
-            behavioural: false
+        // --- GLOBAL VARIABLES & CONSTANTS ---
+        const API_ENDPOINT = 'https://[Your-Supabase-Project-Ref].supabase.co/functions/v1/assessment-api'; // REPLACE THIS
+        const QUESTIONS_PER_MODULE = 15; // New Requirement
+        const TIME_LIMIT_MINUTES = 15;  // New Requirement
+        const MODULES = {
+            'technical': 'Technical Fundamentals',
+            'aptitude': 'Aptitude and Reasoning',
+            'behavioural': 'Behavioural Assessment'
         };
 
-        const topics = [
-            { id: 'technical', name: 'Technical Fundamentals', apiTopic: 'Technical Fundamentals', color: 'blue', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />' },
-            { id: 'aptitude', name: 'Aptitude and Reasoning', apiTopic: 'Aptitude and Reasoning', color: 'green', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.24a10.03 10.03 0 010 14.884l-2.432-2.432m-4.636-4.636L12 10.707l-2 2-2 2-4 4" />' },
-            { id: 'behavioural', name: 'Behavioural Assessment', apiTopic: 'Behavioural and Situational Questions', color: 'purple', icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.828-1.24a6 6 0 00-10.344 0C4.829 16.76 4 18 4 18v2h5m0-10a4 4 0 11-8 0 4 4 0 018 0zm10 0a4 4 0 11-8 0 4 4 0 018 0z" />' }
-        ];
-
-
-        // --- STATE MANAGEMENT ---
-
-        function loadState() {
-            try {
-                const storedState = localStorage.getItem(ASSESSMENT_KEY);
-                if (storedState) {
-                    assessmentState = JSON.parse(storedState);
-                }
-            } catch (e) {
-                console.warn("Could not load state from localStorage. Starting fresh.", e);
-            }
-        }
-
-        function saveState() {
-            try {
-                localStorage.setItem(ASSESSMENT_KEY, JSON.stringify(assessmentState));
-            } catch (e) {
-                console.error("Could not save state to localStorage.", e);
-            }
-        }
-
-        function checkAllComplete() {
-            return assessmentState.technical && assessmentState.aptitude && assessmentState.behavioural;
-        }
-
-        // --- UI UPDATES ---
-
-        function updateDashboard() {
-            const buttonContainer = document.getElementById('assessment-buttons');
-            buttonContainer.innerHTML = '';
-            loadState(); // Ensure state is fresh
-            const allComplete = checkAllComplete();
+        let userToken = null;
+        let userEmail = null;
+        let currentModule = null;
+        let questions = [];
+        let answers = {};
+        let timerInterval = null; // Timer variable for the quiz
+        
+        // --- CONSTANTS ---
+        const MENTOR_EMAIL = 'ready4industry@gmail.com';
+        
+        // --- UTILITY FUNCTIONS ---
+        
+        // Function to parse the fragment for the token (Simulates Supabase Auth Redirect)
+        function parseFragment() {
+            const params = new URLSearchParams(window.location.hash.substring(1));
+            const token = params.get('access_token');
+            const email = params.get('email') || 'Guest User';
             
-            topics.forEach((t, index) => {
-                const isCompleted = assessmentState[t.id];
-                const isDisabled = isCompleted || allComplete;
-                const button = document.createElement('button');
-                
-                button.className = `quiz-option-button w-full p-4 bg-${t.color}-500 text-white font-bold rounded-lg shadow-md flex justify-between items-center`;
-                button.disabled = isDisabled;
-                button.onclick = () => startQuiz(t.id, t.apiTopic);
-                
-                let text = `${index + 1}. ${t.name}`;
-                if (isCompleted) {
-                    text += ' (Completed)';
-                    button.classList.add('opacity-75'); // Visual hint for completion
-                    button.classList.remove(`bg-${t.color}-500`);
-                    button.classList.add('bg-gray-400');
-                } else {
-                    button.classList.remove('bg-gray-400');
-                    button.classList.add(`bg-${t.color}-500`);
+            if (token) {
+                userToken = token;
+                userEmail = email;
+            } else {
+                // Mock email for preview mode testing if no token is present
+                userEmail = 'keshav.karn@gmail.com'; 
+            }
+        }
+
+        // --- TIMER LOGIC ---
+        function startTimer() {
+            cleanupTimer(); // Clear any existing timer
+            let timeRemaining = TIME_LIMIT_MINUTES * 60;
+            updateTimerDisplay(timeRemaining);
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay(timeRemaining);
+
+                if (timeRemaining <= 0) {
+                    cleanupTimer();
+                    timeExpired();
                 }
+            }, 1000);
+        }
 
-                button.innerHTML = `
-                    <span>${text}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        ${t.icon}
-                    </svg>
-                `;
-                buttonContainer.appendChild(button);
-            });
-
-            // Show or hide the final result button
-            document.getElementById('result-button').classList.toggle('hidden', !allComplete);
+        function cleanupTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
         }
         
-        function showFinalResult() {
-             const resultMessage = `Thank you for completing all assessments! Your detailed insights and results are ready. Please pay ₹99 to proceed and contact the owner (keshav.karn@gmail.com) for further steps.`;
-             document.getElementById('result-button').disabled = true;
-             displayStatus(resultMessage, false);
+        function updateTimerDisplay(seconds) {
+            const timerElement = document.getElementById('timer-display');
+            if (!timerElement) return;
+
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            timerElement.textContent = display;
+
+            // Highlight timer red when under 1 minute
+            if (seconds <= 60) {
+                timerElement.classList.add('text-red-600', 'font-extrabold');
+            } else {
+                timerElement.classList.remove('text-red-600', 'font-extrabold');
+            }
         }
 
-        // --- QUIZ FLOW ---
+        function timeExpired() {
+            const quizMessage = document.getElementById('quiz-message');
+            if (quizMessage) {
+                 quizMessage.innerHTML = "<span class='font-bold text-red-600'>Time Expired!</span> Submitting your current answers automatically...";
+            }
+           
+            // Disable further interaction
+            document.querySelectorAll('.radio-option').forEach(el => el.onclick = null);
+            const submitButton = document.getElementById('submit-button');
+            if (submitButton) submitButton.disabled = true;
 
-        async function startQuiz(topicId, apiTopicName) {
-            if (!userToken) {
-                displayStatus("Authentication failed. Please log in again.", true);
+            // Automatically submit after a short delay
+            setTimeout(() => {
+                submitAssessment(true); // true means forced submission
+            }, 1500);
+        }
+        
+        // --- DASHBOARD/STATE MANAGEMENT ---
+
+        function getModuleState() {
+            try {
+                const state = JSON.parse(localStorage.getItem('assessmentState') || '{}');
+                return state;
+            } catch (e) {
+                console.error("Error loading assessment state from localStorage:", e);
+                return {};
+            }
+        }
+
+        function setModuleCompleted(moduleKey) {
+            const state = getModuleState();
+            state[moduleKey] = true;
+            localStorage.setItem('assessmentState', JSON.stringify(state));
+            currentModule = null; // Exit quiz view
+            render();
+        }
+
+        function displayDashboard() {
+            const app = document.getElementById('app');
+            const state = getModuleState();
+            
+            const allCompleted = Object.keys(MODULES).every(key => state[key]);
+
+            let moduleHtml = Object.entries(MODULES).map(([key, name], index) => {
+                const isCompleted = state[key] === true;
+                const disabled = isCompleted ? 'disabled' : '';
+                const status = isCompleted ? '(Completed)' : 'Start Challenge';
+                
+                let colorClass;
+
+                if (key === 'technical') {
+                    colorClass = 'from-blue-500 to-indigo-600';
+                } else if (key === 'aptitude') {
+                    colorClass = 'from-green-500 to-teal-600';
+                } else if (key === 'behavioural') {
+                    colorClass = 'from-purple-500 to-pink-600';
+                }
+
+                return `
+                    <button 
+                        onclick="startAssessment('${key}', '${name}')" 
+                        class="module-button w-full text-left p-8 rounded-2xl text-white font-extrabold text-xl shadow-xl transition duration-300 ${colorClass} ${disabled}"
+                        style="--tw-gradient-stops: var(--tw-gradient-from) var(--tw-gradient-to);"
+                        ${disabled}
+                    >
+                        <div class="flex flex-col">
+                            <span class="text-4xl opacity-75 mb-2">${index + 1}.</span>
+                            <span class="text-2xl">${name}</span>
+                            <div class="flex justify-between items-center mt-3 pt-3 border-t border-white border-opacity-30">
+                                <span class="text-sm font-semibold tracking-wider bg-white bg-opacity-20 py-1 px-3 rounded-full">${status}</span>
+                                ${isCompleted 
+                                    ? '<span class="text-sm font-light">Review complete.</span>' 
+                                    : `<span class="text-sm font-light">${QUESTIONS_PER_MODULE} Questions | ${TIME_LIMIT_MINUTES} min</span>`}
+                            </div>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+            
+            // --- Contact Mentor Button ---
+            const mentorButton = `
+                <a href="mailto:${MENTOR_EMAIL}" class="w-full block mt-8">
+                    <button class="w-full p-4 bg-gray-100 text-gray-800 rounded-xl font-semibold hover:bg-gray-200 transition duration-200 shadow-lg border border-gray-200">
+                        Need Guidance? Contact Your Mentor: <span class="text-indigo-600">${MENTOR_EMAIL}</span>
+                    </button>
+                </a>
+            `;
+            
+            // --- Upbeat Welcome Section ---
+            const welcomeSection = `
+                <div class="bg-indigo-600 text-white p-8 rounded-xl mb-8 shadow-2xl">
+                    <h1 class="text-4xl font-extrabold mb-1">Your Career Launchpad: Skills Challenge</h1>
+                    <p class="text-xl font-medium opacity-90">Welcome, ${userEmail}! Conquer these challenges to unlock your potential.</p>
+                </div>
+            `;
+
+            app.innerHTML = `
+                ${welcomeSection}
+                
+                <h2 class="text-2xl font-bold text-gray-700 mb-6 border-b pb-3">Modules Awaiting Your Brilliance:</h2>
+                
+                <div class="grid md:grid-cols-3 gap-6">
+                    ${moduleHtml}
+                </div>
+                
+                ${allCompleted ? `
+                    <div class="mt-12 p-8 bg-yellow-50 border-4 border-yellow-300 rounded-xl text-center shadow-2xl">
+                        <p class="text-2xl font-extrabold text-yellow-800 mb-4">Challenge Complete! Victory Achieved!</p>
+                        <p class="text-lg text-gray-700 mb-8">You have successfully finished all modules. It's time to see your detailed performance report and unlock personalized feedback.</p>
+                        <button 
+                            onclick="showPaymentModal()" 
+                            class="w-full md:w-3/5 px-10 py-4 bg-red-600 text-white rounded-lg font-extrabold text-xl hover:bg-red-700 transition duration-200 shadow-2xl transform hover:scale-[1.05]"
+                        >
+                            Get Final Result: Pay ₹99
+                        </button>
+                    </div>
+                ` : mentorButton}
+                
+                ${!allCompleted ? mentorButton : ''}
+            `;
+        }
+
+        // --- QUIZ VIEW AND INTERACTION ---
+
+        function displayQuiz() {
+            const app = document.getElementById('app');
+            const topicName = MODULES[currentModule];
+            
+            const questionHtml = questions.map((q, qIndex) => {
+                const optionsHtml = q.options.map((opt, oIndex) => {
+                    const optionId = `q${qIndex}o${oIndex}`;
+                    const isSelected = answers[q.id] === opt;
+                    const selectedClass = isSelected ? 'selected' : '';
+
+                    return `
+                        <div 
+                            class="radio-option ${selectedClass}"
+                            onclick="handleOptionSelect('${q.id}', '${opt.replace(/'/g, "\\'")}')"
+                            id="${optionId}"
+                        >
+                            <span class="font-medium text-gray-800">${String.fromCharCode(65 + oIndex)}.</span> ${opt}
+                        </div>
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="quiz-container shadow-md">
+                        <p class="font-semibold text-xl text-gray-900 mb-4">${qIndex + 1}. ${q.question}</p>
+                        <div class="space-y-2">
+                            ${optionsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            app.innerHTML = `
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <h1 class="text-3xl font-bold text-gray-800">${topicName}</h1>
+                    <div class="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg shadow-inner">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="timer-display" class="text-2xl font-bold text-indigo-600">--:--</span>
+                    </div>
+                </div>
+                
+                <p class="text-lg text-gray-600 mb-6">You have ${TIME_LIMIT_MINUTES} minutes to answer all ${QUESTIONS_PER_MODULE} questions.</p>
+                
+                ${questionHtml}
+                
+                <div class="flex justify-between items-center mt-6 pt-4 border-t">
+                    <button 
+                        onclick="cleanupQuiz(); render();" 
+                        class="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-semibold hover:bg-gray-400 transition duration-200"
+                    >
+                        &larr; Exit Challenge
+                    </button>
+                    <button 
+                        onclick="submitAssessment(false)" 
+                        id="submit-button"
+                        class="px-8 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled
+                    >
+                        Submit Quiz
+                    </button>
+                </div>
+                <div id="quiz-message" class="mt-4 text-sm text-red-600 font-medium"></div>
+            `;
+            // Start the timer when the quiz display is rendered
+            startTimer();
+            updateSubmitButtonState();
+        }
+
+        function handleOptionSelect(questionId, selectedOption) {
+            answers[questionId] = selectedOption;
+            // Re-render the quiz section to update selection visuals
+            displayQuiz(); 
+            updateSubmitButtonState();
+        }
+        
+        function updateSubmitButtonState() {
+            const submitButton = document.getElementById('submit-button');
+            if (submitButton) {
+                const answeredCount = Object.keys(answers).length;
+                const requiredCount = questions.length;
+                
+                if (answeredCount === requiredCount) {
+                    submitButton.disabled = false;
+                    document.getElementById('quiz-message').textContent = 'All questions answered. Ready to submit!';
+                    document.getElementById('quiz-message').classList.remove('text-red-600');
+                    document.getElementById('quiz-message').classList.add('text-green-600');
+                } else {
+                    submitButton.disabled = true;
+                    document.getElementById('quiz-message').textContent = `Please answer all ${requiredCount} questions before submitting. (${answeredCount}/${requiredCount} answered)`;
+                    document.getElementById('quiz-message').classList.add('text-red-600');
+                    document.getElementById('quiz-message').classList.remove('text-green-600');
+                }
+            }
+        }
+        
+        function cleanupQuiz() {
+            // Clears all state and the timer when leaving the quiz view (either by submit or exit)
+            cleanupTimer();
+            currentModule = null; 
+            answers = {}; 
+            questions = []; 
+        }
+
+        function submitAssessment(isForced = false) {
+            const answeredCount = Object.keys(answers).length;
+            if (!isForced && answeredCount !== questions.length) {
+                document.getElementById('quiz-message').textContent = 'Please answer all questions before submitting.';
                 return;
             }
 
-            currentTopicId = topicId;
+            // In a real app, you would send answers to the backend (assessment-api) here.
+            
+            // Mark complete and clean up
+            setModuleCompleted(currentModule);
+            cleanupQuiz();
+        }
+        
+        // --- API CALLS ---
+        
+        async function startAssessment(key, name) {
+            currentModule = key;
             questions = [];
             answers = {};
-
-            document.getElementById('loading-view').classList.remove('hidden');
-            document.getElementById('dashboard-view').classList.add('hidden');
-            document.getElementById('status-message').classList.add('hidden');
+            renderLoading(`Gearing up for the ${name} challenge (${QUESTIONS_PER_MODULE} questions)...`);
 
             try {
-                const response = await fetch(EDGE_FUNCTION_URL, {
+                const response = await fetch(API_ENDPOINT, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${userToken}`,
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userToken}`,
                     },
-                    body: JSON.stringify({ action: 'generate_questions', topic: apiTopicName, count: QUESTION_COUNT }),
+                    body: JSON.stringify({
+                        action: 'generate_questions',
+                        topic: name,
+                        // Sending the new 15 question count to the backend
+                        count: QUESTIONS_PER_MODULE 
+                    })
                 });
 
                 if (!response.ok) {
                     const errorJson = await response.json();
-                    throw new Error(`Failed to load questions from the server: ${errorJson.error || response.statusText}`);
+                    throw new Error(errorJson.error || 'Unknown server error');
                 }
 
-                questions = await response.json();
+                const data = await response.json();
                 
-                if (questions.length === 0) {
-                     throw new Error("The API returned an empty list of questions.");
+                if (data && Array.isArray(data) && data.length === QUESTIONS_PER_MODULE) {
+                    questions = data;
+                } else {
+                     throw new Error(`AI returned an unexpected number of questions. Expected ${QUESTIONS_PER_MODULE}, got ${data.length || 0}.`);
                 }
-
-                renderQuiz();
-                document.getElementById('quiz-title').textContent = `${topics.find(t => t.id === topicId).name} (${questions.length} Questions)`;
-                showView('quiz-view');
-
+                
+                displayQuiz();
+                
             } catch (error) {
-                console.error("Quiz Start Error:", error);
-                displayStatus(`Error: Failed to load questions for ${apiTopicName}: ${error.message}`, true);
-                showView('dashboard-view');
+                renderError(`Failed to load questions for ${name}: ${error.message}`);
+                console.error("Assessment Load Error:", error);
+                // On error, revert to dashboard
+                currentModule = null;
+                setTimeout(render, 3000); 
             }
+        }
+
+        // --- VIEW RENDERING ---
+
+        function renderLoading(message) {
+             document.getElementById('app').innerHTML = `
+                <div class="flex flex-col items-center justify-center p-16 text-gray-600">
+                    <svg class="animate-spin h-10 w-10 text-indigo-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="text-xl font-medium">${message}</p>
+                    <p class="text-sm mt-2 text-gray-500">Generating ${QUESTIONS_PER_MODULE} questions might take a moment...</p>
+                </div>
+            `;
+        }
+
+        function renderError(message) {
+            document.getElementById('app').innerHTML = `
+                <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg shadow-md" role="alert">
+                    <p class="font-bold">Error Loading Assessment</p>
+                    <p>${message}</p>
+                    <p class="text-sm mt-2">Returning to dashboard in 3 seconds...</p>
+                </div>
+            `;
         }
         
-        function submitQuiz() {
-            const totalQuestions = questions.length;
-            const answeredQuestions = Object.keys(answers).length;
-
-            if (answeredQuestions < totalQuestions) {
-                // Using a custom message box instead of window.confirm for better UI/UX in a real app
-                const confirmMessage = `You have only answered ${answeredQuestions} out of ${totalQuestions} questions. Are you sure you want to submit?`;
-                if (!window.confirm(confirmMessage)) return; 
-            }
-
-            document.getElementById('submit-button').disabled = true;
-            document.getElementById('submit-button').textContent = "Submitting...";
-
-            // 1. Mark as complete and save state
-            assessmentState[currentTopicId] = true;
-            saveState();
-
-            // 2. Submit to backend (for mock scoring)
-            fetch(EDGE_FUNCTION_URL, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${userToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    action: 'submit_assessment', 
-                    topic: currentTopicId,
-                    answers: answers 
-                }),
-            }).then(response => response.json())
-            .then(() => {
-                // 3. Navigate back to dashboard and display success
-                const completionStatus = checkAllComplete() ? "All modules complete!" : "Completed!";
-                showDashboard();
-                displayStatus(`${topics.find(t => t.id === currentTopicId).name} submitted. ${completionStatus}`, false);
-            })
-            .catch(error => {
-                console.error("Submission Error:", error);
-                displayStatus(`Error submitting assessment: ${error.message}`, true);
-                showDashboard();
-            })
-            .finally(() => {
-                document.getElementById('submit-button').disabled = false;
-                document.getElementById('submit-button').textContent = "Submit Quiz";
-            });
-        }
-        
-        // --- UTILITY FUNCTIONS ---
-        
-        function showView(viewId) {
-            document.getElementById('loading-view').classList.add('hidden');
-            document.getElementById('dashboard-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.add('hidden');
-            document.getElementById(viewId).classList.remove('hidden');
-        }
-
-        function showDashboard(clearStatus = false) {
-            updateDashboard();
-            showView('dashboard-view');
-            if (clearStatus) {
-                document.getElementById('status-message').classList.add('hidden');
-            }
-        }
-        
-        function parseFragment() {
-            // ... (JWT parsing logic remains the same)
-            const fragment = window.location.hash.substring(1);
-            const params = new URLSearchParams(fragment);
-            
-            const accessToken = params.get('access_token');
-            if (accessToken) {
-                userToken = accessToken;
-                try {
-                    const base64Url = accessToken.split('.')[1];
-                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                    }).join(''));
-                    const payload = JSON.parse(jsonPayload);
-                    userEmail = payload.email;
-                } catch (e) {
-                    userEmail = "User";
-                }
-            }
-        }
-
-        function updateWelcomeMessage() {
-            if (userEmail) {
-                document.getElementById('welcome-message').innerHTML = `Welcome, <span class="font-bold text-gray-800">${userEmail}</span>! Please select a module to begin.`;
-            } else {
-                document.getElementById('welcome-message').textContent = 'Please log in to start your assessment.';
-            }
-        }
-
-        function displayStatus(message, isError = false) {
-            const statusDiv = document.getElementById('status-message');
-            statusDiv.textContent = message;
-            statusDiv.classList.remove('hidden');
-            if (isError) {
-                statusDiv.className = 'mt-6 p-4 bg-red-100 text-red-800 rounded-lg font-medium';
-            } else {
-                statusDiv.className = 'mt-6 p-4 bg-green-100 text-green-800 rounded-lg font-medium';
-            }
-        }
-
-        function renderQuiz() {
-            // ... (Quiz rendering logic remains the same)
-            const questionArea = document.getElementById('question-area');
-            questionArea.innerHTML = '';
-            
-            questions.forEach((q, qIndex) => {
-                const qDiv = document.createElement('div');
-                qDiv.className = 'mb-6 p-4 border border-gray-200 rounded-lg';
-                qDiv.innerHTML = `
-                    <p class="font-bold text-gray-900 mb-3">Q${qIndex + 1}. (${q.topic}) ${q.question}</p>
+        function render() {
+            if (!userToken && !userEmail) {
+                // Should only happen in true unauthenticated state (not in the editor preview)
+                document.getElementById('app').innerHTML = `
+                    <h1 class="text-3xl font-bold text-gray-800 mb-4">Core Concepts Check</h1>
+                    <p class="text-xl text-red-600">No authentication token found. Please log in through the main page.</p>
                 `;
-                
-                // Shuffle options to prevent correct answer always being first
-                const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5); 
-
-                shuffledOptions.forEach((option, oIndex) => {
-                    const optionId = `q${q.id}-${oIndex}`;
-                    const radioName = `q-${q.id}`;
-                    
-                    const optionDiv = document.createElement('div');
-                    optionDiv.className = 'flex items-center mb-2';
-                    optionDiv.innerHTML = `
-                        <input type="radio" id="${optionId}" name="${radioName}" value="${option}" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 rounded" onclick="handleAnswer('${q.id}', '${option}')">
-                        <label for="${optionId}" class="ml-3 text-sm font-medium text-gray-700 cursor-pointer">${option}</label>
-                    `;
-                    qDiv.appendChild(optionDiv);
-                });
-                
-                questionArea.appendChild(qDiv);
-            });
+            } else if (currentModule) {
+                displayQuiz();
+            } else {
+                displayDashboard();
+            }
         }
         
-        function handleAnswer(questionId, selectedOption) {
-            answers[questionId] = selectedOption;
+        // --- PAYMENT MODAL FUNCTIONS ---
+
+        function showPaymentModal() {
+            const modal = document.getElementById('payment-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.add('opacity-100');
+            modal.querySelector('.transform').classList.remove('scale-95');
         }
+
+        function closePaymentModal() {
+            const modal = document.getElementById('payment-modal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('.transform').classList.add('scale-95');
+        }
+
 
         // --- INITIALIZATION ---
-        window.onload = function() {
-            parseFragment();
-            updateWelcomeMessage();
-            loadState(); // Load state on initialization
+        
+        // Find the Supabase API URL from the environment (or use a placeholder)
+        const __placeholder_api_url = 'http://localhost:54321/functions/v1/assessment-api'; // Fallback
+        
+        // Check if environment variables are available, otherwise use placeholder
+        const global_supabase_url = typeof __supabase_url !== 'undefined' ? __supabase_url : __placeholder_api_url.substring(0, __placeholder_api_url.indexOf('/functions'));
+        
+        // If we found the global URL, update the constant
+        if(global_supabase_url && global_supabase_url !== __placeholder_api_url.substring(0, __placeholder_api_url.indexOf('/functions'))) {
+            const endpoint_prefix = global_supabase_url.endsWith('/') ? global_supabase_url.slice(0, -1) : global_supabase_url;
+            API_ENDPOINT = `${endpoint_prefix}/functions/v1/assessment-api`;
+        }
+        
+        parseFragment();
+        render();
 
-            if (userToken) {
-                showDashboard(); // Show dashboard initialized with state
-            } else {
-                displayStatus("No authentication token found. Please log in through the main page.", true);
-                showView('dashboard-view');
+        // Attach event listener for closing modal via ESC key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePaymentModal();
             }
-        };
+        });
     </script>
 </body>
 </html>
-```
-
-### Next Steps
-
-1.  **Redeploy the Edge Function:** Go to your terminal and redeploy the updated `index.ts` file:
-    ```bash
-    supabase functions deploy assessment-api
-    
