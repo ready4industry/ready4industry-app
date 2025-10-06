@@ -11,43 +11,23 @@
   />
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   
-  <style>
-    body {
-      font-family: "Inter", sans-serif;
-      background-color: #f9fafb;
-    }
-    #app-root {
-      min-height: 100vh;
-    }
-    .transition-all-slow {
-      transition: all 0.3s ease-in-out;
-    }
-  </style>
-</head>
+  </head>
 
 <body class="p-4 md:p-8">
   <div id="app-root">
     <div id="content-container"></div>
   </div>
 
-  <div
-    id="user-message-box"
-    class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"
-  ></div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     // --- CONFIGURATION ---
     const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co"; 
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8"; // Replace with your Anon Key
-    const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/assessment-api`;
-    const QUESTIONS_PER_MODULE = 10;
-    const RAZORPAY_KEY_ID = "rzp_live_YOUR_KEY_ID"; // Replace with your LIVE/TEST Razorpay Key ID
-    const RAZORPAY_MENTOR_CONTACT = "mentor@example.com"; // Your contact email
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8"; 
+    // ... other config ...
 
-    // Line 52: This line now executes AFTER the library is loaded, resolving the error.
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Line 50 or similar: This line is now safe to execute
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
 
     // --- STATE MANAGEMENT ---
     let appState = {};
