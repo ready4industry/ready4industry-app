@@ -305,39 +305,6 @@
       </div>
     `;
 
-    const renderQuiz = () => {
-      return `
-        ${renderHeader()}
-        <div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-lg">
-          <h2 class="text-2xl font-bold mb-4">${currentModule.name} Quiz</h2>
-          <div>
-            ${currentQuestions.map((q, i) => `
-              <div class="mb-6">
-                <p class="font-semibold">${i+1}. ${q.question}</p>
-                <div class="mt-2 space-y-2">
-                  ${q.options.map((opt, idx) => `
-                    <button 
-                      class="block w-full text-left px-4 py-2 rounded-lg border ${
-                        userAnswers[q.id] === idx ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900'
-                      } hover:bg-indigo-500 hover:text-white transition"
-                      onclick="selectAnswer('${q.id}', ${idx})"
-                    >${opt}</button>
-                  `).join('')}
-                </div>
-              </div>
-            `).join('')}
-          </div>
-          <button 
-            class="mt-6 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
-            onclick="submitAssessment()"
-            ${Object.keys(userAnswers).length !== currentQuestions.length ? 'disabled class="opacity-50 cursor-not-allowed"' : ''}
-          >
-            Submit Assessment
-          </button>
-        </div>
-      `;
-    };
-
     const renderComplete = () => `
       ${renderHeader()}
       <div class="max-w-xl mx-auto text-center p-8 bg-white rounded-xl shadow-lg">
@@ -368,7 +335,7 @@
           content = renderLoading();
           break;
         case "quiz":
-          content = renderQuiz();
+          content = renderLoading();
           break;
         case "complete":
           content = renderComplete();
