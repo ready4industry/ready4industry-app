@@ -4,30 +4,48 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Skills Challenge Dashboard</title>
-<script src="https://cdn.tailwindcss.com"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
     rel="stylesheet"
   />
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   
-  </head>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f9fafb;
+    }
+    #app-root {
+      min-height: 100vh;
+    }
+    .transition-all-slow {
+      transition: all 0.3s ease-in-out;
+    }
+  </style>
+</head>
 
 <body class="p-4 md:p-8">
   <div id="app-root">
     <div id="content-container"></div>
   </div>
 
+  <div
+    id="user-message-box"
+    class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"
+  ></div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     // --- CONFIGURATION ---
     const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co"; 
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8"; 
-    // ... other config ...
-
-    // Line 50 or similar: This line is now safe to execute
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"; // Replace with your Anon Key
+    const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/assessment-api`;
+    const QUESTIONS_PER_MODULE = 10;
+    
+    // Initialize Supabase Client
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- STATE MANAGEMENT ---
     let appState = {};
@@ -66,17 +84,21 @@
 
     // --- AUTHENTICATION ---
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        showUserMessage("Please sign in to start the assessment.", 'error');
-        window.location.href = './index.html';
+      const { data: { user, session }, error: authError } = await supabase.auth.getSession();
+      
+      if (authError || !session) {
+        console.error("Authentication failed. Redirecting to login.", authError);
+        showUserMessage("Session expired or invalid. Please sign in again.", 'error');
+        setTimeout(() => {
+             window.location.href = './index.html';
+        }, 500);
         return false;
       }
 
-      currentUserId = session.user.id;
+      currentUserId = user.id;
       appState = loadState(currentUserId);
-      appState.user.email = session.user.email;
-      appState.user.fullName = session.user.user_metadata.full_name || session.user.email;
+      appState.user.email = user.email;
+      appState.user.fullName = user.user_metadata.full_name || user.email;
       
       await loadCompletedAssessments();
       return true;
@@ -86,18 +108,20 @@
       const { data: assessments, error } = await supabase
         .from("assessments")
         .select("module_id, score, completed")
-        .eq("completed", true);
+        .eq("user_id", currentUserId)
+        .order("created_at", { ascending: false }); // Show the latest completion
 
       if (error) {
         console.error("Error loading assessments:", error);
         return;
       }
 
-      assessments.forEach(a => {
-        const module = appState.modules.find(m => m.id === a.module_id);
-        if (module) {
-          module.completed = true;
-          module.score = a.score;
+      // Merge the latest scores into appState
+      appState.modules.forEach(module => {
+        const latestAssessment = assessments.find(a => a.module_id === module.id);
+        if (latestAssessment) {
+          module.completed = latestAssessment.completed;
+          module.score = latestAssessment.score;
         }
       });
     };
@@ -160,8 +184,9 @@
     const startQuiz = (module) => {
       currentModule = appState.modules.find(m => m.id === module.id);
       if (currentModule.completed) {
-        showUserMessage(`${currentModule.name} is already completed.`, 'info');
-        return;
+        // Allow re-taking the quiz
+        // showUserMessage(`${currentModule.name} is already completed.`, 'info');
+        // return; 
       }
       quizState = "loading";
       mainRender();
@@ -217,89 +242,14 @@
       }
     };
 
-    // --- PAYMENT FUNCTIONS ---
-    const showPaymentModal = async (score) => {
-        try {
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-            if (sessionError || !session) throw new Error("User session invalid.");
-            const token = session.access_token;
-
-            // 1. Call Edge Function to create Razorpay Order
-            const res = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    action: "create_order",
-                    score: score,
-                    email: appState.user.email,
-                }),
-            });
-            
-            if (!res.ok) {
-                const errData = await res.json().catch(() => ({ error: 'Invalid JSON response' }));
-                throw new Error(errData.error || `Order creation failed with status ${res.status}`);
-            }
-
-            const { order_id } = await res.json();
-            
-            // 2. Launch Razorpay Modal
-            payWithRazorpay(order_id, score);
-
-        } catch (e) {
-            console.error("Payment setup failed:", e);
-            showUserMessage(`Payment error: ${e.message}. Contact ${RAZORPAY_MENTOR_CONTACT}`, 'error');
-            quizState = "ready";
-            mainRender();
-        }
-    };
-
-    const payWithRazorpay = (order_id, score) => {
-        const options = {
-            key: RAZORPAY_KEY_ID, 
-            amount: 9900, // 99.00 INR in paise
-            currency: "INR",
-            name: "Ready4Industry Assessment Report",
-            description: `Unlock detailed report for ${currentModule.name} (${score}%)`,
-            order_id: order_id, 
-            handler: function (response) {
-                // Success: Razorpay will trigger the Webhook on the backend
-                showUserMessage("Payment successful! Report access will be unlocked shortly.", 'success');
-                // The webhook handles the DB update.
-                // We reload the dashboard to update the status.
-                setTimeout(() => {
-                    quizState = "ready";
-                    loadCompletedAssessments().then(mainRender);
-                }, 1000);
-            },
-            prefill: {
-                name: appState.user.fullName,
-                email: appState.user.email,
-            },
-            theme: {
-                color: "#4f46e5" // Indigo
-            }
-        };
-        const rzp = new Razorpay(options);
-        rzp.open();
-
-        // If the user closes the modal, return to the assessment results screen
-        rzp.on('payment.failed', function (response){
-            showUserMessage(`Payment Failed: ${response.error.description}. Please try again or contact support.`, 'error');
-            quizState = "complete"; // Stay on the complete screen
-            mainRender();
-        });
-    };
-    
     const handleQuizComplete = (score) => {
         finalScore = score;
+        // In the free version, we treat the submission as completion for display purposes
         currentModule.completed = true;
-        currentModule.score = score;
+        currentModule.score = score; 
         quizState = "complete";
         mainRender();
-        showPaymentModal(score); // Trigger the payment flow
+        // Removed payment/report unlock logic
     };
 
 
@@ -329,9 +279,8 @@
             <button 
               onclick="startQuiz(appState.modules.find(mod => mod.id === '${m.id}'))"
               class="px-4 py-2 text-white font-semibold rounded-lg transition duration-150 
-              ${m.completed ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}"
-              ${m.completed ? 'disabled' : ''}>
-              Start Quiz (10 mins)
+              ${m.completed ? 'bg-indigo-400 hover:bg-indigo-500' : 'bg-indigo-600 hover:bg-indigo-700'}">
+              ${m.completed ? 'Retake Quiz' : 'Start Quiz (10 mins)'}
             </button>
           </div>
         </div>
@@ -344,9 +293,9 @@
           ${moduleCards}
         </div>
         ${allCompleted ? `
-          <div class="mt-8 p-6 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded-lg shadow-md">
+          <div class="mt-8 p-6 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-lg shadow-md">
             <p class="font-bold">Congratulations!</p>
-            <p>You have completed all modules. Your final report is ready to be unlocked.</p>
+            <p>You have completed all modules. You can retake any assessment to improve your score.</p>
           </div>
         ` : ''}
       `;
@@ -358,7 +307,6 @@
         const q = currentQuestions[questionIndex];
 
         if (!q) {
-            // Should not happen, but a safeguard
             return `<div class="p-6 bg-white rounded-xl shadow-lg">Quiz completed. Click 'Submit' below.</div>`;
         }
 
@@ -416,17 +364,10 @@
             </h2>
             <p class="text-6xl font-black mb-6">${finalScore}%</p>
             <p class="text-gray-700 mb-8">
-                Your score for the **${currentModule.name}** module has been recorded.
+                Your score for the **${currentModule.name}** module has been recorded. You can retake the assessment at any time.
             </p>
-            <div class="p-4 bg-yellow-50 border border-yellow-300 rounded-lg mb-6">
-                <p class="font-bold text-yellow-800">Unlock Full Report (₹99)</p>
-                <p class="text-sm text-yellow-700">Pay to instantly view detailed analysis, correct answers, and feedback.</p>
-            </div>
             
-            <button onclick="showPaymentModal(${finalScore})" class="w-full px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition">
-                Pay ₹99 and Unlock Report
-            </button>
-            <button onclick="quizState='ready'; loadCompletedAssessments().then(mainRender)" class="mt-4 w-full px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition">
+            <button onclick="quizState='ready'; loadCompletedAssessments().then(mainRender)" class="mt-4 w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">
                 Return to Dashboard
             </button>
         </div>
@@ -441,14 +382,12 @@
           content = renderDashboard();
           break;
         case "loading":
+        case "scoring": // Use loading screen for scoring wait
           content = renderLoading();
           break;
         case "quiz":
           content = renderQuiz();
           break;
-        case "scoring":
-            content = renderLoading(); // Re-use loading screen for scoring wait
-            break;
         case "complete":
           content = renderComplete();
           break;
