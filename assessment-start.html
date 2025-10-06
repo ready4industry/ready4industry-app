@@ -1,653 +1,359 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skills Challenge Dashboard</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
-        }
-        /* Custom style to replicate JSX style container for readability */
-        #app-root {
-            min-height: 100vh;
-        }
-        /* Global transition for better UX */
-        .transition-all-slow {
-            transition: all 0.3s ease-in-out;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skills Challenge Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f9fafb;
+    }
+    #app-root {
+      min-height: 100vh;
+    }
+    .transition-all-slow {
+      transition: all 0.3s ease-in-out;
+    }
+  </style>
 </head>
+
 <body class="p-4 md:p-8">
+  <div id="app-root">
+    <div id="content-container"></div> 
+  </div>
 
-    <div id="app-root" class="font-[Inter, sans-serif]">
-        <!-- Content will be injected here by JavaScript -->
-        <div id="content-container"></div>
-    </div>
+  <div
+    id="user-message-box"
+    class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"
+  ></div>
 
-    <!-- Custom Message Box for alerts (replaces alert() function) -->
-    <div id="user-message-box" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <script>
-        // --- CONFIGURATION and CONSTANTS ---
-        const MOCK_USERS = {
-            'user_keshav': { id: 'user_keshav', name: 'Keshav Karn', email: 'keshav.karn@example.com' },
-            'user_admin': { id: 'user_admin', name: 'Mentor Admin', email: 'ready4industry@gmail.com' },
-        };
+  <script>
+    // --- CONFIGURATION ---
+    const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8"; 
+    const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/assessment-api`;
+    const QUESTIONS_PER_MODULE = 10;
+    
+    // Initialize Supabase Client (declared here, assigned in INIT block)
+    let supabase; 
 
-        const MODULES = [
-            { id: 'module_1', name: 'Technical Fundamentals', topic: 'BTech Graduate Syllabus Fundamentals' },
-            { id: 'module_2', name: 'Aptitude & Reasoning', topic: 'Aptitude and Reasoning Fundamentals' },
-            { id: 'module_3', name: 'Behavioural Skills', topic: 'Behavioural Fundamentals' },
-        ];
+    // --- STATE MANAGEMENT ---
+    let appState = {};
+    let currentModule = null;
+    let quizState = "ready";
+    let currentAssessmentId = null;
+    let currentQuestions = [];
+    let userAnswers = {};
+    let finalScore = 0;
+    let currentUserId = null;
 
-        const QUESTIONS_PER_MODULE = 10;
-        const TIME_LIMIT_SECONDS = 600; // 10 minutes per quiz
+    const loadState = (userId) => ({
+      user: {
+        id: userId,
+        email: "",
+        fullName: "",
+      },
+      modules: [
+        { id: "technical", name: "Technical Skills", topic: "Full Stack JavaScript Development", completed: false, score: 0 },
+        { id: "aptitude", name: "Aptitude Test", topic: "Quantitative Aptitude and Logical Reasoning", completed: false, score: 0 },
+      ],
+    });
 
-        // ======================================================================
-        // ACTION REQUIRED: REPLACE THESE WITH YOUR ACTUAL SUPABASE CONFIG VALUES!
-        // ======================================================================
-        const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co"; 
+    // --- UTILITIES ---
+    const showUserMessage = (message, type = 'info') => {
+      const box = document.getElementById('user-message-box');
+      box.textContent = message;
+      box.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-100 pointer-events-auto ${
+        type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-blue-600'
+      }`;
+      setTimeout(() => {
+        box.classList.replace('opacity-100', 'opacity-0');
+        box.classList.replace('pointer-events-auto', 'pointer-events-none');
+      }, 5000);
+    };
+
+    // --- AUTHENTICATION ---
+    const checkAuth = async () => {
+      const { data: { user, session }, error: authError } = await supabase.auth.getSession();
+      
+      if (authError || !session) {
+        console.error("Authentication failed. Redirecting to login.", authError);
+        showUserMessage("Session expired or invalid. Please sign in again.", 'error');
+        setTimeout(() => {
+             window.location.href = './index.html';
+        }, 500);
+        return false;
+      }
+      
+      // ⭐️ CRITICAL FIX: Ensure we use the correct user object.
+      // After OAuth redirect, 'user' is often null, but 'session.user' is populated.
+      const authenticatedUser = user || session.user;
+
+      if (!authenticatedUser) {
+        throw new Error("Could not retrieve user details from session.");
+      }
+      
+      currentUserId = authenticatedUser.id;
+      appState = loadState(currentUserId);
+      appState.user.email = authenticatedUser.email;
+      appState.user.fullName = authenticatedUser.user_metadata.full_name || authenticatedUser.email;
+      
+      await loadCompletedAssessments();
+      return true;
+    };
+
+    const loadCompletedAssessments = async () => {
+      const { data: assessments, error } = await supabase
+        .from("assessments")
+        .select("module_id, score, completed")
+        .eq("user_id", currentUserId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error loading assessments:", error);
+        return;
+      }
+
+      appState.modules.forEach(module => {
+        const latestAssessment = assessments.find(a => a.module_id === module.id);
+        if (latestAssessment) {
+          module.completed = latestAssessment.completed;
+          module.score = latestAssessment.score;
+        }
+      });
+    };
+
+    const signOut = async () => {
+      await supabase.auth.signOut();
+      window.location.href = './index.html';
+    };
+
+    // --- QUIZ FUNCTIONS (Remaining functions are correct) ---
+    const fetchQuestions = async (m) => {
+      try {
+        const { data: { session }, error: sessionError } =
+          await supabase.auth.getSession();
+        if (sessionError || !session) {
+          throw new Error("User not logged in. Please sign in again.");
+        }
+
+        const token = session.access_token;
+
+        const res = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            action: "generate_questions",
+            topic: m.topic,
+            count: QUESTIONS_PER_MODULE,
+            moduleId: m.id,
+          }),
+        });
         
-        // 🔑 Anon Key: Used for unauthenticated requests (like client-side reads)
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8";
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({ error: 'Invalid JSON response from AI' }));
+          throw new Error(errData.error || `Question generation failed with status ${res.status}`);
+        }
 
-        // 🛑 AUTHENTICATED JWT REQUIRED: This must be the access_token obtained from a successful sign-in!
-        const MOCK_AUTH_TOKEN = "PASTE_YOUR_GENERATED_JWT_HERE_FROM_STEP_2";
+        const fetchedData = await res.json(); 
+        const fetchedQuestions = fetchedData.questions;
+        if (!Array.isArray(fetchedQuestions) || fetchedQuestions.length === 0) {
+          throw new Error("AI returned zero or invalid questions.");
+        }
+
+        currentQuestions = fetchedQuestions;
+        currentAssessmentId = fetchedData.assessment_id;
+        userAnswers = {};
+        quizState = "quiz";
+        mainRender();
+
+      } catch (e) {
+        console.error("Failed to load quiz:", e);
+        quizState = "ready";
+        showUserMessage(`Failed to load quiz: ${e.message}`, 'error');
+        mainRender();
+      }
+    };
+
+    const startQuiz = (module) => {
+      currentModule = appState.modules.find(m => m.id === module.id);
+      quizState = "loading";
+      mainRender();
+      fetchQuestions(currentModule);
+    };
+    
+    const selectAnswer = (questionId, optionIndex) => {
+      userAnswers[questionId] = optionIndex;
+      mainRender();
+    };
+
+    const submitAssessment = async () => {
+      quizState = "scoring";
+      mainRender();
+
+      try {
+        const { data: { session }, error: sessionError } =
+          await supabase.auth.getSession();
+        if (sessionError || !session) {
+          throw new Error("User not logged in. Please sign in again.");
+        }
+        const token = session.access_token;
+
+        const submissionBody = {
+          action: 'submit_assessment',
+          assessmentId: currentAssessmentId,
+          userAnswers: userAnswers,
+        };
+
+        const res = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(submissionBody),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({ error: 'Invalid JSON response from server' }));
+          throw new Error(errData.error || `Submission failed with status ${res.status}`);
+        }
+
+        const result = await res.json();
+        finalScore = result.score;
+        handleQuizComplete(finalScore);
+
+      } catch (e) {
+        console.error("Submission failed:", e);
+        quizState = 'ready';
+        showUserMessage(`Failed to submit assessment: ${e.message}`, 'error');
+        mainRender();
+      }
+    };
+
+    const handleQuizComplete = (score) => {
+        finalScore = score;
+        currentModule.completed = true;
+        currentModule.score = score; 
+        quizState = "complete";
+        mainRender();
+    };
+
+
+    // --- RENDERING (All render functions remain the same) ---
+    const renderHeader = () => `
+      <header class="flex justify-between items-center py-4 px-6 bg-white shadow-md rounded-xl mb-8">
+        <h1 class="text-2xl font-extrabold text-indigo-600">Skills Challenge</h1>
+        <div class="flex items-center space-x-4">
+          <span class="text-gray-700 font-medium hidden sm:inline">Welcome, ${appState.user.fullName.split(' ')[0]}</span>
+          <button onclick="signOut()" class="text-sm px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 transition">Sign Out</button>
+        </div>
+      </header>
+    `;
+
+    const renderDashboard = () => {
+      const allCompleted = appState.modules.every(m => m.completed);
+      const moduleCards = appState.modules.map(m => `
+        <div class="bg-white p-6 rounded-xl shadow-lg border ${m.completed ? 'border-green-400' : 'border-gray-200'}">
+          <h3 class="text-xl font-bold text-gray-800 mb-2">${m.name}</h3>
+          <p class="text-gray-600 mb-4">${m.topic}</p>
+          <div class="flex items-center justify-between mt-4">
+            <span class="text-sm font-semibold ${m.completed ? 'text-green-600' : 'text-yellow-600'}">
+              Status: ${m.completed ? `Completed (${m.score}%)` : 'Pending'}
+            </span>
+            <button 
+              onclick="startQuiz(appState.modules.find(mod => mod.id === '${m.id}'))"
+              class="px-4 py-2 text-white font-semibold rounded-lg transition duration-150 bg-indigo-600 hover:bg-indigo-700">
+              ${m.completed ? 'Retake Quiz' : 'Start Quiz (10 mins)'}
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        ${renderHeader()}
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Assessment Modules</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          ${moduleCards}
+        </div>
+        ${allCompleted ? `
+          <div class="mt-8 p-6 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-lg shadow-md">
+            <p class="font-bold">Congratulations!</p>
+            <p>You have completed all modules. You can retake any assessment to improve your score.</p>
+          </div>
+        ` : ''}
+      `;
+    };
+
+    const renderQuiz = () => {
+        const currentQuestionIndex = currentQuestions.findIndex(q => userAnswers[q.assessment_id] === undefined);
+        const questionIndex = currentQuestionIndex === -1 ? 0 : currentQuestionIndex;
+        const q = currentQuestions[questionIndex];
+
+        if (!q) {
+            return `<div class="p-6 bg-white rounded-xl shadow-lg">Quiz completed. Click 'Submit' below.</div>`;
+        }
+
+        const isLastQuestion = questionIndex === currentQuestions.length - 1 || currentQuestionIndex === -1;
+
+        const optionsHtml = q.options.map((option, index) => `
+            <div 
+                onclick="selectAnswer('${q.assessment_id}', ${index})"
+                class="p-4 border rounded-lg cursor-pointer transition-all-slow 
+                ${userAnswers[q.assessment_id] === index ? 'bg-indigo-100 border-indigo-600 ring-2 ring-indigo-600' : 'bg-gray-50 hover:bg-gray-100 border-gray-300'}">
+                <span class="font-medium text-gray-800">${String.fromCharCode(65 + index)}. ${option}</span>
+            </div>
+        `).join('');
         
-        // This constructs the full URL to the Edge Function (assessment-api)
-        const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL.replace(/\/$/, '')}/functions/v1/assessment-api`;
+        const isAnswered = userAnswers[q.assessment_id] !== undefined;
+        
+        const actionButton = isLastQuestion 
+            ? `<button onclick="submitAssessment()" ${!isAnswered ? 'disabled' : ''} class="w-full px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition disabled:bg-gray-400">Submit Assessment</button>`
+            : `<button onclick="selectAnswer('${q.assessment_id}', userAnswers['${q.assessment_id}']); mainRender();" ${!isAnswered ? 'disabled' : ''} class="w-full px-6 py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-400">Next Question</button>`;
 
 
-        // --- STATE MANAGEMENT ---
-        let currentUserId = 'user_keshav';
-        let appState = {}; // Holds progress, populated in initializeApp
-        let currentView = null; // null (dashboard) or module_id (quiz)
-
-        // Quiz-specific state
-        let questions = [];
-        let currentQuestionIndex = 0;
-        let selectedAnswers = {};
-        let timeLeft = TIME_LIMIT_SECONDS;
-        let quizState = 'loading'; // 'loading', 'ready', 'submitting', 'error'
-        let error = null;
-        let timerInterval = null;
-
-
-        // --- UTILITY FUNCTIONS ---
-
-        const loadState = (userId) => {
-            try {
-                const serializedState = localStorage.getItem(`assessmentState_${userId}`);
-                if (serializedState === null) {
-                    return {
-                        progress: MODULES.reduce((acc, module) => {
-                            acc[module.id] = { completed: false, score: 0, started: false };
-                            return acc;
-                        }, {}),
-                    };
-                }
-                return JSON.parse(serializedState);
-            } catch (e) {
-                console.error("Could not load state:", e);
-                return {
-                    progress: MODULES.reduce((acc, module) => {
-                        acc[module.id] = { completed: false, score: 0, started: false };
-                        return acc;
-                    }, {}),
-                };
-            }
-        };
-
-        const saveState = () => {
-            try {
-                const serializedState = JSON.stringify(appState);
-                localStorage.setItem(`assessmentState_${currentUserId}`, serializedState);
-            } catch (e) {
-                console.error("Could not save state:", e);
-            }
-        };
-
-        const formatTime = (seconds) => {
-            const minutes = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        };
-
-        // Custom function to show a message (replaces alert() function)
-        const showUserMessage = (message, type = 'info') => {
-            const messageBox = document.getElementById('user-message-box');
-            let bgColor = 'bg-blue-500';
-            if (type === 'error') bgColor = 'bg-red-500';
-            if (type === 'success') bgColor = 'bg-green-500';
-
-            messageBox.textContent = message;
-            messageBox.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 ${bgColor}`;
-            messageBox.style.opacity = '1';
-            messageBox.style.pointerEvents = 'auto';
-
-            setTimeout(() => {
-                messageBox.style.opacity = '0';
-                messageBox.style.pointerEvents = 'none';
-            }, 3000);
-        };
-
-        // --- RENDER FUNCTIONS ---
-
-        const mainRender = () => {
-            const container = document.getElementById('content-container');
-            container.innerHTML = ''; 
-
-            if (currentView) {
-                renderQuizView(container);
-            } else {
-                renderDashboard(container);
-            }
-        };
-
-        const renderDashboard = (container) => {
-            const user = MOCK_USERS[currentUserId];
-            const totalModules = MODULES.length;
-            const completedModules = MODULES.filter(m => appState.progress[m.id]?.completed).length;
-            const isAssessmentComplete = completedModules === totalModules;
-            const mentorEmail = MOCK_USERS['user_admin'].email;
-
-            // Dashboard HTML Structure
-            container.innerHTML = `
-                <!-- User Switcher -->
-                <div class="fixed top-2 right-4 z-10 bg-white p-2 rounded-lg shadow-lg border border-indigo-100 flex items-center space-x-2">
-                    <label for="user-switcher" class="text-sm font-medium text-gray-700">
-                        Current User (Mock Login):
-                    </label>
-                    <select
-                        id="user-switcher"
-                        class="p-1 border border-gray-300 rounded-md text-sm bg-gray-50 focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                        ${Object.entries(MOCK_USERS).map(([id, u]) => `
-                            <option value="${id}" ${id === currentUserId ? 'selected' : ''}>
-                                ${u.name}
-                            </option>
-                        `).join('')}
-                    </select>
+        return `
+            ${renderHeader()}
+            <div class="max-w-3xl mx-auto">
+                <div class="text-lg font-semibold text-indigo-600 mb-4">Question ${questionIndex + 1} of ${currentQuestions.length}</div>
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <p class="text-xl font-bold text-gray-800 mb-6">${q.question_text}</p>
+                    <div class="space-y-4">
+                        ${optionsHtml}
+                    </div>
                 </div>
-
-                <header class="text-center mb-10 pt-10">
-                    <h1 class="text-4xl font-extrabold text-indigo-700 tracking-tight">
-                        Skills Challenge Dashboard
-                    </h1>
-                    <p class="mt-2 text-xl text-gray-500">
-                        Welcome, ${user.name}. Complete the modules below to unlock your final report.
-                    </p>
-                    
-                    <!-- Progress Bar -->
-                    <div class="mt-6 w-full max-w-2xl mx-auto">
-                        <div class="h-3 bg-gray-200 rounded-full">
-                            <div
-                                class="h-3 bg-indigo-500 rounded-full transition-all-slow"
-                                style="width: ${(completedModules / totalModules) * 100}%"
-                            ></div>
-                        </div>
-                        <p class="mt-1 text-sm font-medium text-gray-600">${completedModules} of ${totalModules} Modules Completed</p>
-                    </div>
-                </header>
-
-                <!-- Module Cards -->
-                <div id="module-cards-container" class="max-w-4xl mx-auto space-y-6">
-                    ${MODULES.map(module => {
-                        const status = appState.progress[module.id];
-                        const isCompleted = status.completed;
-                        const isDisabled = isCompleted; 
-                        const buttonText = isCompleted ? `Review Score: ${status.score}%` : 'Start Assessment';
-                        
-                        return `
-                            <div 
-                                class="flex flex-col md:flex-row items-start md:items-center justify-between p-6 rounded-xl shadow-lg transition-all-slow 
-                                ${isCompleted ? 'bg-green-50 border-green-300 border-2' : 'bg-white border border-gray-200 hover:shadow-xl'}
-                            ">
-                                <div>
-                                    <h3 class="text-xl font-bold ${isCompleted ? 'text-green-800' : 'text-indigo-600'}">
-                                        ${module.name}
-                                    </h3>
-                                    <p class="mt-1 text-gray-600">${module.topic}</p>
-                                </div>
-
-                                <button
-                                    data-module-id="${module.id}"
-                                    ${isDisabled ? 'disabled' : ''}
-                                    class="start-quiz-button mt-4 md:mt-0 px-6 py-2 font-semibold rounded-lg transition-colors duration-200 disabled:opacity-50 
-                                    ${isCompleted
-                                        ? 'bg-green-500 text-white hover:bg-green-600'
-                                        : 'bg-indigo-500 text-white hover:bg-indigo-600'
-                                    }
-                                    "
-                                >
-                                    ${buttonText}
-                                </button>
-                            </div>
-                        `;
-                    }).join('')}
+                <div class="mt-6">
+                    ${actionButton}
                 </div>
+            </div>
+        `;
+    };
 
-                <!-- Completion/Mentor Section -->
-                <div class="mt-12 max-w-4xl mx-auto p-6 text-center bg-white rounded-xl shadow-2xl border-t-4 border-indigo-500">
-                    ${isAssessmentComplete ? `
-                        <>
-                            <h2 class="text-2xl font-bold text-green-700">
-                                Congratulations! Assessment Complete.
-                            </h2>
-                            <p class="mt-3 text-lg text-gray-700">
-                                Your final report is ready. Please click below to view your results.
-                            </p>
-                            <button
-                                class="mt-4 px-8 py-3 bg-indigo-500 text-white text-lg font-bold rounded-xl shadow-lg hover:bg-indigo-600 transition-colors"
-                                onclick="showUserMessage('Report viewing is not yet implemented. Great job completing the assessment!', 'info')"
-                            >
-                                Get Final Report
-                            </button>
-                        </>
-                    ` : `
-                        <h2 class="text-2xl font-bold text-indigo-700">
-                            Complete all modules to unlock your Final Report.
-                        </h2>
-                    `}
+    const renderLoading = () => `
+        ${renderHeader()}
+        <div class="flex justify-center items-center h-96">
+            <div class="text-center">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-4"></div>
+                <p class="text-xl text-gray-700 font-semibold">Generating Questions via AI...</p>
+                <p class="text-sm text-gray-500 mt-2">This may take a few moments.</p>
+            </div>
+        </div>
+    `;
 
-                    <!-- Mentor Contact (Permanently Visible) -->
-                    <div class="mt-6 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-800">Need Guidance?</h3>
-                        <p class="text-sm text-gray-600">
-                            Contact your mentor for next steps or support on your journey.
-                        </p>
-                        <a 
-                            href="mailto:${mentorEmail}" 
-                            class="mt-2 inline-block px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                        >
-                            Contact Your Mentor: ${mentorEmail}
-                        </a>
-                    </div>
-                </div>
-            `;
-
-            // Attach Event Listeners after rendering
-            document.getElementById('user-switcher').addEventListener('change', (e) => {
-                currentUserId = e.target.value;
-                appState = loadState(currentUserId);
-                mainRender();
-            });
-
-            document.querySelectorAll('.start-quiz-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    handleStartQuiz(button.getAttribute('data-module-id'));
-                });
-            });
-        };
-        
-        const renderQuizView = (container) => {
-            const module = MODULES.find(m => m.id === currentView);
-            const currentQuestion = questions[currentQuestionIndex];
-            
-            // Render different states: Loading, Error, Ready
-            let content;
-
-            if (quizState === 'error') {
-                 content = `
-                    <div class="bg-red-50 border border-red-400 text-red-700 p-6 rounded-xl shadow-lg max-w-4xl mx-auto">
-                        <h2 class="text-xl font-bold">Failed to Load Quiz</h2>
-                        <p class="mt-2">${error}</p>
-                        <button
-                            onclick="handleBackToDashboard()"
-                            class="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
-                        >
-                            Back to Dashboard
-                        </button>
-                    </div>
-                 `;
-            } else if (quizState === 'loading' || questions.length === 0) {
-                 content = `
-                    <div class="flex items-center justify-center p-12 bg-white rounded-xl shadow-lg h-96">
-                        <div class="text-center">
-                          <svg class="animate-spin h-8 w-8 text-indigo-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          <p class="mt-4 text-gray-700">Generating ${QUESTIONS_PER_MODULE} questions for ${module.name} using Perplexity AI's **sonar-pro** model...</p>
-                        </div>
-                    </div>
-                 `;
-            } else {
-                // Quiz Ready State
-                content = `
-                    <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl max-w-4xl mx-auto">
-                        <header class="mb-6 border-b pb-4 flex justify-between items-center">
-                            <h2 class="text-2xl font-bold text-indigo-700">${module.name}</h2>
-                            <div class="text-lg font-mono px-3 py-1 rounded-full ${timeLeft < 60 ? 'bg-red-100 text-red-600' : 'bg-indigo-100 text-indigo-600'}">
-                                Time Left: ${formatTime(timeLeft)}
-                            </div>
-                        </header>
-                        
-                        ${error ? `<div class="p-3 mb-4 text-red-700 bg-red-100 rounded-lg">${error}</div>` : ''}
-
-                        <div class="text-lg mb-6">
-                            <p class="font-semibold text-gray-800">Question ${currentQuestionIndex + 1} of ${questions.length}</p>
-                            <p class="mt-2 p-4 bg-gray-50 rounded-lg border">${currentQuestion.question}</p>
-                        </div>
-
-                        <div id="options-container" class="space-y-3 mb-8">
-                            ${currentQuestion.options.map((option, index) => {
-                                const isSelected = selectedAnswers[currentQuestion.id] === index;
-                                return `
-                                    <button
-                                        data-option-index="${index}"
-                                        class="option-button w-full text-left p-3 rounded-lg border transition-all duration-200 
-                                          ${isSelected
-                                            ? 'bg-indigo-500 text-white shadow-md border-indigo-600'
-                                            : 'bg-white text-gray-800 hover:bg-indigo-50 border-gray-200'
-                                          }"
-                                        ${quizState === 'submitting' ? 'disabled' : ''}
-                                    >
-                                        <span class="font-medium mr-2">${String.fromCharCode(65 + index)}.</span>
-                                        ${option}
-                                    </button>
-                                `;
-                            }).join('')}
-                        </div>
-
-                        <footer class="flex justify-between items-center border-t pt-4">
-                            <button
-                                onclick="handlePrevious()"
-                                ${currentQuestionIndex === 0 || quizState === 'submitting' ? 'disabled' : ''}
-                                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50 transition-colors"
-                            >
-                                &larr; Previous
-                            </button>
-                            
-                            <div class="flex space-x-2">
-                                <button
-                                    onclick="handleBackToDashboard()"
-                                    ${quizState === 'submitting' ? 'disabled' : ''}
-                                    class="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors"
-                                >
-                                    End Quiz
-                                </button>
-                                
-                                ${currentQuestionIndex === questions.length - 1 ? `
-                                    <button
-                                        onclick="handleSubmit()"
-                                        ${quizState === 'submitting' ? 'disabled' : ''}
-                                        class="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-green-600 transition-colors disabled:opacity-50"
-                                    >
-                                        ${quizState === 'submitting' ? 'Submitting Score...' : 'Submit Assessment'}
-                                    </button>
-                                ` : `
-                                    <button
-                                        onclick="handleNext()"
-                                        ${quizState === 'submitting' ? 'disabled' : ''}
-                                        class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 disabled:opacity-50 transition-colors"
-                                    >
-                                        Next &rarr;
-                                    </button>
-                                `}
-                            </div>
-                        </footer>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = content;
-            
-            // Attach event listeners for options if in Ready state
-            if (quizState === 'ready' && currentQuestion) {
-                 document.querySelectorAll('.option-button').forEach(button => {
-                     button.addEventListener('click', (e) => {
-                         const index = parseInt(e.currentTarget.getAttribute('data-option-index'));
-                         handleAnswerSelect(index);
-                     });
-                 });
-            }
-        };
-
-
-        // --- ACTION HANDLERS ---
-
-        const handleStartQuiz = (moduleId) => {
-            currentView = moduleId;
-            appState.progress[moduleId].started = true;
-            
-            // Reset quiz state variables for the new quiz
-            questions = [];
-            currentQuestionIndex = 0;
-            selectedAnswers = {};
-            timeLeft = TIME_LIMIT_SECONDS;
-            quizState = 'loading'; 
-            error = null;
-            
-            saveState();
-            mainRender(); // Show loading screen
-            fetchQuestions(); // Start fetching questions
-        };
-
-        const handleQuizComplete = (score) => {
-            const moduleId = currentView;
-            appState.progress[moduleId] = { completed: true, score: score, started: true };
-            clearInterval(timerInterval);
-            timerInterval = null;
-            currentView = null;
-            saveState();
-            showUserMessage(`Assessment for Module ${moduleId} completed! Score: ${score}%`, 'success');
-            mainRender(); // Go back to dashboard
-        };
-        
-        const handleBackToDashboard = () => {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            currentView = null;
-            mainRender();
-        };
-
-        const handleAnswerSelect = (optionIndex) => {
-            const currentQuestion = questions[currentQuestionIndex];
-            selectedAnswers[currentQuestion.id] = optionIndex;
-            mainRender(); // Re-render to show selection
-        };
-
-        const handleNext = () => {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                mainRender();
-            }
-        };
-
-        const handlePrevious = () => {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                mainRender();
-            }
-        };
-        
-        const startTimer = () => {
-             clearInterval(timerInterval); // Clear any existing timer
-             timerInterval = setInterval(() => {
-                timeLeft--;
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    handleSubmit(true);
-                }
-                // Only re-render the timer element to avoid full page repaint (optimization)
-                const timerElement = document.querySelector('.font-mono');
-                if (timerElement) {
-                    timerElement.textContent = `Time Left: ${formatTime(timeLeft)}`;
-                    if (timeLeft < 60) {
-                        timerElement.classList.remove('bg-indigo-100', 'text-indigo-600');
-                        timerElement.classList.add('bg-red-100', 'text-red-600');
-                    }
-                } else {
-                    // This is a rare fallback, but ensures the view is updated if the element is somehow missing
-                    mainRender(); 
-                }
-             }, 1000);
-        };
-
-
-        // --- API INTEGRATION (Perplexity via Supabase Edge Function) ---
-
-        const fetchQuestions = async () => {
-            const module = MODULES.find(m => m.id === currentView);
-            if (!module) return;
-
-            // Check if configurations are set before attempting fetch
-            if (MOCK_AUTH_TOKEN.includes("PASTE_YOUR_GENERATED_JWT_HERE")) {
-                error = "Configuration required: Please update MOCK_AUTH_TOKEN with a valid JWT from your Supabase project to enable dynamic questions.";
-                quizState = 'error';
-                mainRender();
-                return;
-            }
-
-            // Clear previous errors/state
-            error = null;
-            quizState = 'loading';
-            mainRender();
-
-            // Construct the payload for the request
-            const requestBody = { 
-                action: 'generate_questions', 
-                topic: module.topic, 
-                count: QUESTIONS_PER_MODULE 
-            };
-            
-            // --- LOGGING: Request Details ---
-            console.log("--- API Request (generate_questions) ---");
-            console.log("URL:", SUPABASE_EDGE_FUNCTION_URL);
-            console.log("Payload:", JSON.stringify(requestBody, null, 2));
-            console.log("Authorization Header:", `Bearer ${MOCK_AUTH_TOKEN.substring(0, 15)}...`); // Masked for security
-            
-            try {
-                const response = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${MOCK_AUTH_TOKEN}`, 
-                    },
-                    body: JSON.stringify(requestBody),
-                });
-                
-                // --- LOGGING: Response Status ---
-                console.log("Response Status:", response.status);
-
-                if (!response.ok) {
-                    // Clone response to read text/json for error reporting without draining the original stream
-                    const errorResponseClone = response.clone();
-                    let errorData;
-                    try {
-                        errorData = await response.json();
-                        console.error("Error Response Body (JSON):", errorData);
-                    } catch {
-                        errorData = await errorResponseClone.text();
-                        console.error("Error Response Body (Text):", errorData);
-                        errorData = { error: `Non-JSON response received: ${errorData}` };
-                    }
-                    
-                    const errorMessage = errorData.error || `HTTP error! Status: ${response.status}. Check your Supabase configuration.`;
-                    throw new Error(errorMessage);
-                }
-                
-                const fetchedQuestions = await response.json();
-                
-                // --- LOGGING: Successful Response Data ---
-                console.log("Success Response Body (Questions):", fetchedQuestions);
-
-
-                if (!Array.isArray(fetchedQuestions) || fetchedQuestions.length === 0) {
-                    throw new Error("AI returned zero or invalid questions.");
-                }
-                
-                questions = fetchedQuestions;
-                currentQuestionIndex = 0;
-                selectedAnswers = {};
-                timeLeft = TIME_LIMIT_SECONDS;
-                quizState = 'ready';
-                
-                mainRender();
-                startTimer();
-
-            } catch (e) {
-                console.error("Failed to fetch questions (Catch Block):", e);
-                error = `Could not load quiz: ${e.message}.`;
-                quizState = 'error';
-                mainRender();
-            }
-        };
-
-        const handleSubmit = async (isTimedOut = false) => { 
-            if (quizState === 'submitting') return;
-            quizState = 'submitting';
-            mainRender(); // Update button state
-            clearInterval(timerInterval);
-
-            const module = MODULES.find(m => m.id === currentView);
-            let correctCount = 0;
-            
-            // MOCK SCORING LOGIC: Assumes index 0 is always correct
-            questions.forEach(q => {
-                const selectedIndex = selectedAnswers[q.id];
-                if (selectedIndex === 0) {
-                    correctCount++;
-                }
-            });
-
-            const finalScore = Math.round((correctCount / QUESTIONS_PER_MODULE) * 100);
-
-            try {
-                // Check for config before submission as well
-                if (MOCK_AUTH_TOKEN.includes("PASTE_YOUR_GENERATED_JWT_HERE")) {
-                    throw new Error("Cannot save: Configuration required to submit results to Supabase.");
-                }
-
-                // Since we are not actually writing to DB in the Edge function, 
-                // this submission call is purely to check the Edge Function route.
-                const submissionResponse = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${MOCK_AUTH_TOKEN}`, 
-                    },
-                    body: JSON.stringify({
-                        action: 'submit_assessment',
-                        moduleId: module.id,
-                        score: finalScore,
-                    }),
-                });
-
-                if (!submissionResponse.ok) {
-                    const errorData = await submissionResponse.json().catch(() => ({ error: 'Invalid JSON response from submission server.' }));
-                    throw new Error(errorData.error || `Submission failed with status ${submissionResponse.status}`);
-                }
-
-                // Submission successful, update local state
-                handleQuizComplete(finalScore); 
-                
-            } catch (e) {
-                console.error("Assessment submission failed:", e);
-                error = `Failed to save results: ${e.message}. The score has not been saved in Supabase.`;
-                quizState = 'ready'; // Revert state so user can exit
-                showUserMessage(error, 'error');
-                mainRender(); 
-            }
-        };
-
-
-        // --- INITIALIZATION ---
-
-        const initializeApp = () => {
-            // Load initial state for the default user
-            appState = loadState(currentUserId);
-            mainRender();
-        };
-
-        window.onload = initializeApp;
-
-    </script>
-</body>
-</html>
+    const renderComplete = () => `
+        ${renderHeader()}
+        <div class="max-w-xl mx-auto text-center p-8 bg-white rounded-xl shadow-lg">
+            <h2 class="text-4xl font-extrabold mb-4 ${finalScore >= 60 ? 'text-green-600' :
