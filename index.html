@@ -1,537 +1,178 @@
-                                                                                                                                                                                                                                                                                                                                <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ready4Industry: A Premier Web Presence</title>
+    <title>Ready4Industry: Assessment Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLPD7yF4gB8WwL7S4Tz4WpG8wL7S4Tz4WpG8w4vF2M/4jD/6z9+1gL8M8T7B1g3J5jG2x9z3N8w5t+7b9+6B2fG+6C9d6G+8Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" referrerpolicy="no-referrer" />
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
-    
-   // <script src="https://accounts.google.com/gsi/client" async defer></script> 
-    google-sign-in-button
-    <script src="https://unpkg.com/jwt-decode@4.0.0/build/jwt-decode.js"></script> 
     
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        .bg-gradient-header {
-            background-image: linear-gradient(to right, #104e4e, #2c776b);
-        }
-        .bg-gradient-offers {
-            background-image: linear-gradient(to bottom, #d9f99d, #bfef7a);
-        }
-        .offer-card {
-            transition: all 0.3s ease-in-out;
-        }
-        .offer-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        .pricing-card {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-        }
-        .pricing-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-        }
-        @keyframes marquee-left {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        @keyframes marquee-right {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        .animate-marquee-left {
-            animation: marquee-left 35s linear infinite;
-        }
-        .animate-marquee-right {
-            animation: marquee-right 35s linear infinite;
+        .hero {
+            background-color: #f9fafb;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
-    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-50 transition-all duration-300">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="flex items-center space-x-3">
-                <img src="logo.png" alt="Ready4Industry Logo" class="h-10 w-auto bg-white rounded p-1">
-                <span class="text-3xl font-extrabold text-emerald-400 tracking-tight transition-colors hover:text-teal-600">
-                    Ready4Industry
-                </span>
-            </a>
-            <nav class="space-x-6 text-sm font-medium hidden md:block">
-                <a href="#mission" class="text-white hover:text-teal-400 transition-colors">Our Mission</a>
-                <a href="#offerings" class="text-white hover:text-teal-400 transition-colors">Offerings</a>
-                <a href="#pricing" class="text-white hover:text-teal-400 transition-colors">Pricing</a>
-                <a href="#assessments" class="text-white hover:text-teal-400 transition-colors font-bold">Assessments</a> 
-                <a href="#journey" class="text-white hover:text-teal-400 transition-colors">The Journey</a>
-                <a href="#contact" class="text-white hover:text-teal-400 transition-colors">Contact</a>
-            </nav>
+<body class="min-h-screen bg-gray-50">
+
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl font-bold text-indigo-600">Ready4Industry</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#features" class="text-gray-600 hover:text-indigo-600 transition">Features</a>
+                    <a href="#about" class="text-gray-600 hover:text-indigo-600 transition">About</a>
+                    <button id="openRegister" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
+                        Start Assessment
+                    </button>
+                </div>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <main>
-        <section id="welcome" class="relative py-24 md:py-32 px-6 bg-cover bg-center bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
-            <div class="absolute inset-0 bg-slate-900/60"></div>
-            <div class="container mx-auto text-center relative z-10">
-                <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight animate-fade-in-up">
-                    Beyond the Degree: Launch Your Engineering Career
-                </h1>
-                <p class="mt-6 text-lg md:text-xl text-white max-w-4xl mx-auto opacity-0 animate-fade-in" style="animation-delay: 0.5s;">
-                    Are you ready to turn your academic knowledge into a successful career? We're here to give you the unfair advantage in the job market.
-                </p>
-                <a href="#offerings" class="inline-block mt-10 px-8 py-4 bg-teal-600 text-white font-bold rounded-full shadow-lg hover:bg-teal-700 transition-all duration-300 transform hover:scale-105">
-                    Explore Our Offerings
-                </a>
-            </div>
-        </section>
-
-        <section id="challenge" class="py-20 px-6">
-            <div class="container mx-auto text-center">
-                <h2 class="text-4xl font-extrabold text-slate-900">The Gap Between Campus and Career</h2>
-                <div class="mt-8 grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                    <div class="p-6 bg-white rounded-xl shadow-lg border-t-4 border-teal-600 space-y-3 offer-card">
-                        <i class="fas fa-question-circle text-4xl text-teal-600"></i>
-                        <h3 class="text-xl font-bold">Feeling Lost?</h3>
-                        <p class="text-sm text-slate-600">Unsure what companies are truly looking for or what skills you need to succeed?</p>
-                    </div>
-                    <div class="p-6 bg-white rounded-xl shadow-lg border-t-4 border-teal-600 space-y-3 offer-card">
-                        <i class="fas fa-file-alt text-4xl text-teal-600"></i>
-                        <h3 class="text-xl font-bold">Resume Woes?</h3>
-                        <p class="text-sm text-slate-600">Worried that your resume isn't good enough to get you past automated screening systems?</p>
-                    </div>
-                    <div class="p-6 bg-white rounded-xl shadow-lg border-t-4 border-teal-600 space-y-3 offer-card">
-                        <i class="fas fa-hammer text-4xl text-teal-600"></i>
-                        <h3 class="text-xl font-bold">Lack of Experience?</h3>
-                        <p class="text-sm text-slate-600">Do you feel like you don't have enough "real-world" experience to stand out from the crowd?</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="mission" class="bg-white py-20 px-6">
-            <div class="container mx-auto grid md:grid-cols-2 gap-16 items-center">
-                <div>
-                    <h2 class="text-4xl font-extrabold text-slate-900">Your Partner in Success</h2>
-                    <p class="mt-6 text-lg text-slate-600 leading-relaxed">
-                        This is where we come in. We are Ready4Industry. With over 21 years of experience in the IT world, we've worked with tech giants like IBM, PwC, and Wipro. We've attended countless campus interviews and know your pain points.
-                    </p>
-                    <p class="mt-4 text-lg text-slate-600 leading-relaxed">
-                        We're here to help you apply your syllabus core concepts like Data Structures, Object-Oriented Programming, and Database Management Systems to real-world problems. We bridge the gap by providing the tools, experience, and guidance you need to land your first job.
-                    </p>
-                </div>
-                <div class="relative w-full h-80 rounded-xl overflow-hidden shadow-2xl">
-                    <img src="https://placehold.co/900x1600/D4D4D8/334155?text=Ready4Industry%0AMission" alt="Team members collaborating" class="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110">
-                </div>
-            </div>
-        </section>
-        
-        <section id="offerings" class="py-20 px-6 bg-slate-100">
-            <div class="container mx-auto text-center">
-                <h2 class="text-4xl font-extrabold text-slate-900">Our Offerings</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
-                    We offer flexible and focused guidance tailored to your specific needs.
-                </p>
-                <div class="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
-                        <i class="fas fa-user-friends text-5xl text-teal-600"></i>
-                        <h3 class="text-2xl font-bold text-slate-900">Personalized 1-on-1 Mentorship</h3>
-                        <p class="text-slate-600">Get a personalized roadmap to your dream job. We pair you with an industry expert for private sessions to define your goals and develop a clear career path.</p>
-                    </div>
-                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
-                        <i class="fas fa-users text-5xl text-teal-600"></i>
-                        <h3 class="text-2xl font-bold text-slate-900">Collaborative Group Coaching</h3>
-                        <p class="text-slate-600">Learn and grow with your peers. Our small-group coaching sessions provide a supportive environment for collaborative learning and shared insights from professionals.</p>
-                    </div>
-                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
-                        <i class="fas fa-university text-5xl text-teal-600"></i>
-                        <h3 class="text-2xl font-bold text-slate-900">On-Campus Workshops</h3>
-                        <p class="text-slate-600">Bring the future to your campus. We can run an intensive, two-week workshop right at your college, giving students a hands-on, immersive learning experience.</p>
-                    </div>
-                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
-                        <i class="fas fa-code-branch text-5xl text-teal-600"></i>
-                        <h3 class="text-2xl font-bold text-slate-900">Real-World Projects</h3>
-                        <p class="text-slate-600">Build a portfolio that gets noticed. Work on projects that solve real industry problems with technologies like AWS and Power BI.</p>
-                    </div>
-                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
-                        <i class="fas fa-file-alt text-5xl text-teal-600"></i>
-                        <h3 class="text-2xl font-bold text-slate-900">Resume Building</h3>
-                        <p class="text-slate-600">Craft a killer resume that uses keywords to get past automated screening systems and catches the eye of recruiters.</p>
-                    </div>
-                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
-                        <i class="fab fa-linkedin text-5xl text-teal-600"></i>
-                        <h3 class="text-2xl font-bold text-slate-900">LinkedIn Profile</h3>
-                        <p class="text-slate-600">Build your professional brand. Learn how to optimize your profile to attract opportunities and master the secrets of networking.</p>
-                    </div>
-                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
-                        <i class="fas fa-user-tie text-5xl text-teal-600"></i>
-                        <h3 class="text-2xl font-bold text-slate-900">Mock Interviews</h3>
-                        <p class="text-slate-600">Ace your interview, every time. Practice in a safe environment and learn to answer tough technical and behavioral questions with confidence.</p>
-                    </div>
-                    <div class="offer-card bg-white p-8 rounded-xl shadow-lg border-t-4 border-teal-600 space-y-4">
-                        <i class="fas fa-lightbulb text-5xl text-teal-600"></i>
-                        <h3 class="text-2xl font-bold text-slate-900">Skills Development</h3>
-                        <p class="text-slate-600">Master in-demand technical skills like Cloud Computing and AI/ML/Agentic AI, and hone soft skills like teamwork and problem-solving.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="pricing" class="py-20 px-6 bg-slate-900 text-white">
-            <div class="container mx-auto text-center">
-                <h2 class="text-4xl font-extrabold text-emerald-400">Choose Your Path to Success</h2>
-                <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">
-                    Select the plan that best fits your career goals and get started with our expert guidance.
-                </p>
-                <div class="mt-12 grid md:grid-cols-3 gap-8 items-stretch">
-                    
-                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-slate-400">
-                        <h3 class="text-3xl font-bold text-slate-900">Bronze</h3>
-                        <p class="mt-2 text-xl font-semibold text-teal-600">Foundational Skills</p>
-                        <p class="mt-4 text-sm text-slate-500">
-                            The perfect start for building your professional brand.
-                        </p>
-                        <div class="mt-8 flex flex-col items-center flex-grow">
-                            <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
-                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdG6f1yT19g3rkq0JJyES_hNvWuqNk-iYBJ6ge09vb3MhBrPQ/viewform?usp=header" 
-                                target="_blank" rel="noopener noreferrer" 
-                                class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
-                                Open Registration Form
-                            </a>
-                        </div>
-                        <ul class="mt-6 text-left space-y-3 w-full">
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Resume Building</span></li>
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>LinkedIn Profile</span></li>
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Core Skills Development</span></li>
-                        </ul>
-                    </div>
-
-                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-teal-600">
-                        <h3 class="text-3xl font-bold text-slate-900">Silver</h3>
-                        <p class="mt-2 text-xl font-semibold text-teal-600">Interview Ready</p>
-                        <p class="mt-4 text-sm text-slate-500">
-                            Build on the basics with practical experience and interview preparation.
-                        </p>
-                        <div class="mt-8 flex flex-col items-center flex-grow">
-                            <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
-                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSejh1vS9QtzgSlrwUxh0l-q8V-3kcLU40AICBp6tAzpH9optQ/viewform?usp=header" 
-                                target="_blank" rel="noopener noreferrer" 
-                                class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
-                                Open Registration Form
-                            </a>
-                        </div>
-                        <ul class="mt-6 text-left space-y-3 w-full">
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Everything in Bronze</span></li>
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Collaborative Group Coaching</span></li>
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Skills Development & Workshops</span></li>
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Mock Interviews</span></li>
-                        </ul>
-                    </div>
-
-                    <div class="pricing-card bg-white text-slate-900 p-8 rounded-xl shadow-lg flex flex-col items-center border-t-4 border-amber-500">
-                        <h3 class="text-3xl font-bold text-slate-900">Gold</h3>
-                        <p class="mt-2 text-xl font-semibold text-teal-600">The Complete Package</p>
-                        <p class="mt-4 text-sm text-slate-500">
-                            Get the ultimate career launch with personalized and project-based learning.
-                        </p>
-                        <div class="mt-8 flex flex-col items-center flex-grow">
-                            <p class="text-xl font-semibold text-slate-900 mb-4">Register here to know more</p>
-                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdhwSx6WOBO0QaoGVrnq7PBJB-Z7Z7mLs7w3XUinCTs_-5brA/viewform?usp=header" 
-                                target="_blank" rel="noopener noreferrer" 
-                                class="mt-4 text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300 rounded-full px-6 py-2 inline-block shadow-md">
-                                Open Registration Form
-                            </a>
-                        </div>
-                        <ul class="mt-6 text-left space-y-3 w-full">
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Everything in Silver</span></li>
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Personalized 1-on-1 Mentorship</span></li>
-                            <li class="flex items-center space-x-2"><i class="fas fa-check-circle text-teal-500"></i><span>Real-World Projects</span></li>
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <section id="assessments" class="py-20 px-6 bg-slate-100">
-            <div class="container mx-auto text-center">
-                <h2 class="text-4xl font-extrabold text-slate-900">Take a Quick Skill Assessment</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
-                    Ready to test your knowledge? Choose a certification below to get instant access. Your details will be saved for your report card.
-                </p>
-                <div class="mt-12 grid md:grid-cols-3 gap-8 items-stretch">
-                    <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-green-500 space-y-6"> 
-                        <h3 class="text-3xl font-bold text-slate-900">Core Concepts Check</h3>
-                        <p class="text-xl font-semibold text-green-600">FREE</p>
-                        <p class="text-slate-600">Test your foundational knowledge in Data Structures, OOP, and DBMS.</p>
-                        
-                        
-<p class="text-sm text-slate-500 mt-4">Sign in to start your free exam:</p>
-<button 
-    onclick="handleGoogleSignIn()"
-    class="w-full mt-2 flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 shadow-lg"
->
-    <i class="fab fa-google"></i>
-    <span>Sign In with Google</span>
-</button>
-                  
-                    </div>
-
-                    <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-indigo-600 space-y-6">
-                        <h3 class="text-3xl font-bold text-slate-900">Cloud Fundamentals</h3>
-                        <p class="text-xl font-semibold text-indigo-600">₹99</p>
-                        <p class="text-slate-600">A comprehensive test on AWS, Azure, and GCP basic concepts.</p>
-                        <button onclick="openRegistration('Cloud Fundamentals Assessment', 99, true)"
-                            class="w-full mt-4 text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-300 rounded-lg px-6 py-3 font-bold shadow-md">
-                            Register & Pay ₹99
-                        </button>
-                    </div>
-
-                    <div class="pricing-card bg-white p-8 rounded-xl shadow-xl border-t-4 border-red-500 space-y-6">
-                        <h3 class="text-3xl font-bold text-slate-900">Advanced DevOps</h3>
-                        <p class="text-xl font-semibold text-red-600">₹199</p>
-                        <p class="text-slate-600">Deep dive into CI/CD, Containers (Docker/K8s), and infrastructure as code.</p>
-                        <button onclick="openRegistration('Advanced DevOps Assessment', 199, true)"
-                            class="w-full mt-4 text-white bg-red-600 hover:bg-red-700 transition-colors duration-300 rounded-lg px-6 py-3 font-bold shadow-md">
-                            Register & Pay ₹199
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <section id="journey" class="py-20 px-6">
-            <div class="container mx-auto text-center">
-                <h2 class="text-4xl font-extrabold text-slate-900">The Ready4Industry Journey</h2>
-                <div class="mt-12 relative flex flex-col items-center">
-                    <div class="flex items-center space-x-6 md:space-x-12 mb-12">
-                        <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">1</div>
-                        <div class="text-left">
-                            <h3 class="text-xl font-bold text-slate-900">Personalized Guidance & Skills Development</h3>
-                            <p class="text-slate-600">The first step to defining your path and building a strong foundation.</p>
-                        </div>
-                    </div>
-                    <div class="w-1 bg-teal-300 h-20"></div>
-
-                    <div class="flex items-center space-x-6 md:space-x-12 mb-12">
-                        <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">2</div>
-                        <div class="text-left">
-                            <h3 class="text-xl font-bold text-slate-900">Project-Based Learning</h3>
-                            <p class="text-slate-600">Move on to real-world projects to build a portfolio that stands out.</p>
-                        </div>
-                    </div>
-                    <div class="w-1 bg-teal-300 h-20"></div>
-                    
-                    <div class="flex items-center space-x-6 md:space-x-12 mb-12">
-                        <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">3</div>
-                        <div class="text-left">
-                            <h3 class="text-xl font-bold text-slate-900">Resume Building & LinkedIn Updates</h3>
-                            <p class="text-slate-600">Perfect your professional brand to attract opportunities and get noticed.</p>
-                        </div>
-                    </div>
-                    <div class="w-1 bg-teal-300 h-20"></div>
-                    
-                    <div class="flex items-center space-x-6 md:space-x-12">
-                        <div class="bg-teal-600 text-white rounded-full w-16 h-16 flex items-center justify-center font-bold text-2xl shadow-lg">4</div>
-                        <div class="text-left">
-                            <h3 class="text-xl font-bold text-slate-900">Mock Interviews</h3>
-                            <p class="text-slate-600">Prepare for success and ace your interviews with confidence.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="get-started" class="bg-slate-900 text-white py-20 px-6 text-center">
-            <h2 class="text-4xl font-extrabold text-emerald-400">Your Future Starts Today</h2>
-            <p class="mt-4 text-lg text-slate-300 max-w-3xl mx-auto">
-                What's the first step? Let's connect and get you started on your career journey.
+    <section class="hero py-16 md:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
+                Unlock Your <span class="text-indigo-600">Full Stack Potential</span>
+            </h1>
+            <p class="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+                Take the challenge. Get AI-driven feedback. Secure your future in tech.
             </p>
-            <div class="mt-12 flex flex-col md:flex-row items-center justify-center">
-                <a href="https://wa.me/919160131770?text=Hello%20Ready4Industry!" class="block">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?data=https://wa.me/919160131770?text=Hello%20Ready4Industry!&size=150x150"
-                        alt="QR code to our WhatsApp chat" 
-                        class="w-40 h-40 rounded-lg shadow-md mb-2 mx-auto">
-                    <p class="text-sm text-slate-400">Scan to connect with us on WhatsApp</p>
-                </a>
-                
-                <div class="mt-6 md:mt-0 md:ml-8 text-center md:text-left">
-                    <p class="text-lg font-bold text-white">Prefer to click?</p>
-                    <a href="https://wa.me/919160131770?text=Hello!%20I'm%20interested%20in%20personalized%20guidance%20from%20Ready4Industry..."
-                        class="mt-2 text-teal-400 font-medium hover:text-teal-300 transition-colors duration-300">
-                        Click here to send a detailed message
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact" class="py-20 px-6">
-            <div class="container mx-auto text-center">
-                <h2 class="text-4xl font-extrabold text-slate-900">Let's Talk!</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
-                    Thank you for your time and attention. We're excited to help you on your career journey. The conversation doesn't have to stop here.
-                </p>
-                <div class="mt-8 flex justify-center space-x-6 text-4xl">
-                    <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="text-red-600 hover:text-red-800"><i class="fab fa-youtube"></i></a>
-                    <a href="https://www.facebook.com/profile.php?id=61579121846664" target="_blank" class="text-blue-600 hover:text-blue-800">
-                        <i class="fab fa-facebook"></i>
-                    </a>
-                    <a href="https://x.com/ready4industry" target="_blank" class="text-black hover:text-gray-700">
-                        <i class="fa-brands fa-x-twitter"></i>
-                    </a>
-                    <a href="https://www.instagram.com/ready4industry" target="_blank" class="text-pink-600 hover:text-pink-800"><i class="fab fa-instagram"></i></a>
-                    <a href="mailto:ready4industry@gmail.com" class="text-red-600 hover:text-red-800"><i class="fas fa-envelope"></i></a>
-                </div>
-            </div>
-        </section>
-
-        <section class="bg-slate-900 text-white py-6 overflow-hidden relative space-y-4">
-            <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">AWS Series</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Classroom to Career</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cloud Computing</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Azure Series</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">GCP Series</a>
-            </div>
-
-            <div class="whitespace-nowrap flex animate-marquee-right text-lg font-semibold tracking-wide">
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power BI</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Power Automate</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">DevOps</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Cybersecurity</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">ITIL</a>
-            </div>
-
-            <div class="whitespace-nowrap flex animate-marquee-left text-lg font-semibold tracking-wide">
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Project Management</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Agile</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">All About AI</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">FinOps</a>
-                <a href="https://www.youtube.com/@Ready4industry/playlists" target="_blank" class="mx-8 hover:text-emerald-400">Oracle Cloud</a>
-            </div>
-        </section>
-
-    </main>
-
-    <div id="registrationModal" class="fixed inset-0 bg-slate-900 bg-opacity-75 z-[100] hidden flex items-center justify-center p-4 transition-opacity duration-300">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-8 relative transform transition-transform duration-300 scale-95" role="dialog" aria-modal="true">
-            <button onclick="closeRegistration()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-900 transition-colors">
-                <i class="fas fa-times text-2xl"></i>
-            </button>
-
-            <h3 class="text-2xl font-bold text-slate-900 mb-4" id="modalTitle">Register for Assessment</h3>
-            <p class="text-slate-600 mb-6" id="modalText">Please provide your details to register for the assessment.</p>
-            
-            <form id="registrationForm">
-                <div class="mb-4">
-                    <label for="fullName" class="block text-sm font-medium text-slate-700">Full Name</label>
-                    <input type="text" id="fullName" class="mt-1 block w-full border border-slate-300 rounded-lg p-3 focus:ring-teal-500 focus:border-teal-500" required>
-                </div>
-                <div class="mb-6">
-                    <label for="email" class="block text-sm font-medium text-slate-700">Email Address</label>
-                    <input type="email" id="email" class="mt-1 block w-full border border-slate-300 rounded-lg p-3 focus:ring-teal-500 focus:border-teal-500" required>
-                </div>
-                
-                <input type="hidden" id="examName">
-                <input type="hidden" id="examCost">
-                <input type="hidden" id="isPaid">
-
-                <button type="submit" id="submitButton" class="w-full text-white bg-teal-600 hover:bg-teal-700 transition-colors duration-300 rounded-lg px-6 py-3 font-bold shadow-md">
-                    Proceed to Payment
+            <div class="mt-8 flex justify-center space-x-4">
+                <button onclick="handleGoogleSignIn()" class="px-8 py-3 bg-white border border-gray-300 text-gray-800 font-semibold rounded-lg shadow-lg hover:bg-gray-100 transition duration-150 flex items-center">
+                    <i class="fab fa-google mr-2"></i> Sign In with Google
                 </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-extrabold text-gray-900 text-center mb-12">Why Choose Our Assessment?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="text-center p-6 border rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                    <div class="text-indigo-600 text-3xl mb-4"><i class="fas fa-brain"></i></div>
+                    <h3 class="text-xl font-bold mb-2">AI-Driven Questions</h3>
+                    <p class="text-gray-600">Dynamic quiz generation ensures fresh, relevant questions for every attempt.</p>
+                </div>
+                <div class="text-center p-6 border rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                    <div class="text-indigo-600 text-3xl mb-4"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Secure Monetization</h3>
+                    <p class="text-gray-600">Unlock detailed reports and personalized feedback using the secure Razorpay payment gateway.</p>
+                </div>
+                <div class="text-center p-6 border rounded-xl shadow-lg hover:shadow-xl transition duration-300">
+                    <div class="text-indigo-600 text-3xl mb-4"><i class="fas fa-shield-alt"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Auth by Supabase</h3>
+                    <p class="text-gray-600">Robust and simple authentication using Supabase Auth with Google OAuth.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="registrationModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full relative">
+            <button id="closeRegister" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Manual Registration (Not Recommended)</h3>
+            <form id="registrationForm" class="space-y-4">
+                <div>
+                    <label for="fullName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="fullName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                    <input type="email" id="email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                </div>
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                        Register & Start Assessment
+                    </button>
+                </div>
+                <div class="text-center pt-4">
+                    <span class="text-sm text-gray-500">OR</span>
+                </div>
             </form>
+            <button onclick="handleGoogleSignIn()" class="mt-4 w-full px-4 py-2 bg-white border border-gray-300 text-gray-800 font-semibold rounded-lg shadow-sm hover:bg-gray-100 transition flex items-center justify-center">
+                <i class="fab fa-google mr-2"></i> Sign In with Google
+            </button>
         </div>
     </div>
-  <script>
-    // --- SUPABASE CONFIGURATION (Verified) ---
-    const SUPABASE_URL = 'https://glskwkzzkhhwftzddqmo.supabase.co'; 
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8';
+
+    <footer id="about" class="bg-gray-800 text-white mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <p>&copy; 2025 Ready4Industry. All rights reserved. Built with Supabase, AI, and Razorpay.</p>
+        </div>
+    </footer>
+
+<script>
+    // --- CONFIGURATION ---
+    const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co"; // YOUR_SUPABASE_URL
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8"; // YOUR_SUPABASE_ANON_KEY
+    
+    // Corrected REDIRECT URL for GitHub Pages deployment
+    const REDIRECT_URL = 'https://ready4industry.github.io/ready4industry-app/assessment-start.html'; 
+
+    // Initialize Supabase Client
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ----------------------------------------
 
-    const registrationModal = document.getElementById('registrationModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalText = document.getElementById('modalText');
-    const fullNameInput = document.getElementById('fullName');
-    const emailInput = document.getElementById('email');
-    const examNameInput = document.getElementById('examName');
-    const examCostInput = document.getElementById('examCost');
-    const isPaidInput = document.getElementById('isPaid');
-    const submitButton = document.getElementById('submitButton');
+    // --- MODAL HANDLING ---
+    const modal = document.getElementById('registrationModal');
+    const openBtn = document.getElementById('openRegister');
+    const closeBtn = document.getElementById('closeRegister');
 
-    function openRegistration(examName, examCost, isPaid) {
-        examNameInput.value = examName;
-        examCostInput.value = examCost;
-        isPaidInput.value = isPaid;
+    const openRegistration = () => modal.classList.remove('hidden');
+    const closeRegistration = () => modal.classList.add('hidden');
 
-        modalTitle.textContent = `Register for: ${examName}`;
-        modalText.textContent = isPaid ? 
-            `The cost is ₹${examCost}. Enter your details to proceed to payment.` :
-            `This assessment is FREE. Enter your details to start the exam.`;
-        submitButton.textContent = isPaid ? 'Proceed to Payment' : 'Start FREE Exam';
+    openBtn.addEventListener('click', openRegistration);
+    closeBtn.addEventListener('click', closeRegistration);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeRegistration();
+    });
 
-        registrationModal.classList.remove('hidden');
-    }
-
-    function closeRegistration() {
-        registrationModal.classList.add('hidden');
-    }
-
-    // HANDLES MANUAL REGISTRATION (FOR PAID ASSESSMENTS)
+    // --- MANUAL REGISTRATION HANDLER ---
     async function handleRegistration(event) {
         event.preventDefault();
-
-        const fullName = fullNameInput.value;
-        const email = emailInput.value;
-        const examName = examNameInput.value;
-        const examCost = parseFloat(examCostInput.value);
-        const isPaid = isPaidInput.value === 'true'; 
-
-        // 1. Insert data into Supabase
-        const { error } = await supabaseClient 
-            .from('registration_') 
-            .insert([
-                { 
-                    full_name: fullName, 
-                    email: email, 
-                    exam_name: examName, 
-                    exam_cost: examCost,
-                    login_type: 'Manual' 
-                },
-            ]);
+        
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        
+        // Manual signup logic (less secure, primarily for testing manual flow)
+        const { data, error } = await supabaseClient.auth.signUp({
+            email: email,
+            password: 'temporary-password-for-manual-signup', // Use a temporary placeholder password
+            options: {
+                data: { full_name: fullName },
+            }
+        });
 
         if (error) {
-            console.error('Supabase Error:', error.message);
-            alert(`A database error occurred. Please try again. Error: ${error.message}`);
+            alert(`Error during sign up: ${error.message}`);
+            console.error('Sign Up Error:', error);
             return;
         }
-        
-        // 2. Success Handling
-        if (isPaid) {
-            alert(`Thank you, ${fullName}! You are registered. Next, you would be redirected to the payment page.`);
-            // Stripe logic will go here later
-        } else {
-            alert(`Welcome, ${fullName}! You are registered for the ${examName}. Starting exam now!`);
-            window.location.href = './assessment-start.html'; // Redirect for free manual sign-up
-        }
-        
+
+        alert(`Welcome, ${fullName}! Check your email for a confirmation link to complete registration.`);
         closeRegistration();
         document.getElementById('registrationForm').reset();
     }
 
-    // NEW, ROBUST GOOGLE SIGN-IN FUNCTION (SUPABASE NATIVE OAUTH)
+    // --- GOOGLE SIGN-IN FUNCTION (SUPABASE NATIVE OAUTH) ---
     async function handleGoogleSignIn() {
-        // CORRECTED REDIRECT URL: Includes the repository name
-        const REDIRECT_URL = 'https://ready4industry.github.io/ready4industry-app/assessment-start.html'; 
-
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'google',
             options: {
                 redirectTo: REDIRECT_URL, 
+                // Note: Ensure Google is enabled in Supabase Auth Providers and the Redirect URL is whitelisted.
             },
         });
 
@@ -546,12 +187,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
