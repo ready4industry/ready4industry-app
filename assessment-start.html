@@ -74,7 +74,16 @@
                 { id: 'behavioural', name: 'Behavioural & Cultural Fit', description: 'Examine your soft skills, communication, and workplace adaptability.', isPaid: false, color: 'green', icon: '💡' }
             ],
             selectedModuleId: null, // Holds the ID of the module currently being viewed
-            currentView: 'list' // 'list' or 'detail' (for the selected module)
+            currentView: 'list', // 'list' or 'detail' (for the selected module)
+
+            // NEW ASSESSMENT MOCK STATE
+            currentQuestionIndex: 0, // Tracks the index of the currently viewed question
+            userAnswers: {}, // Stores answers: { 'q1': 'optionA', 'q2': 'optionC' }
+            assessmentData: [
+                { id: 'q1', type: 'mcq', question: 'Which data structure uses LIFO (Last-In, First-Out) principle?', options: ['Queue', 'Stack', 'Array', 'Linked List'] },
+                { id: 'q2', type: 'mcq', question: 'What is the primary function of the CSS box model?', options: ['Managing database connections', 'Controlling element layout and spacing', 'Handling user authentication', 'Defining JavaScript variables'] },
+                { id: 'q3', type: 'mcq', question: 'In networking, what does DHCP stand for?', options: ['Domain Host Configuration Protocol', 'Dynamic Host Configuration Protocol', 'Data Handling Control Program', 'Disk High-speed Capacity Protocol'] },
+            ]
         };
         
         // Define API endpoint. It will default to MOCK_URL if the environment variable is not set.
@@ -90,6 +99,8 @@
             if (!hash) {
                 state.selectedModuleId = null;
                 state.currentView = 'list';
+                state.currentQuestionIndex = 0; // Reset assessment index when leaving
+                state.userAnswers = {}; // Reset answers
                 return;
             }
 
@@ -99,11 +110,9 @@
                 state.selectedModuleId = params.get('module');
                 state.currentView = 'detail';
             } else if (params.has('assessment')) {
-                // If an assessment ID is in the hash, we skip this view and assume the user is in the assessment.
-                // For this file, we can simply log it.
+                // If an assessment ID is in the hash, we go to the assessment view
                 console.log(`Currently viewing assessment session: ${params.get('assessment')}`);
-                state.selectedModuleId = null;
-                state.currentView = 'assessment'; // Placeholder view
+                state.currentView = 'assessment'; 
             } else {
                 state.selectedModuleId = null;
                 state.currentView = 'list';
@@ -125,14 +134,7 @@
             } else if (state.currentView === 'list') {
                 html = renderModuleList();
             } else if (state.currentView === 'assessment') {
-                // Simple placeholder if the hash is for an active assessment
-                html = `
-                    <div class="text-center py-12">
-                        <h1 class="text-3xl font-extrabold text-indigo-700">Assessment In Progress</h1>
-                        <p class="mt-4 text-gray-600">The application is running an active assessment session. If you were redirecting, the assessment content would load here.</p>
-                        <button onclick="window.location.hash = ''" class="mt-6 px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Go Back to List</button>
-                    </div>
-                `;
+                html = renderAssessmentView();
             } else {
                  // Fallback to the list view if state is inconsistent
                 html = renderModuleList();
@@ -215,7 +217,116 @@
                 </div>
             `;
         }
+
+        /**
+         * Generates the HTML for the active assessment view (question template).
+         */
+        function renderAssessmentView() {
+            const currentQ = state.assessmentData[state.currentQuestionIndex];
+            
+            // Fallback for assessment view (shouldn't happen with correct flow)
+            if (!currentQ) {
+                return `
+                    <div class="text-center py-12">
+                        <h1 class="text-3xl font-extrabold text-red-700">Assessment Error</h1>
+                        <p class="mt-4 text-gray-600">Could not load the question content.</p>
+                        <button onclick="window.location.hash = ''" class="mt-6 px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">Go Back to List</button>
+                    </div>
+                `;
+            }
+
+            const totalQuestions = state.assessmentData.length;
+            const currentNumber = state.currentQuestionIndex + 1;
+            const isLastQuestion = currentNumber === totalQuestions;
+            const isFirstQuestion = state.currentQuestionIndex === 0;
+            const currentAnswer = state.userAnswers[currentQ.id];
+
+            return `
+                <div class="space-y-6">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-gray-200">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2 sm:mb-0">Technical Skills Assessment</h1>
+                        <div class="text-xl font-semibold text-indigo-600">
+                            Question ${currentNumber} of ${totalQuestions}
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
+                        <p class="text-2xl font-medium text-gray-900">${currentQ.question}</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        ${currentQ.options.map((option, index) => {
+                            // Automatically assign option letters (A, B, C, D)
+                            const optionLabel = String.fromCharCode(65 + index); 
+                            const isSelected = currentAnswer === option;
+                            return `
+                                <div 
+                                    class="p-4 border-2 rounded-lg cursor-pointer transition duration-150 ease-in-out 
+                                    ${isSelected ? 'bg-indigo-100 border-indigo-600 shadow-md' : 'bg-white border-gray-200 hover:border-indigo-400'}"
+                                    onclick="selectAnswer('${currentQ.id}', '${option}')"
+                                >
+                                    <span class="font-bold text-indigo-600 mr-3">${optionLabel}.</span> 
+                                    <span class="text-gray-700">${option}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="flex justify-between pt-6 border-t border-gray-200">
+                        <button 
+                            onclick="navigateQuestion(-1)" 
+                            ${isFirstQuestion ? 'disabled' : ''}
+                            class="px-6 py-2 rounded-lg font-semibold transition duration-150 
+                            ${isFirstQuestion ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-gray-700 text-white hover:bg-gray-800'}"
+                        >
+                            Previous
+                        </button>
+                        
+                        <button 
+                            onclick="navigateQuestion(1)" 
+                            class="px-6 py-2 rounded-lg font-bold text-white transition duration-150 
+                            ${isLastQuestion ? 'bg-green-600 hover:bg-green-700' : 'bg-indigo-600 hover:bg-indigo-700'}"
+                        >
+                            ${isLastQuestion ? 'Submit Assessment' : 'Next Question'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
         
+        /**
+         * Saves the selected answer for the current question and re-renders the view.
+         */
+        function selectAnswer(questionId, answer) {
+            state.userAnswers[questionId] = answer;
+            console.log(`Answer saved for ${questionId}: ${answer}`);
+            render(); // Re-render to highlight the selected option
+        }
+
+        /**
+         * Navigates to the next or previous question.
+         * @param {number} direction - 1 for next, -1 for previous.
+         */
+        function navigateQuestion(direction) {
+            let newIndex = state.currentQuestionIndex + direction;
+            
+            // Check if attempting to navigate past the last question (Submit)
+            if (direction === 1 && newIndex >= state.assessmentData.length) {
+                console.log("Assessment submitted! User Answers:", state.userAnswers);
+                // Redirect back to the list view after submission
+                window.location.hash = '';
+                return;
+            }
+            
+            // Handle boundary conditions (Previous button)
+            if (newIndex < 0) {
+                newIndex = 0; 
+            }
+            
+            state.currentQuestionIndex = newIndex;
+            render();
+        }
+
         /**
          * Helper to get Tailwind color gradients for the module cards.
          */
@@ -245,7 +356,7 @@
             modal.querySelector('.transform').classList.add('scale-95');
         }
 
-        // --- ASSESSMENT START LOGIC (LIKELY CAUSE OF ORIGINAL ERROR) ---
+        // --- ASSESSMENT START LOGIC (MOCK API) ---
         
         /**
          * Handles the logic for initiating the assessment session.
@@ -270,7 +381,6 @@
                     console.log(`Attempting to call API at: ${API_ENDPOINT}`);
                     
                     // In a real application, you would make a POST request here
-                    // to start a session on the backend.
                     const response = await fetch(API_ENDPOINT, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
