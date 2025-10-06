@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Skills Challenge Dashboard</title>
 
-  <!-- Load Supabase and Tailwind -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
     rel="stylesheet"
   />
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  
   <style>
     body {
       font-family: "Inter", sans-serif;
@@ -38,388 +39,122 @@
 
   <script>
     // --- CONFIGURATION ---
-    const MOCK_USERS = {
-      user_keshav: {
-        id: "user_keshav",
-        name: "Keshav Karn",
-        email: "keshav.karn@example.com",
-      },
-      user_admin: {
-        id: "user_admin",
-        name: "Mentor Admin",
-        email: "ready4industry@gmail.com",
-      },
-    };
-
-    const MODULES = [
-      {
-        id: "module_1",
-        name: "Technical Fundamentals",
-        topic: "BTech Graduate Syllabus Fundamentals",
-      },
-      {
-        id: "module_2",
-        name: "Aptitude & Reasoning",
-        topic: "Aptitude and Reasoning Fundamentals",
-      },
-      {
-        id: "module_3",
-        name: "Behavioural Skills",
-        topic: "Behavioural Fundamentals",
-      },
-    ];
-
-    const QUESTIONS_PER_MODULE = 10;
-    const TIME_LIMIT_SECONDS = 600; // 10 minutes per quiz
-
-    // --- SUPABASE SETUP ---
-    const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co";
-    const SUPABASE_ANON_KEY =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8";
-
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
-
+    const SUPABASE_URL = "YOUR_SUPABASE_URL"; // Replace with your Supabase URL
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"; // Replace with your Supabase Anon Key
+    const RAZORPAY_KEY_ID = "rzp_test_YOUR_KEY_ID"; // ⭐️ IMPORTANT: Replace with your actual Test/Live Razorpay Key ID ⭐️
+    
+    // The Edge Function URL is derived from the Supabase URL
     const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL.replace(
       /\/$/,
       ""
     )}/functions/v1/assessment-api`;
 
-    // --- STATE ---
-    let currentUserId = "user_keshav";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const TIME_LIMIT_SECONDS = 10 * 60; // 10 minutes
+    const QUESTIONS_PER_MODULE = 10;
+    
+    // --- STATE MANAGEMENT ---
     let appState = {};
-    let currentView = null;
+    let currentUserId = null;
+    let currentModule = null;
     let questions = [];
     let currentQuestionIndex = 0;
-    let selectedAnswers = {};
+    let selectedAnswers = {}; // Stores { question_id: selected_index }
     let timeLeft = TIME_LIMIT_SECONDS;
-    let quizState = "loading";
-    let error = null;
     let timerInterval = null;
+    let quizState = "ready"; // 'ready', 'active', 'finished'
 
-    // --- UTILITIES ---
-    const loadState = (userId) => {
-      try {
-        const data = localStorage.getItem(`assessmentState_${userId}`);
-        if (!data)
-          return {
-            progress: MODULES.reduce((acc, m) => {
-              acc[m.id] = { completed: false, score: 0, started: false };
-              return acc;
-            }, {}),
-          };
-        return JSON.parse(data);
-      } catch {
-        return {
-          progress: MODULES.reduce((acc, m) => {
-            acc[m.id] = { completed: false, score: 0, started: false };
-            return acc;
-          }, {}),
-        };
-      }
-    };
+    const MODULES = [
+      {
+        id: "technical",
+        name: "Technical Foundation Check (B.Tech Curriculum)",
+        topic: "Fundamental Computer Science and Core Engineering Concepts",
+        completed: false,
+        score: null,
+        assessment_id: null, // Stores the active assessment ID
+      },
+      {
+        id: "aptitude",
+        name: "Aptitude and Quantitative Reasoning",
+        topic: "Basic Arithmetic, Algebra, and Logical Puzzles",
+        completed: false,
+        score: null,
+        assessment_id: null,
+      },
+      {
+        id: "behavioral",
+        name: "Behavioural and HR Fundamentals",
+        topic: "Professional Ethics, Teamwork, and Communication Skills",
+        completed: false,
+        score: null,
+        assessment_id: null,
+      },
+    ];
 
-    const saveState = () => {
-      localStorage.setItem(
-        `assessmentState_${currentUserId}`,
-        JSON.stringify(appState)
-      );
-    };
-
-    const formatTime = (s) => {
-      const m = Math.floor(s / 60);
-      const sec = s % 60;
-      return `${m.toString().padStart(2, "0")}:${sec
-        .toString()
-        .padStart(2, "0")}`;
-    };
-
-    const showUserMessage = (msg, type = "info") => {
+    // --- HELPER FUNCTIONS ---
+    const showUserMessage = (message, type = "info") => {
       const box = document.getElementById("user-message-box");
-      let color = "bg-blue-500";
-      if (type === "error") color = "bg-red-500";
-      if (type === "success") color = "bg-green-500";
-      box.textContent = msg;
-      box.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold ${color}`;
-      box.style.opacity = "1";
-      box.style.pointerEvents = "auto";
+      box.textContent = message;
+      box.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl font-semibold transition-opacity duration-300 opacity-100 pointer-events-auto ${
+        type === "error"
+          ? "bg-red-500"
+          : type === "success"
+          ? "bg-green-500"
+          : "bg-blue-500"
+      }`;
+
       setTimeout(() => {
-        box.style.opacity = "0";
-        box.style.pointerEvents = "none";
+        box.className = box.className.replace("opacity-100", "opacity-0");
       }, 3000);
     };
 
-    // --- RENDER ---
-    const mainRender = () => {
-      const c = document.getElementById("content-container");
-      c.innerHTML = "";
-      currentView ? renderQuizView(c) : renderDashboard(c);
+    const loadState = (userId) => {
+      // In a real app, this would fetch data from the DB. 
+      // For now, we initialize with MODULES structure.
+      return {
+        modules: JSON.parse(JSON.stringify(MODULES)), // Deep copy
+        totalScore: 0,
+        reportPaid: false, // NEW: Payment status
+      };
     };
-
-    const renderDashboard = (c) => {
-      const user = MOCK_USERS[currentUserId];
-      const total = MODULES.length;
-      const done = MODULES.filter((m) => appState.progress[m.id]?.completed)
-        .length;
-      const complete = done === total;
-      const mentorEmail = MOCK_USERS.user_admin.email;
-
-      c.innerHTML = `
-        <div class="fixed top-2 right-4 bg-white p-2 rounded-lg shadow-lg border border-indigo-100 flex items-center space-x-2">
-          <label for="user-switcher" class="text-sm font-medium text-gray-700">Current User (Mock Login):</label>
-          <select id="user-switcher" class="p-1 border rounded-md text-sm bg-gray-50">
-            ${Object.entries(MOCK_USERS)
-              .map(
-                ([id, u]) =>
-                  `<option value="${id}" ${
-                    id === currentUserId ? "selected" : ""
-                  }>${u.name}</option>`
-              )
-              .join("")}
-          </select>
-        </div>
-
-        <header class="text-center mb-10 pt-10">
-          <h1 class="text-4xl font-extrabold text-indigo-700">Skills Challenge Dashboard</h1>
-          <p class="mt-2 text-xl text-gray-500">Welcome, ${
-            user.name
-          }. Complete the modules below to unlock your final report.</p>
-          <div class="mt-6 w-full max-w-2xl mx-auto">
-            <div class="h-3 bg-gray-200 rounded-full">
-              <div class="h-3 bg-indigo-500 rounded-full transition-all-slow" style="width:${
-                (done / total) * 100
-              }%"></div>
-            </div>
-            <p class="mt-1 text-sm font-medium text-gray-600">${done} of ${total} Modules Completed</p>
-          </div>
-        </header>
-
-        <div class="max-w-4xl mx-auto space-y-6">
-          ${MODULES.map((m) => {
-            const s = appState.progress[m.id];
-            const done = s.completed;
-            const btn = done
-              ? `Review Score: ${s.score}%`
-              : "Start Assessment";
-            return `
-              <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-6 rounded-xl shadow-lg ${
-                done
-                  ? "bg-green-50 border-green-300 border-2"
-                  : "bg-white border border-gray-200 hover:shadow-xl"
-              }">
-                <div>
-                  <h3 class="text-xl font-bold ${
-                    done ? "text-green-800" : "text-indigo-600"
-                  }">${m.name}</h3>
-                  <p class="mt-1 text-gray-600">${m.topic}</p>
-                </div>
-                <button data-module-id="${m.id}" ${
-              done ? "disabled" : ""
-            } class="start-quiz-button mt-4 md:mt-0 px-6 py-2 font-semibold rounded-lg ${
-              done
-                ? "bg-green-500 text-white hover:bg-green-600"
-                : "bg-indigo-500 text-white hover:bg-indigo-600"
-            }">${btn}</button>
-              </div>`;
-          }).join("")}
-        </div>
-
-        <div class="mt-12 max-w-4xl mx-auto p-6 text-center bg-white rounded-xl shadow-2xl border-t-4 border-indigo-500">
-          ${
-            complete
-              ? `<h2 class="text-2xl font-bold text-green-700">Congratulations! Assessment Complete.</h2>
-                 <p class="mt-3 text-lg text-gray-700">Your final report is ready.</p>
-                 <button class="mt-4 px-8 py-3 bg-indigo-500 text-white text-lg font-bold rounded-xl shadow-lg hover:bg-indigo-600" onclick="showUserMessage('Report viewing not yet implemented.','info')">Get Final Report</button>`
-              : `<h2 class="text-2xl font-bold text-indigo-700">Complete all modules to unlock your Final Report.</h2>`
-          }
-          <div class="mt-6 pt-4 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Need Guidance?</h3>
-            <a href="mailto:${mentorEmail}" class="mt-2 inline-block px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700">Contact Your Mentor: ${mentorEmail}</a>
-          </div>
-        </div>
-      `;
-
-      document
-        .getElementById("user-switcher")
-        .addEventListener("change", (e) => {
-          currentUserId = e.target.value;
-          appState = loadState(currentUserId);
-          mainRender();
-        });
-
-      document.querySelectorAll(".start-quiz-button").forEach((btn) => {
-        btn.addEventListener("click", () =>
-          handleStartQuiz(btn.getAttribute("data-module-id"))
-        );
-      });
-    };
-
-    const renderQuizView = (c) => {
-      const m = MODULES.find((m) => m.id === currentView);
-      const q = questions[currentQuestionIndex];
-      let content;
-
-      if (quizState === "error") {
-        content = `
-          <div class="bg-red-50 border border-red-400 text-red-700 p-6 rounded-xl shadow-lg max-w-4xl mx-auto">
-            <h2 class="text-xl font-bold">Failed to Load Quiz</h2>
-            <p class="mt-2">${error}</p>
-            <button onclick="handleBackToDashboard()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Back to Dashboard</button>
-          </div>`;
-      } else if (quizState === "loading" || questions.length === 0) {
-        content = `
-          <div class="flex items-center justify-center p-12 bg-white rounded-xl shadow-lg h-96">
-            <div class="text-center">
-              <svg class="animate-spin h-8 w-8 text-indigo-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <p class="mt-4 text-gray-700">Generating ${QUESTIONS_PER_MODULE} questions for ${m.name}...</p>
-            </div>
-          </div>`;
-      } else {
-        content = `
-          <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl max-w-4xl mx-auto">
-            <header class="mb-6 border-b pb-4 flex justify-between items-center">
-              <h2 class="text-2xl font-bold text-indigo-700">${m.name}</h2>
-              <div class="text-lg font-mono px-3 py-1 rounded-full ${
-                timeLeft < 60
-                  ? "bg-red-100 text-red-600"
-                  : "bg-indigo-100 text-indigo-600"
-              }">Time Left: ${formatTime(timeLeft)}</div>
-            </header>
-            <div class="text-lg mb-6">
-              <p class="font-semibold text-gray-800">Question ${
-                currentQuestionIndex + 1
-              } of ${questions.length}</p>
-              <p class="mt-2 p-4 bg-gray-50 rounded-lg border">${q.question}</p>
-            </div>
-            <div id="options-container" class="space-y-3 mb-8">
-              ${q.options
-                .map(
-                  (opt, i) => `
-                <button data-option-index="${i}" class="option-button w-full text-left p-3 rounded-lg border ${
-                    selectedAnswers[q.id] === i
-                      ? "bg-indigo-500 text-white border-indigo-600"
-                      : "bg-white text-gray-800 hover:bg-indigo-50 border-gray-200"
-                  }">${String.fromCharCode(65 + i)}. ${opt}</button>`
-                )
-                .join("")}
-            </div>
-            <footer class="flex justify-between items-center border-t pt-4">
-              <button onclick="handlePrevious()" ${
-                currentQuestionIndex === 0 || quizState === "submitting"
-                  ? "disabled"
-                  : ""
-              } class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50">&larr; Previous</button>
-              <div class="flex space-x-2">
-                <button onclick="handleBackToDashboard()" ${
-                  quizState === "submitting" ? "disabled" : ""
-                } class="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200">End Quiz</button>
-                ${
-                  currentQuestionIndex === questions.length - 1
-                    ? `<button onclick="handleSubmit()" class="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-green-600">Submit Assessment</button>`
-                    : `<button onclick="handleNext()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">Next &rarr;</button>`
-                }
-              </div>
-            </footer>
-          </div>`;
-      }
-      c.innerHTML = content;
-
-      if (quizState === "ready" && q) {
-        document.querySelectorAll(".option-button").forEach((btn) => {
-          btn.addEventListener("click", (e) => {
-            const i = parseInt(e.currentTarget.getAttribute("data-option-index"));
-            handleAnswerSelect(i);
-          });
-        });
-      }
-    };
-
-    // --- ACTION HANDLERS ---
-    const handleStartQuiz = (moduleId) => {
-      currentView = moduleId;
-      appState.progress[moduleId].started = true;
-      questions = [];
-      currentQuestionIndex = 0;
-      selectedAnswers = {};
-      timeLeft = TIME_LIMIT_SECONDS;
-      quizState = "loading";
-      error = null;
-      saveState();
-      mainRender();
-      fetchQuestions();
-    };
-
-    const handleQuizComplete = (score) => {
-      const id = currentView;
-      appState.progress[id] = { completed: true, score, started: true };
-      clearInterval(timerInterval);
-      timerInterval = null;
-      currentView = null;
-      saveState();
-      showUserMessage(`Assessment for ${id} completed! Score: ${score}%`, "success");
-      mainRender();
-    };
-
-    const handleBackToDashboard = () => {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      currentView = null;
-      mainRender();
-    };
-
-    const handleAnswerSelect = (index) => {
-      const q = questions[currentQuestionIndex];
-      selectedAnswers[q.id] = index;
-      mainRender();
-    };
-
-    const handleNext = () => {
-      if (currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
-        mainRender();
-      }
-    };
-
-    const handlePrevious = () => {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        mainRender();
-      }
-    };
-
+    
+    // --- TIMER LOGIC ---
     const startTimer = () => {
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
+      if (timerInterval) clearInterval(timerInterval);
+      
+      const timerFunction = () => {
         timeLeft--;
+        mainRender(); // Re-render to update the timer
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
-          handleSubmit(true);
+          showUserMessage("Time's up! Submitting your answers.", "info");
+          handleSubmitQuiz(); 
         }
-        const t = document.querySelector(".font-mono");
-        if (t) {
-          t.textContent = `Time Left: ${formatTime(timeLeft)}`;
-          if (timeLeft < 60) {
-            t.classList.remove("bg-indigo-100", "text-indigo-600");
-            t.classList.add("bg-red-100", "text-red-600");
-          }
-        }
-      }, 1000);
+      };
+      
+      timerInterval = setInterval(timerFunction, 1000);
+    };
+    
+    const formatTime = (seconds) => {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
     };
 
-    // --- API CALLS ---
-    const fetchQuestions = async () => {
-      const m = MODULES.find((m) => m.id === currentView);
-      if (!m) return;
+    // --- QUIZ FLOW FUNCTIONS ---
 
-      error = null;
+    const startQuiz = (module) => {
+      currentModule = appState.modules.find(m => m.id === module.id);
+      if (currentModule.completed) {
+        showUserMessage(`${currentModule.name} is already completed.`, 'info');
+        return;
+      }
       quizState = "loading";
       mainRender();
+      fetchQuestions(currentModule);
+    };
 
+    const fetchQuestions = async (m) => {
       try {
         const { data: { session }, error: sessionError } =
           await supabase.auth.getSession();
@@ -439,89 +174,354 @@
             action: "generate_questions",
             topic: m.topic,
             count: QUESTIONS_PER_MODULE,
+            moduleId: m.id,
           }),
         });
-
+        
         if (!res.ok) {
-          const err = await res.text();
-          throw new Error(`Failed: ${err}`);
+          const errData = await res.json().catch(() => ({ error: 'Invalid JSON response from AI' }));
+          throw new Error(errData.error || `Question generation failed with status ${res.status}`);
         }
 
-        const fetchedQuestions = await res.json();
+        const fetchedData = await res.json(); 
+        const fetchedQuestions = fetchedData.questions;
         if (!Array.isArray(fetchedQuestions) || fetchedQuestions.length === 0) {
           throw new Error("AI returned zero or invalid questions.");
         }
 
         questions = fetchedQuestions;
+        // ⭐️ UPDATED: Capture and store the assessment_id ⭐️
+        currentModule.assessment_id = fetchedData.assessment_id; 
         currentQuestionIndex = 0;
         selectedAnswers = {};
         timeLeft = TIME_LIMIT_SECONDS;
-        quizState = "ready";
+        quizState = "active";
         mainRender();
         startTimer();
 
       } catch (e) {
-        console.error("Failed to fetch questions:", e);
-        error = `Could not load quiz: ${e.message}`;
-        quizState = "error";
+        console.error("Fetch Questions Failed:", e);
+        showUserMessage(`Error: ${e.message}`, 'error');
+        quizState = "ready";
+        mainRender();
+      }
+    };
+    
+    const selectAnswer = (questionId, index) => {
+      selectedAnswers[questionId] = index;
+      mainRender();
+    };
+
+    const nextQuestion = () => {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
         mainRender();
       }
     };
 
-    const handleSubmit = async (isTimedOut = false) => { 
-      if (quizState === 'submitting') return;
-      quizState = 'submitting';
-      mainRender();
+    const prevQuestion = () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        mainRender();
+      }
+    };
+    
+    const handleSubmitQuiz = async () => {
       clearInterval(timerInterval);
+      quizState = 'loading';
+      mainRender();
 
-      const m = MODULES.find(m => m.id === currentView);
-      let correctCount = 0;
+      const m = currentModule;
+      const currentAssessmentId = m.assessment_id;
 
-      // Simple scoring logic: assume first option is correct
-      questions.forEach(q => {
-        const i = selectedAnswers[q.id];
-        if (i === 0) correctCount++;
+      if (!currentAssessmentId) {
+          showUserMessage("Error: Assessment ID is missing. Cannot submit.", "error");
+          quizState = 'ready';
+          mainRender();
+          return;
+      }
+
+      // ⭐️ UPDATED: Prepare userAnswers object for server submission ⭐️
+      const userAnswers = {};
+      questions.forEach((q) => {
+          // q.id is the question's UUID from the database returned by generate_questions
+          userAnswers[q.id] = selectedAnswers[q.id]; 
       });
 
-      const finalScore = Math.round((correctCount / QUESTIONS_PER_MODULE) * 100);
-
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError || !session) throw new Error("User not logged in. Please sign in again.");
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          if (sessionError || !session) throw new Error("User not logged in. Please sign in again.");
 
-        const token = session.access_token;
+          const token = session.access_token;
 
-        const submissionResponse = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            action: 'submit_assessment',
-            moduleId: m.id,
-            score: finalScore,
-          }),
-        });
+          const submissionResponse = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
+              method: 'POST',
+              headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                  action: 'submit_assessment',
+                  assessmentId: currentAssessmentId, // Pass the ID
+                  userAnswers: userAnswers, // Pass the answers object
+              }),
+          });
 
-        if (!submissionResponse.ok) {
-          const errData = await submissionResponse.json().catch(() => ({ error: 'Invalid JSON response' }));
-          throw new Error(errData.error || `Submission failed with status ${submissionResponse.status}`);
-        }
+          if (!submissionResponse.ok) {
+              const errData = await submissionResponse.json().catch(() => ({ error: 'Invalid JSON response' }));
+              throw new Error(errData.error || `Submission failed with status ${submissionResponse.status}`);
+          }
 
-        handleQuizComplete(finalScore);
+          const resultData = await submissionResponse.json(); // Get the score from the server
+          handleQuizComplete(resultData.score); // Use the server-provided score
 
       } catch (e) {
-        console.error("Submission failed:", e);
-        error = `Failed to save results: ${e.message}`;
-        quizState = 'ready';
-        showUserMessage(error, 'error');
-        mainRender();
+          console.error("Submission failed:", e);
+          let error = `Failed to save results: ${e.message}`;
+          quizState = 'ready';
+          showUserMessage(error, 'error');
+          mainRender();
+      }
+    };
+
+    const handleQuizComplete = (finalScore) => {
+      if (currentModule) {
+        currentModule.completed = true;
+        currentModule.score = finalScore; // Store the server-provided score
+      }
+      
+      // Calculate total score percentage (simple average for this example)
+      const completedModules = appState.modules.filter(m => m.completed);
+      const totalScore = completedModules.reduce((sum, m) => sum + m.score, 0);
+      appState.totalScore = completedModules.length > 0 ? Math.round(totalScore / completedModules.length) : 0;
+      
+      quizState = 'finished';
+      currentModule = null;
+      questions = [];
+      mainRender();
+      showUserMessage("Module completed! Score updated.", "success");
+    };
+    
+    // ⭐️ NEW: Payment Initiation Function (Step 6A) ⭐️
+    const handlePayment = async () => {
+        let userEmail = '';
+        let totalScore = appState.totalScore;
+        
+        try {
+            const { data: { user, session }, error: sessionError } = await supabase.auth.getSession();
+            if (sessionError || !session) throw new Error("User not logged in.");
+            userEmail = user.email; // Get user email for prefill
+            
+            // 1. Call Backend (Edge Function) to Create Razorpay Order
+            const orderResponse = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+                body: JSON.stringify({
+                    action: 'create_order', // NEW action for the Edge Function
+                    amount: 9900, // Amount in paise (₹99)
+                    email: userEmail,
+                    score: totalScore, // Pass the final score for context/metadata
+                }),
+            });
+
+            if (!orderResponse.ok) {
+                const err = await orderResponse.json();
+                throw new Error(err.error || "Failed to create payment order.");
+            }
+
+            const { order_id } = await orderResponse.json();
+
+            // 2. Launch Razorpay Checkout Modal
+            const options = {
+                key: RAZORPAY_KEY_ID,
+                amount: 9900, // Amount in paise
+                currency: "INR",
+                name: "Ready4Industry Assessment Report",
+                description: "Detailed Score and Insights",
+                order_id: order_id,
+                handler: function (response) {
+                    // Payment successful on Razorpay's side. Webhook handles the DB update.
+                    showUserMessage("Payment successful! Please wait for the mentor to share your detailed report via email.", "success");
+                    appState.reportPaid = true; // Optimistic update, but relies on webhook
+                    mainRender();
+                },
+                prefill: {
+                    email: userEmail,
+                },
+                modal: {
+                    ondismiss: () => {
+                        showUserMessage("Payment window closed.", "info");
+                    }
+                }
+            };
+
+            const rzp1 = new Razorpay(options);
+            rzp1.open();
+
+        } catch (e) {
+            console.error("Payment initiation error:", e);
+            showUserMessage(`Payment initiation failed: ${e.message}. Contact mentor for direct payment.`, "error");
+        }
+    };
+
+
+    // --- RENDERING ---
+
+    const renderDashboard = () => {
+      const allCompleted = appState.modules.every(m => m.completed);
+
+      const moduleCards = appState.modules.map(m => `
+        <div class="bg-white p-6 rounded-xl shadow-lg border ${m.completed ? 'border-green-400' : 'border-gray-200'}">
+          <h3 class="text-xl font-bold text-gray-800 mb-2">${m.name}</h3>
+          <p class="text-gray-600 mb-4">${m.topic}</p>
+          <div class="flex items-center justify-between mt-4">
+            <span class="text-sm font-semibold ${m.completed ? 'text-green-600' : 'text-yellow-600'}">
+              Status: ${m.completed ? `Completed (${m.score}%)` : 'Pending'}
+            </span>
+            <button 
+              onclick="startQuiz(appState.modules.find(mod => mod.id === '${m.id}'))"
+              class="px-4 py-2 text-white font-semibold rounded-lg transition duration-150 
+              ${m.completed ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}"
+              ${m.completed ? 'disabled' : ''}>
+              Start Quiz (10 mins)
+            </button>
+          </div>
+        </div>
+      `).join('');
+      
+      let finalReportSection = '';
+      if (allCompleted) {
+        finalReportSection = `
+          <div class="mt-8 p-6 bg-yellow-50 rounded-xl border-2 border-yellow-300 shadow-md">
+            <h3 class="text-2xl font-extrabold text-gray-800 text-center mb-4">Assessment Complete!</h3>
+            <p class="text-center text-lg font-bold text-indigo-600 mb-4">Total Average Score: ${appState.totalScore}%</p>
+            
+            ${appState.reportPaid 
+                ? `<div class="text-center text-green-600 font-bold text-xl">Report Paid. Please check your email for the detailed report.</div>`
+                : `<button 
+                    onclick="handlePayment()" 
+                    class="mt-6 w-full px-6 py-3 text-lg font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-150 shadow-lg">
+                    Get Detail, Score, and Insights - Pay ₹99
+                  </button>
+                  <p class="mt-4 text-center text-sm text-gray-600">
+                    Contact the mentor at <a href="mailto:ready4industry@gmail.com" class="text-indigo-600 hover:underline">ready4industry@gmail.com</a> for assistance.
+                  </p>`
+            }
+          </div>
+        `;
+      }
+      
+
+      return `
+        <div class="max-w-4xl mx-auto">
+          <h2 class="text-3xl font-extrabold text-gray-900 mb-8 text-center">Skills Challenge Dashboard</h2>
+          <div class="space-y-6">
+            ${moduleCards}
+          </div>
+          ${finalReportSection}
+        </div>
+      `;
+    };
+
+    const renderQuiz = () => {
+      if (!currentModule || questions.length === 0) return '';
+      
+      const q = questions[currentQuestionIndex];
+      const questionId = q.id;
+      const selectedIndex = selectedAnswers[questionId];
+
+      const optionsHtml = q.options.map((option, index) => `
+        <li class="mb-4">
+          <label class="flex items-center p-4 border rounded-lg cursor-pointer transition-all-slow 
+            ${selectedIndex === index ? 'bg-indigo-100 border-indigo-500 shadow-md' : 'bg-white hover:bg-gray-50'}"
+          >
+            <input 
+              type="radio" 
+              name="answer_${questionId}" 
+              value="${index}" 
+              class="form-radio h-5 w-5 text-indigo-600 transition-all-slow" 
+              onclick="selectAnswer('${questionId}', ${index})"
+              ${selectedIndex === index ? 'checked' : ''}
+            >
+            <span class="ml-4 text-gray-700 font-medium">${option}</span>
+          </label>
+        </li>
+      `).join('');
+
+      return `
+        <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-2xl">
+          <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <h2 class="text-2xl font-bold text-indigo-600">${currentModule.name}</h2>
+            <div class="text-lg font-extrabold ${timeLeft < 60 ? 'text-red-500' : 'text-gray-800'}">
+              Time Left: ${formatTime(timeLeft)}
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <p class="text-sm text-gray-500 mb-2">Question ${currentQuestionIndex + 1} of ${questions.length}</p>
+            <p class="text-xl font-semibold text-gray-900">${q.question_text}</p>
+          </div>
+          
+          <ul class="list-none p-0 space-y-3">
+            ${optionsHtml}
+          </ul>
+          
+          <div class="flex justify-between mt-8 pt-4 border-t">
+            <button 
+              onclick="prevQuestion()" 
+              class="px-6 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-all-slow disabled:opacity-50" 
+              ${currentQuestionIndex === 0 ? 'disabled' : ''}>
+              &larr; Previous
+            </button>
+            <button 
+              onclick="nextQuestion()" 
+              class="px-6 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all-slow disabled:opacity-50"
+              ${currentQuestionIndex === questions.length - 1 ? 'disabled' : ''}>
+              Next &rarr;
+            </button>
+          </div>
+          
+          ${currentQuestionIndex === questions.length - 1 ? `
+            <div class="mt-6">
+              <button 
+                onclick="handleSubmitQuiz()" 
+                class="w-full px-6 py-3 text-lg font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-150">
+                Submit Quiz
+              </button>
+            </div>
+          ` : ''}
+          
+        </div>
+      `;
+    };
+
+    const mainRender = () => {
+      const container = document.getElementById("content-container");
+      if (quizState === "loading") {
+        container.innerHTML = `
+          <div class="max-w-xl mx-auto text-center mt-20 p-8 bg-white rounded-xl shadow-lg">
+             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+             <p class="text-lg text-gray-700 font-medium">Generating ${QUESTIONS_PER_MODULE} questions via AI...</p>
+             <p class="text-sm text-gray-500 mt-2">This may take a few seconds due to the complexity of the prompt.</p>
+          </div>
+        `;
+      } else if (quizState === "active") {
+        container.innerHTML = renderQuiz();
+      } else {
+        container.innerHTML = renderDashboard();
       }
     };
 
     // --- INIT ---
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Check for user session after redirect from index.html
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        // If no user, redirect back to login page (index.html)
+        window.location.href = './index.html'; 
+        return;
+      }
+      currentUserId = user.id;
       appState = loadState(currentUserId);
       mainRender();
     });
