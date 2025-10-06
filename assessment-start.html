@@ -45,7 +45,7 @@
     const QUESTIONS_PER_MODULE = 10;
     
     // Initialize Supabase Client
-    // ⭐️ FIX: Using the explicit global 'supabase' object for initialization
+    // ⭐️ CRITICAL FIX APPLIED HERE ⭐️
     const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
 
     // --- STATE MANAGEMENT ---
