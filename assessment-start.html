@@ -40,12 +40,13 @@
   <script>
     // --- CONFIGURATION ---
     const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co"; 
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8"; // Replace with your Anon Key
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8"; // Your Anon Key
     const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/assessment-api`;
     const QUESTIONS_PER_MODULE = 10;
     
     // Initialize Supabase Client
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ⭐️ FIX: Using the explicit global 'supabase' object for initialization
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); 
 
     // --- STATE MANAGEMENT ---
     let appState = {};
@@ -109,14 +110,13 @@
         .from("assessments")
         .select("module_id, score, completed")
         .eq("user_id", currentUserId)
-        .order("created_at", { ascending: false }); // Show the latest completion
+        .order("created_at", { ascending: false });
 
       if (error) {
         console.error("Error loading assessments:", error);
         return;
       }
 
-      // Merge the latest scores into appState
       appState.modules.forEach(module => {
         const latestAssessment = assessments.find(a => a.module_id === module.id);
         if (latestAssessment) {
@@ -183,11 +183,6 @@
 
     const startQuiz = (module) => {
       currentModule = appState.modules.find(m => m.id === module.id);
-      if (currentModule.completed) {
-        // Allow re-taking the quiz
-        // showUserMessage(`${currentModule.name} is already completed.`, 'info');
-        // return; 
-      }
       quizState = "loading";
       mainRender();
       fetchQuestions(currentModule);
@@ -244,12 +239,10 @@
 
     const handleQuizComplete = (score) => {
         finalScore = score;
-        // In the free version, we treat the submission as completion for display purposes
         currentModule.completed = true;
         currentModule.score = score; 
         quizState = "complete";
         mainRender();
-        // Removed payment/report unlock logic
     };
 
 
@@ -279,7 +272,7 @@
             <button 
               onclick="startQuiz(appState.modules.find(mod => mod.id === '${m.id}'))"
               class="px-4 py-2 text-white font-semibold rounded-lg transition duration-150 
-              ${m.completed ? 'bg-indigo-400 hover:bg-indigo-500' : 'bg-indigo-600 hover:bg-indigo-700'}">
+              ${'bg-indigo-600 hover:bg-indigo-700'}">
               ${m.completed ? 'Retake Quiz' : 'Start Quiz (10 mins)'}
             </button>
           </div>
@@ -382,7 +375,7 @@
           content = renderDashboard();
           break;
         case "loading":
-        case "scoring": // Use loading screen for scoring wait
+        case "scoring":
           content = renderLoading();
           break;
         case "quiz":
