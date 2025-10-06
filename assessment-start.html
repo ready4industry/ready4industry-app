@@ -104,8 +104,15 @@
 
         const QuizView = ({ module, onComplete, onBack, userId }) => { 
           // --- IMPORTANT CONFIGURATION: REPLACE THESE PLACEHOLDERS ---
-          const SUPABASE_URL = "YOUR_SUPABASE_URL_HERE"; 
-          const MOCK_AUTH_TOKEN = "MOCK_JWT_FOR_DEMO_REPLACE_ME";
+          
+          // 1. SUPABASE_URL: Found in Supabase Dashboard under Project Settings > API > Project URL.
+          // User provided the base URL: https://glskwkzzkhhwftzddqmo.supabase.co
+          const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co"; 
+          
+          // 2. MOCK_AUTH_TOKEN: This must be a valid JWT (JSON Web Token) from a test user signed into your Supabase project.
+          // This token was extracted from the user's console log (URL hash fragment).
+          const MOCK_AUTH_TOKEN = "eyJhbGciOiJIUzI1NiIsImtpZCI6Ik5sd1FzVEJqRXZZS2xVdDAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2dsc2t3a3p6a2hod2Z0emRkcW1vLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwNDA4MjY1MC0zNjg4LTQwYTgtYjBiZC1kMWI3NjQzNmE3MDMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzU5NzI4MzMxLCJpYXQiOjE3NTk3MjQ3MzEsImVtYWlsIjoia2VzaGF2a2FybjE5NzYwZ21haWwuY29tIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJnb29nbGUiLCJwcm92aWRlcnMiOlsiZ29vZ2xlIl19LCJ1c2VyX21ldGFkYXRhIjp7ImF2YXRhcl91cmwiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BQ2c4b2NMNEVkaGwyeFQyWmZlUTVSVDU4bWYwSzBOX3gtUmdVbzIxeDNuSmtjaUtaZ2dDb1E9czk2LWMiLCJlbWFpbCI6Imtlc2hhdmthcm4xOTc2QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmdWxsX25hbWUiOiJrZXNoYXYiLCJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJuYW1lIjoia2VzaGF2IiwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jTDRFZGhsMnhUMlpmZVE1UlQ1OG1mMEswTl94LVJnVW8yMXgzbkprY2lLWmdnQ29RPXM5Ni1jIiwicHJvdmlkZXJfaWQiOiIxMTAyMjE0NzkxMTIzMzQxNDI3NjciLCJzdWIiOiIwNDA4MjY1MC0zNjg4LTQwYTgtYjBiZC1kMWI3NjQzNmE3MDMiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJvYXV0aCIsInRpbWVzdGFtcCI6MTc1OTcyNDczMX1dLCJzZXNzaW9uX2lkIjoiODdkMWUxYmEtMWM3NS00Y2Q4LWE4NGEtMTBlM2U2ODNiZGYzIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.13-yU9OgE6JfBtADm7DRHCNR-geYQW8yIuMY_hfudVw";
+          
           const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/assessment-api`;
 
           const [questions, setQuestions] = useState([]); 
@@ -142,8 +149,9 @@
               setQuizState('loading');
               setError(null);
 
-              if (SUPABASE_URL === "YOUR_SUPABASE_URL_HERE" || MOCK_AUTH_TOKEN === "MOCK_JWT_FOR_DEMO_REPLACE_ME") {
-                  setError("Error: Please set your SUPABASE_URL and a valid MOCK_AUTH_TOKEN in QuizView to fetch real questions.");
+              // Check is no longer needed since MOCK_AUTH_TOKEN is populated, but we keep the error reporting structure.
+              if (SUPABASE_URL === "YOUR_SUPABASE_URL_HERE" || MOCK_AUTH_TOKEN.length < 50) { 
+                  setError("Error: The authentication token or Supabase URL seems invalid or missing.");
                   setQuizState('error');
                   return;
               }
