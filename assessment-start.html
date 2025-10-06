@@ -41,13 +41,13 @@
   <script>
     // --- CONFIGURATION ---
     const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co"; 
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNmD0zEBbMhX8RZ1PLH5R8"; // Replace with your Anon Key
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY"; // Replace with your Anon Key
     const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/assessment-api`;
     const QUESTIONS_PER_MODULE = 10;
     const RAZORPAY_KEY_ID = "rzp_live_YOUR_KEY_ID"; // Replace with your LIVE/TEST Razorpay Key ID
     const RAZORPAY_MENTOR_CONTACT = "mentor@example.com"; // Your contact email
 
-    // ⭐️ FIX: createClient is now defined because the script above has loaded ⭐️
+    // Line 52: This line now executes AFTER the library is loaded, resolving the error.
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // --- STATE MANAGEMENT ---
