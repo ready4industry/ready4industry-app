@@ -35,7 +35,7 @@
   ></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+  <script>
     // --- CONFIGURATION ---
     const MOCK_USERS = {
       user_keshav: { id: "user_keshav", name: "Keshav Karn", email: "keshav.karn@example.com" },
@@ -129,7 +129,8 @@
     const renderDashboard = (c) => {
       const user = MOCK_USERS[currentUserId];
       const total = MODULES.length;
-      const done = MODULES.filter((m) => appState.progress[m.id]?.completed).length;
+      // The crash was here: appState might not have all keys from MODULES.
+      const done = MODULES.filter((m) => appState.progress[m.id]?.completed).length; 
       const complete = done === total;
       const mentorEmail = MOCK_USERS.user_admin.email;
 
@@ -154,8 +155,9 @@
 
         <div class="max-w-4xl mx-auto space-y-6">
           ${MODULES.map((m) => {
-            const s = appState.progress[m.id];
-            const isCompleted = s.completed;
+            // ✅ THE FIX: Use Nullish Coalescing (||) to provide a default object if the key is missing.
+            const s = appState.progress[m.id] || { completed: false, score: 0 }; 
+            const isCompleted = s.completed;  
             const btnText = isCompleted ? `Review Score: ${s.score}%` : "Start Assessment";
             return `
               <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-6 rounded-xl shadow-lg ${isCompleted ? "bg-green-50 border-green-300 border-2" : "bg-white border border-gray-200 hover:shadow-xl"}">
