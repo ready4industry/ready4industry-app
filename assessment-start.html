@@ -1,528 +1,485 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Skills Challenge Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skills Challenge Dashboard</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
-    rel="stylesheet"
-  />
-  <style>
-    body {
-      font-family: "Inter", sans-serif;
-      background-color: #f9fafb;
-    }
-    #app-root {
-      min-height: 100vh;
-    }
-    .transition-all-slow {
-      transition: all 0.3s ease-in-out;
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f9fafb;
+    }
+    #app-root {
+      min-height: 100vh;
+    }
+    .transition-all-slow {
+      transition: all 0.3s ease-in-out;
+    }
+  </style>
 </head>
 
 <body class="p-4 md:p-8">
-  <div id="app-root">
-    <div id="content-container"></div>
-  </div>
+  <div id="app-root">
+    <div id="content-container"></div>
+  </div>
 
-  <div
-    id="user-message-box"
-    class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"
-  ></div>
+  <div
+    id="user-message-box"
+    class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"
+  ></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    // --- CONFIGURATION ---
-    const MOCK_USERS = {
-      user_admin: { id: "user_admin", name: "Mentor Admin", email: "ready4industry@gmail.com" },
-    };
+  <script>
+    // --- CONFIGURATION ---
+    const MOCK_USERS = {
+      user_admin: { id: "user_admin", name: "Mentor Admin", email: "ready4industry@gmail.com" },
+    };
 
-    const MODULES = [
-      { id: "technical", name: "Technical Fundamentals", topic: "BTech Graduate Syllabus Fundamentals" },
-      { id: "aptitude", name: "Aptitude & Reasoning", topic: "Aptitude and Reasoning Fundamentals" },
-      { id: "behavioural", name: "Behavioural Skills", topic: "Behavioural Fundamentals" },
-    ];
-    
-    const QUESTIONS_PER_MODULE = 10;
-    const TIME_LIMIT_SECONDS = 600; // 10 minutes per quiz
+    const MODULES = [
+      { id: "technical", name: "Technical Fundamentals", topic: "BTech Graduate Syllabus Fundamentals" },
+      { id: "aptitude", name: "Aptitude & Reasoning", topic: "Aptitude and Reasoning Fundamentals" },
+      { id: "behavioural", name: "Behavioural Skills", topic: "Behavioural Fundamentals" },
+    ];
+    
+    const QUESTIONS_PER_MODULE = 10;
+    const TIME_LIMIT_SECONDS = 600; // 10 minutes per quiz
 
-    // --- SUPABASE SETUP ---
-    const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNzD0zEBbMhX8RZ1PLH5R8";
+    // --- SUPABASE SETUP ---
+    const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNzD0zEBbMhX8RZ1PLH5R8";
 
-    let supabase; 
-    const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL.replace(/\/$/, "")}/functions/v1/assessment-api`;
+    let supabase; 
+    const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL.replace(/\/$/, "")}/functions/v1/assessment-api`;
 
-    // --- STATE ---
-    let currentUserId = null; 
-    let currentUserName = "Guest"; 
-    let appState = {};
-    let currentView = null;
-    let questions = [];
-    let currentQuestionIndex = 0;
-    let selectedAnswers = {};
-    let timeLeft = TIME_LIMIT_SECONDS;
-    let quizState = "loading"; 
-    let error = null;
-    let timerInterval = null;
+    // --- STATE ---
+    let currentUserId = null; 
+    let currentUserName = "Guest"; 
+    let appState = {};
+    let currentView = null;
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let selectedAnswers = {};
+    let timeLeft = TIME_LIMIT_SECONDS;
+    let quizState = "loading"; 
+    let error = null;
+    let timerInterval = null;
 
-    // --- UTILITIES ---
-    const loadState = (userId) => {
-      const key = userId ? `assessmentState_${userId}` : `assessmentState_GUEST`;
-      try {
-        const data = localStorage.getItem(key);
-        const defaultState = { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
+    // --- UTILITIES ---
+    const loadState = (userId) => {
+      const key = userId ? `assessmentState_${userId}` : `assessmentState_GUEST`;
+      try {
+        const data = localStorage.getItem(key);
+        const defaultState = { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
 
-        if (!data) return defaultState;
-        
-        const loadedState = JSON.parse(data);
-        MODULES.forEach(m => {
-            if (!loadedState.progress[m.id]) {
-                loadedState.progress[m.id] = { completed: false, score: 0, started: false };
-            }
-        });
-        return loadedState;
-      } catch (e) {
-        console.error("Failed to load state from localStorage, resetting:", e);
-        return { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
-      }
-    };
+        if (!data) return defaultState;
+        
+        const loadedState = JSON.parse(data);
+        MODULES.forEach(m => {
+            if (!loadedState.progress[m.id]) {
+                loadedState.progress[m.id] = { completed: false, score: 0, started: false };
+            }
+        });
+        return loadedState;
+      } catch (e) {
+        console.error("Failed to load state from localStorage, resetting:", e);
+        return { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
+      }
+    };
 
-    const saveState = () => {
-        const key = currentUserId ? `assessmentState_${currentUserId}` : `assessmentState_GUEST`;
-        localStorage.setItem(key, JSON.stringify(appState));
-    };
-    
-    const formatTime = (s) => {
-      const m = Math.floor(s / 60);
-      const sec = s % 60;
-      return `${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
-    };
+    const saveState = () => {
+        const key = currentUserId ? `assessmentState_${currentUserId}` : `assessmentState_GUEST`;
+        localStorage.setItem(key, JSON.stringify(appState));
+    };
+    
+    const formatTime = (s) => {
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      return `${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
+    };
 
-    const showUserMessage = (msg, type = "info") => {
-      const box = document.getElementById("user-message-box");
-      let color = "bg-blue-500";
-      if (type === "error") color = "bg-red-500";
-      if (type === "success") color = "bg-green-500";
-      box.textContent = msg;
-      box.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold ${color} transition-opacity duration-300 opacity-100 pointer-events-auto`;
-      setTimeout(() => {
-        box.classList.replace('opacity-100', 'opacity-0');
-        box.classList.replace('pointer-events-auto', 'pointer-events-none');
-      }, 3000);
-    };
+    const showUserMessage = (msg, type = "info") => {
+      const box = document.getElementById("user-message-box");
+      let color = "bg-blue-500";
+      if (type === "error") color = "bg-red-500";
+      if (type === "success") color = "bg-green-500";
+      box.textContent = msg;
+      box.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold ${color} transition-opacity duration-300 opacity-100 pointer-events-auto`;
+      setTimeout(() => {
+        box.classList.replace('opacity-100', 'opacity-0');
+        box.classList.replace('pointer-events-auto', 'pointer-events-none');
+      }, 3000);
+    };
 
-    const startTimer = () => {
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          handleSubmit(true); 
-        }
-        const t = document.querySelector(".font-mono");
-        if (t) {
-          t.textContent = `Time Left: ${formatTime(timeLeft)}`;
-          if (timeLeft < 60) {
-            t.classList.remove("bg-indigo-100", "text-indigo-600");
-            t.classList.add("bg-red-100", "text-red-600");
-          }
-        }
-      }, 1000);
-    };
+    const startTimer = () => {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          handleSubmit(true); 
+        }
+        const t = document.querySelector(".font-mono");
+        if (t) {
+          t.textContent = `Time Left: ${formatTime(timeLeft)}`;
+          if (timeLeft < 60) {
+            t.classList.remove("bg-indigo-100", "text-indigo-600");
+            t.classList.add("bg-red-100", "text-red-600");
+          }
+        }
+      }, 1000);
+    };
 
-    // --- API CALLS ---
+    // --- API CALLS ---
 
-    const fetchQuestions = async () => {
-      const m = MODULES.find((m) => m.id === currentView);
-      if (!m) return;
+    const fetchQuestions = async () => {
+      const m = MODULES.find((m) => m.id === currentView);
+      if (!m) return;
 
-      error = null;
-      quizState = "loading";
-      mainRender();
+      error = null;
+      quizState = "loading";
+      mainRender();
 
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) throw sessionError;
-        if (!session) throw new Error("Authentication session expired or not found. Please sign in again.");
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) throw new Error("Authentication session expired or not found. Please sign in again.");
 
-        // Use the authenticated token
-        const token = session.access_token;
-        const userIdForApi = currentUserId; 
+        // Use the authenticated token
+        const token = session.access_token;
+        const userIdForApi = currentUserId; 
 
-        const res = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Use the valid session token
-          },
-          body: JSON.stringify({
-            action: "generate_questions",
-            topic: m.topic,
-            count: QUESTIONS_PER_MODULE,
-            userId: userIdForApi, 
-          }),
-        });
+        const res = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Use the valid session token
+          },
+          body: JSON.stringify({
+            action: "generate_questions",
+            topic: m.topic,
+            count: QUESTIONS_PER_MODULE,
+            userId: userIdForApi, 
+          }),
+        });
 
-        if (!res.ok) {
-          const err = await res.text();
-          throw new Error(`Failed to generate questions: ${err.substring(0, 100)}...`);
-        }
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(`Failed to generate questions: ${err.substring(0, 100)}...`);
+        }
 
-        const fetchedQuestions = await res.json();
-        if (!Array.isArray(fetchedQuestions) || fetchedQuestions.length === 0) {
-          throw new Error("AI returned zero or invalid questions.");
-        }
+        const fetchedQuestions = await res.json();
+        if (!Array.isArray(fetchedQuestions) || fetchedQuestions.length === 0) {
+          throw new Error("AI returned zero or invalid questions.");
+        }
 
-        questions = fetchedQuestions;
-        currentQuestionIndex = 0;
-        selectedAnswers = {};
-        timeLeft = TIME_LIMIT_SECONDS;
-        quizState = "ready";
-        mainRender();
-        startTimer();
+        questions = fetchedQuestions;
+        currentQuestionIndex = 0;
+        selectedAnswers = {};
+        timeLeft = TIME_LIMIT_SECONDS;
+        quizState = "ready";
+        mainRender();
+        startTimer();
 
-      } catch (e) {
-        console.error("Failed to fetch questions:", e);
-        error = `Could not load quiz: ${e.message}. The error was likely an "Invalid JWT". Please ensure your Supabase project is configured correctly and try logging in again.`;
-        quizState = "error";
-        mainRender(); 
-      }
-    };
-    
-    const handleSubmit = async (isTimedOut = false) => { 
-      if (quizState === 'submitting') return;
-      quizState = 'submitting';
-      mainRender();
-      clearInterval(timerInterval);
+      } catch (e) {
+        console.error("Failed to fetch questions:", e);
+        error = `Could not load quiz: ${e.message}. The error was likely an "Invalid JWT". Please ensure your Supabase project is configured correctly and try logging in again.`;
+        quizState = "error";
+        mainRender(); 
+      }
+    };
+    
+    const handleSubmit = async (isTimedOut = false) => { 
+      if (quizState === 'submitting') return;
+      quizState = 'submitting';
+      mainRender();
+      clearInterval(timerInterval);
 
-      const m = MODULES.find(m => m.id === currentView);
-      let correctCount = 0;
+      const m = MODULES.find(m => m.id === currentView);
+      let correctCount = 0;
 
-      questions.forEach(q => {
-        const i = selectedAnswers[q.id];
-        if (i === 0) correctCount++;
-      });
+      questions.forEach(q => {
+        const i = selectedAnswers[q.id];
+        if (i === 0) correctCount++;
+      });
 
-      const finalScore = Math.round((correctCount / QUESTIONS_PER_MODULE) * 100);
+      const finalScore = Math.round((correctCount / QUESTIONS_PER_MODULE) * 100);
 
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) throw sessionError;
-        if (!session) throw new Error("Authentication session expired or not found. Please sign in again.");
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) throw new Error("Authentication session expired or not found. Please sign in again.");
 
-        const token = session.access_token;
-        const userIdForApi = currentUserId; 
+        const token = session.access_token;
+        const userIdForApi = currentUserId; 
 
-        const submissionResponse = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            action: 'submit_assessment',
-            moduleId: m.id,
-            score: finalScore,
-            userId: userIdForApi, 
-          }),
-        });
+        const submissionResponse = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            action: 'submit_assessment',
+            moduleId: m.id,
+            score: finalScore,
+            userId: userIdForApi, 
+          }),
+        });
 
-        if (!submissionResponse.ok) {
-          const errData = await submissionResponse.json().catch(() => ({ error: 'Invalid JSON response' }));
-          throw new Error(errData.error || `Submission failed with status ${submissionResponse.status}`);
-        }
+        if (!submissionResponse.ok) {
+          const errData = await submissionResponse.json().catch(() => ({ error: 'Invalid JSON response' }));
+          throw new Error(errData.error || `Submission failed with status ${submissionResponse.status}`);
+        }
 
-        handleQuizComplete(finalScore, isTimedOut);
+        handleQuizComplete(finalScore, isTimedOut);
 
-      } catch (e) {
-        console.error("Submission failed:", e);
-        error = `Failed to save results: ${e.message}`;
-        quizState = 'ready'; 
-        showUserMessage(error, 'error');
-        mainRender();
-      }
-    };
+      } catch (e) {
+        console.error("Submission failed:", e);
+        error = `Failed to save results: ${e.message}`;
+        quizState = 'ready'; 
+        showUserMessage(error, 'error');
+        mainRender();
+      }
+    };
 
-    // --- ACTION HANDLERS ---
+    // --- ACTION HANDLERS ---
 
-    const handleBackToDashboard = () => {
-        clearInterval(timerInterval);
-        timerInterval = null;
-        currentView = null;
-        quizState = "loading"; // Reset quiz state 
-        mainRender();
-    };
+    const handleBackToDashboard = () => {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        currentView = null;
+        quizState = "loading"; // Reset quiz state 
+        mainRender();
+    };
 
-    const handleQuizComplete = (score, isTimedOut) => {
-      const id = currentView;
-      appState.progress[id] = { completed: true, score, started: true };
-      clearInterval(timerInterval);
-      timerInterval = null;
-      currentView = null;
-      saveState();
-      showUserMessage(`Assessment completed! Score: ${score}%. ${isTimedOut ? "Time expired." : ""}`, "success");
-      mainRender();
-    };
-    
-    const handleStartQuiz = (moduleId) => {
-      currentView = moduleId;
-      appState.progress[moduleId].started = true;
-      questions = [];
-      currentQuestionIndex = 0;
-      selectedAnswers = {};
-      timeLeft = TIME_LIMIT_SECONDS;
-      quizState = "loading";
-      saveState();
-      mainRender();
-      fetchQuestions();
-    };
+    const handleQuizComplete = (score, isTimedOut) => {
+      const id = currentView;
+      appState.progress[id] = { completed: true, score, started: true };
+      clearInterval(timerInterval);
+      timerInterval = null;
+      currentView = null;
+      saveState();
+      showUserMessage(`Assessment completed! Score: ${score}%. ${isTimedOut ? "Time expired." : ""}`, "success");
+      mainRender();
+    };
+    
+    const handleStartQuiz = (moduleId) => {
+      currentView = moduleId;
+      appState.progress[moduleId].started = true;
+      questions = [];
+      currentQuestionIndex = 0;
+      selectedAnswers = {};
+      timeLeft = TIME_LIMIT_SECONDS;
+      quizState = "loading";
+      saveState();
+      mainRender();
+      fetchQuestions();
+    };
 
-    const handleAnswerSelect = (index) => {
-      const q = questions[currentQuestionIndex];
-      selectedAnswers[q.id] = index;
-      mainRender();
-    };
+    const handleAnswerSelect = (index) => {
+      const q = questions[currentQuestionIndex];
+      selectedAnswers[q.id] = index;
+      mainRender();
+    };
 
-    const handleNext = () => {
-      if (currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
-        mainRender();
-      }
-    };
+    const handleNext = () => {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        mainRender();
+      }
+    };
 
-    const handlePrevious = () => {
-      if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        mainRender();
-      }
-    };
-    
-    const handleSignOut = async () => {
-        try {
-            const { error } = await supabase.auth.signOut();
-            if (error) throw error;
-            window.location.href = './index.html'; 
-        } catch (e) {
-            console.error("Sign out failed:", e);
-            showUserMessage(`Sign out failed: ${e.message}`, 'error');
-        }
-    };
+    const handlePrevious = () => {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        mainRender();
+      }
+    };
+    
+    const handleSignOut = async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            window.location.href = './index.html'; 
+        } catch (e) {
+            console.error("Sign out failed:", e);
+            showUserMessage(`Sign out failed: ${e.message}`, 'error');
+        }
+    };
 
 
-    // --- RENDER FUNCTIONS ---
-    
-    const renderQuizView = (c) => {
-      const m = MODULES.find((m) => m.id === currentView);
-      const q = questions[currentQuestionIndex];
-      
-      let content;
+    // --- RENDER FUNCTIONS ---
+    
+    const renderQuizView = (c) => {
+      const m = MODULES.find((m) => m.id === currentView);
+      const q = questions[currentQuestionIndex];
+      
+      let content;
 
-      if (quizState === "error") {
-        content = `
-          <div class="bg-red-50 border border-red-400 text-red-700 p-6 rounded-xl shadow-lg max-w-4xl mx-auto mt-20">
-            <h2 class="text-xl font-bold">Failed to Load Quiz</h2>
-            <p class="mt-2">${error}</p>
-            <button onclick="handleBackToDashboard()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Back to Dashboard</button>
-          </div>`;
-      } else if (quizState === "loading" || questions.length === 0) {
-        return renderLoading(c); 
-      } else if (quizState === "submitting") {
-         content = `
-          <div class="flex items-center justify-center p-12 bg-white rounded-xl shadow-lg h-96 max-w-4xl mx-auto mt-20">
-            <div class="text-center">
-              <svg class="animate-spin h-8 w-8 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <p class="mt-4 text-xl text-green-700 font-semibold">Submitting Assessment...</p>
-              <p class="text-sm text-gray-500 mt-2">Please wait while your score is calculated.</p>
-            </div>
-          </div>`;
-      } else {
-        // Quiz is ready
-        content = `
-          <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl max-w-4xl mx-auto mt-10">
-            <header class="mb-6 border-b pb-4 flex justify-between items-center">
-              <h2 class="text-2xl font-bold text-indigo-700">${m.name}</h2>
-              <div class="text-lg font-mono px-3 py-1 rounded-full ${
-                timeLeft < 60 ? "bg-red-100 text-red-600" : "bg-indigo-100 text-indigo-600"
-              }">Time Left: ${formatTime(timeLeft)}</div>
-            </header>
-            <div class="text-lg mb-6">
-              <p class="font-semibold text-gray-800">Question ${currentQuestionIndex + 1} of ${questions.length}</p>
-              <p class="mt-2 p-4 bg-gray-50 rounded-lg border">${q.question}</p>
-            </div>
-            <div id="options-container" class="space-y-3 mb-8">
-              ${q.options
-                .map(
-                  (opt, i) => `
-                <button data-option-index="${i}" class="option-button w-full text-left p-3 rounded-lg border transition-colors duration-150 ${
-                    selectedAnswers[q.id] === i
-                      ? "bg-indigo-500 text-white border-indigo-600 shadow-md"
-                      : "bg-white text-gray-800 hover:bg-indigo-50 border-gray-200"
-                  }">${String.fromCharCode(65 + i)}. ${opt}</button>`
-                )
-                .join("")}
-            </div>
-            <footer class="flex justify-between items-center border-t pt-4">
-              <button onclick="handlePrevious()" ${
-                currentQuestionIndex === 0 ? "disabled" : ""
-              } class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50">&larr; Previous</button>
-              <div class="flex space-x-2">
-                <button onclick="handleBackToDashboard()" class="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200">End Quiz</button>
-                ${
-                  currentQuestionIndex === questions.length - 1
-                    ? `<button onclick="handleSubmit(false)" class="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-green-600">Submit Assessment</button>`
-                    : `<button onclick="handleNext()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">Next &rarr;</button>`
-                }
-              </div>
-            </footer>
-          </div>`;
-      }
-      
-      c.innerHTML = content;
+      if (quizState === "error") {
+        content = `
+          <div class="bg-red-50 border border-red-400 text-red-700 p-6 rounded-xl shadow-lg max-w-4xl mx-auto mt-20">
+            <h2 class="text-xl font-bold">Failed to Load Quiz</h2>
+            <p class="mt-2">${error}</p>
+            <button onclick="handleBackToDashboard()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Back to Dashboard</button>
+          </div>`;
+      } else if (quizState === "loading" || questions.length === 0) {
+        return renderLoading(c); 
+      } else if (quizState === "submitting") {
+         content = `
+          <div class="flex items-center justify-center p-12 bg-white rounded-xl shadow-lg h-96 max-w-4xl mx-auto mt-20">
+            <div class="text-center">
+              <svg class="animate-spin h-8 w-8 text-green-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p class="mt-4 text-xl text-green-700 font-semibold">Submitting Assessment...</p>
+              <p class="text-sm text-gray-500 mt-2">Please wait while your score is calculated.</p>
+            </div>
+          </div>`;
+      } else {
+        // Quiz is ready
+        content = `
+          <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl max-w-4xl mx-auto mt-10">
+            <header class="mb-6 border-b pb-4 flex justify-between items-center">
+              <h2 class="text-2xl font-bold text-indigo-700">${m.name}</h2>
+              <div class="text-lg font-mono px-3 py-1 rounded-full ${
+                timeLeft < 60 ? "bg-red-100 text-red-600" : "bg-indigo-100 text-indigo-600"
+              }">Time Left: ${formatTime(timeLeft)}</div>
+            </header>
+            <div class="text-lg mb-6">
+              <p class="font-semibold text-gray-800">Question ${currentQuestionIndex + 1} of ${questions.length}</p>
+              <p class="mt-2 p-4 bg-gray-50 rounded-lg border">${q.question}</p>
+            </div>
+            <div id="options-container" class="space-y-3 mb-8">
+              ${q.options
+                .map(
+                  (opt, i) => `
+                <button data-option-index="${i}" class="option-button w-full text-left p-3 rounded-lg border transition-colors duration-150 ${
+                    selectedAnswers[q.id] === i
+                      ? "bg-indigo-500 text-white border-indigo-600 shadow-md"
+                      : "bg-white text-gray-800 hover:bg-indigo-50 border-gray-200"
+                  }">${String.fromCharCode(65 + i)}. ${opt}</button>`
+                )
+                .join("")}
+            </div>
+            <footer class="flex justify-between items-center border-t pt-4">
+              <button onclick="handlePrevious()" ${
+                currentQuestionIndex === 0 ? "disabled" : ""
+              } class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 disabled:opacity-50">&larr; Previous</button>
+              <div class="flex space-x-2">
+                <button onclick="handleBackToDashboard()" class="bg-red-100 text-red-600 px-4 py-2 rounded-lg hover:bg-red-200">End Quiz</button>
+                ${
+                  currentQuestionIndex === questions.length - 1
+                    ? `<button onclick="handleSubmit(false)" class="bg-green-500 text-white px-6 py-2 rounded-lg font-semibold shadow-md hover:bg-green-600">Submit Assessment</button>`
+                    : `<button onclick="handleNext()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600">Next &rarr;</button>`
+                }
+              </div>
+            </footer>
+          </div>`;
+      }
+      
+      c.innerHTML = content;
 
-      if (quizState === "ready" && q) {
-        document.querySelectorAll(".option-button").forEach((btn) => {
-          btn.addEventListener("click", (e) => {
-            const i = parseInt(e.currentTarget.getAttribute("data-option-index"));
-            handleAnswerSelect(i);
-          });
-        });
-      }
-    };
+      if (quizState === "ready" && q) {
+        document.querySelectorAll(".option-button").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const i = parseInt(e.currentTarget.getAttribute("data-option-index"));
+            handleAnswerSelect(i);
+          });
+        });
+      }
+    };
 
-    const renderDashboard = (c) => {
-      const total = MODULES.length;
-      const done = MODULES.filter((m) => appState.progress[m.id]?.completed).length; 
-      const complete = done === total;
-      const mentorEmail = MOCK_USERS.user_admin.email;
+    const renderDashboard = (c) => {
+      c.innerHTML = `
+        <div class="fixed top-2 right-4 bg-white p-2 rounded-lg shadow-lg border border-indigo-100 flex items-center space-x-3">
+          <span class="text-sm font-medium text-gray-700">Logged in as: 
+            <span class="font-bold text-indigo-600">${currentUserName}</span>
+          </span>
+          <button onclick="handleSignOut()" class="text-sm px-3 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">Sign Out</button>
+        </div>
 
-      c.innerHTML = `
-        <div class="fixed top-2 right-4 bg-white p-2 rounded-lg shadow-lg border border-indigo-100 flex items-center space-x-3">
-          <span class="text-sm font-medium text-gray-700">Logged in as: 
-            <span class="font-bold text-indigo-600">${currentUserName}</span>
-          </span>
-          <button onclick="handleSignOut()" class="text-sm px-3 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">Sign Out</button>
-        </div>
+        <div class="flex items-center justify-center pt-20">
+          <h1 class="text-5xl font-extrabold text-indigo-700">Welcome to the Dashboard</h1>
+        </div>
+      `;
 
-        <header class="text-center mb-10 pt-10">
-          <h1 class="text-4xl font-extrabold text-indigo-700">Skills Challenge Dashboard</h1>
-          <p class="mt-2 text-xl text-gray-500">Welcome, ${currentUserName}. Complete the modules below to unlock your final report.</p>
-          <div class="mt-6 w-full max-w-2xl mx-auto">
-            <div class="h-3 bg-gray-200 rounded-full">
-              <div class="h-3 bg-indigo-500 rounded-full transition-all-slow" style="width:${(done / total) * 100}%"></div>
-            </div>
-            <p class="mt-1 text-sm font-medium text-gray-600">${done} of ${total} Modules Completed</p>
-          </div>
-        </header>
+      // NOTE: Since you only requested the welcome message, the buttons and quiz logic are not attached in this simplified view.
+      // To prevent errors if the user tries to click the invisible "Start Quiz" buttons, we simply don't render them.
+    };
+    
+    const renderLoading = (c) => {
+        const m = MODULES.find(mod => mod.id === currentView);
+        c.innerHTML = `
+            <div class="max-w-4xl mx-auto text-center pt-20">
+                <div class="flex items-center justify-center p-12 bg-white rounded-xl shadow-lg h-96">
+                    <div class="text-center">
+                    <svg class="animate-spin h-8 w-8 text-indigo-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <p class="mt-4 text-xl text-gray-700 font-semibold">Generating Questions for ${m.name}...</p>
+                    <p class="text-sm text-gray-500 mt-2">This may take a few moments.</p>
+                    <button onclick="handleBackToDashboard()" class="mt-6 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Cancel & Go Back</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
 
-        <div class="max-w-4xl mx-auto space-y-6">
-          ${MODULES.map((m) => {
-            const s = appState.progress[m.id] || { completed: false, score: 0 }; 
-            const isCompleted = s.completed;  
-            const btnText = isCompleted ? `Review Score: ${s.score}%` : "Start Assessment";
-            return `
-              <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-6 rounded-xl shadow-lg ${isCompleted ? "bg-green-50 border-green-300 border-2" : "bg-white border border-gray-200 hover:shadow-xl"}">
-                <div>
-                  <h3 class="text-xl font-bold ${isCompleted ? "text-green-800" : "text-indigo-600"}">${m.name}</h3>
-                  <p class="mt-1 text-gray-600">${m.topic}</p>
-                </div>
-                <button data-module-id="${m.id}" class="start-quiz-button mt-4 md:mt-0 px-6 py-2 font-semibold rounded-lg ${isCompleted ? "bg-green-500 text-white hover:bg-green-600" : "bg-indigo-500 text-white hover:bg-indigo-600"}">${btnText}</button>
-              </div>`;
-          }).join("")}
-        </div>
+    const mainRender = () => {
+      const c = document.getElementById("content-container");
+      
+      if (currentView) {
+          if (quizState === 'loading' || quizState === 'ready' || quizState === 'submitting' || quizState === 'error') {
+              renderQuizView(c);
+          } else {
+              renderLoading(c); 
+          }
+      } else {
+          renderDashboard(c);
+      }
+    };
 
-        <div class="mt-12 max-w-4xl mx-auto p-6 text-center bg-white rounded-xl shadow-2xl border-t-4 border-indigo-500">
-          ${
-            complete
-              ? `<h2 class="text-2xl font-bold text-green-700">Congratulations! Assessment Complete.</h2>
-                 <p class="mt-3 text-lg text-gray-700">Your final report is ready.</p>
-                 <button class="mt-4 px-8 py-3 bg-indigo-500 text-white text-lg font-bold rounded-xl shadow-lg hover:bg-indigo-600" onclick="showUserMessage('Report viewing not yet implemented.','info')">Get Final Report</button>`
-              : `<h2 class="text-2xl font-bold text-indigo-700">Complete all modules to unlock your Final Report.</h2>`
-          }
-          <div class="mt-6 pt-4 border-t border-gray-200">
-            <h3 class="text-lg font-semibold text-gray-800">Need Guidance?</h3>
-            <a href="mailto:${mentorEmail}" class="mt-2 inline-block px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700">Contact Your Mentor: ${mentorEmail}</a>
-          </div>
-        </div>
-      `;
+    // --- INIT ---
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("Supabase Client Initialized.");
+            
+            const { data: { user } } = await supabase.auth.getUser();
 
-      document.querySelectorAll(".start-quiz-button").forEach((btn) => {
-        btn.addEventListener("click", () => handleStartQuiz(btn.getAttribute("data-module-id")));
-      });
-    };
-    
-    const renderLoading = (c) => {
-        const m = MODULES.find(mod => mod.id === currentView);
-        c.innerHTML = `
-            <div class="max-w-4xl mx-auto text-center pt-20">
-                <div class="flex items-center justify-center p-12 bg-white rounded-xl shadow-lg h-96">
-                    <div class="text-center">
-                    <svg class="animate-spin h-8 w-8 text-indigo-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p class="mt-4 text-xl text-gray-700 font-semibold">Generating Questions for ${m.name}...</p>
-                    <p class="text-sm text-gray-500 mt-2">This may take a few moments.</p>
-                    <button onclick="handleBackToDashboard()" class="mt-6 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Cancel & Go Back</button>
-                    </div>
-                </div>
-            </div>
-        `;
-    };
+            if (user) {
+                currentUserId = user.id;
+                currentUserName = user.user_metadata.full_name || user.email || "User"; 
+            } else {
+                window.location.href = './index.html'; 
+                return;
+            }
 
-    const mainRender = () => {
-      const c = document.getElementById("content-container");
-      
-      if (currentView) {
-          if (quizState === 'loading' || quizState === 'ready' || quizState === 'submitting' || quizState === 'error') {
-              renderQuizView(c);
-          } else {
-              renderLoading(c); 
-          }
-      } else {
-          renderDashboard(c);
-      }
-    };
+            appState = loadState(currentUserId);
+            mainRender();
 
-    // --- INIT ---
-    document.addEventListener("DOMContentLoaded", async () => {
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log("Supabase Client Initialized.");
-            
-            const { data: { user } } = await supabase.auth.getUser();
-
-            if (user) {
-                currentUserId = user.id;
-                currentUserName = user.user_metadata.full_name || user.email || "User"; 
-            } else {
-                window.location.href = './index.html'; 
-                return;
-            }
-
-            appState = loadState(currentUserId);
-            mainRender();
-
-        } catch (e) {
-            console.error("Critical Initialization Error:", e);
-            document.getElementById("content-container").innerHTML = `
-                <div class="max-w-xl mx-auto text-center p-8 bg-red-100 border border-red-400 text-red-700 rounded-xl shadow-lg mt-20">
-                    <h2 class="text-2xl font-bold mb-4">Initial Script Failed 🛑</h2>
-                    <p class="mt-4 font-mono text-sm break-all">Error: ${e.message || 'Check your browser console.'}</p>
-                    <p class="mt-4"><a href="./index.html" class="text-indigo-600 hover:underline">Return to Login</a></p>
-                </div>
-            `;
-            showUserMessage(`Critical Init Error: ${e.message}`, 'error');
-        }
-    });
-  </script>
+        } catch (e) {
+            console.error("Critical Initialization Error:", e);
+            document.getElementById("content-container").innerHTML = `
+                <div class="max-w-xl mx-auto text-center p-8 bg-red-100 border border-red-400 text-red-700 rounded-xl shadow-lg mt-20">
+                    <h2 class="text-2xl font-bold mb-4">Initial Script Failed 🛑</h2>
+                    <p class="mt-4 font-mono text-sm break-all">Error: ${e.message || 'Check your browser console.'}</p>
+                    <p class="mt-4"><a href="./index.html" class="text-indigo-600 hover:underline">Return to Login</a></p>
+                </div>
+            `;
+            showUserMessage(`Critical Init Error: ${e.message}`, 'error');
+        }
+    });
+  </script>
 </body>
 </html>
