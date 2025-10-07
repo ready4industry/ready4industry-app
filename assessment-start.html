@@ -38,7 +38,6 @@
 
   <script>
     // --- CONFIGURATION ---
-    // Note: MOCK_USERS is kept for the admin email contact but not for authentication
     const MOCK_USERS = {
       user_admin: { id: "user_admin", name: "Mentor Admin", email: "ready4industry@gmail.com" },
     };
@@ -60,8 +59,8 @@
     const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL.replace(/\/$/, "")}/functions/v1/assessment-api`;
 
     // --- STATE ---
-    let currentUserId = null; // Will be set to the real Supabase user ID
-    let currentUserName = "Guest"; // Will be set to the real user name
+    let currentUserId = null; 
+    let currentUserName = "Guest"; 
     let appState = {};
     let currentView = null;
     let questions = [];
@@ -74,17 +73,14 @@
 
     // --- UTILITIES ---
     const loadState = (userId) => {
-      // Use the actual user ID in localStorage key
       const key = userId ? `assessmentState_${userId}` : `assessmentState_GUEST`;
       try {
         const data = localStorage.getItem(key);
-        // Ensure default state has all module keys for safety
         const defaultState = { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
 
         if (!data) return defaultState;
         
         const loadedState = JSON.parse(data);
-        // Ensure loaded state has all module keys
         MODULES.forEach(m => {
             if (!loadedState.progress[m.id]) {
                 loadedState.progress[m.id] = { completed: false, score: 0, started: false };
@@ -151,22 +147,25 @@
       mainRender();
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        // Use the authenticated token if available, otherwise use the Anonymous Key
-        const token = session?.access_token || SUPABASE_ANON_KEY;
-        const userIdForApi = currentUserId || "guest_user"; 
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) throw new Error("Authentication session expired or not found. Please sign in again.");
+
+        // Use the authenticated token
+        const token = session.access_token;
+        const userIdForApi = currentUserId; 
 
         const res = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Key to auth the Edge Function
+            Authorization: `Bearer ${token}`, // Use the valid session token
           },
           body: JSON.stringify({
             action: "generate_questions",
             topic: m.topic,
             count: QUESTIONS_PER_MODULE,
-            userId: userIdForApi, // Pass the user ID for logging/context
+            userId: userIdForApi, 
           }),
         });
 
@@ -190,7 +189,7 @@
 
       } catch (e) {
         console.error("Failed to fetch questions:", e);
-        error = `Could not load quiz: ${e.message}. Check browser console for network errors.`;
+        error = `Could not load quiz: ${e.message}. The error was likely an "Invalid JWT". Please ensure your Supabase project is configured correctly and try logging in again.`;
         quizState = "error";
         mainRender(); 
       }
@@ -205,7 +204,6 @@
       const m = MODULES.find(m => m.id === currentView);
       let correctCount = 0;
 
-      // NOTE: Simple scoring logic: Assumes the first option (index 0) is the correct answer
       questions.forEach(q => {
         const i = selectedAnswers[q.id];
         if (i === 0) correctCount++;
@@ -214,9 +212,12 @@
       const finalScore = Math.round((correctCount / QUESTIONS_PER_MODULE) * 100);
 
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token || SUPABASE_ANON_KEY;
-        const userIdForApi = currentUserId || "guest_user"; 
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!session) throw new Error("Authentication session expired or not found. Please sign in again.");
+
+        const token = session.access_token;
+        const userIdForApi = currentUserId; 
 
         const submissionResponse = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
           method: 'POST',
@@ -249,6 +250,14 @@
     };
 
     // --- ACTION HANDLERS ---
+
+    const handleBackToDashboard = () => {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        currentView = null;
+        quizState = "loading"; // Reset quiz state 
+        mainRender();
+    };
 
     const handleQuizComplete = (score, isTimedOut) => {
       const id = currentView;
@@ -298,7 +307,6 @@
         try {
             const { error } = await supabase.auth.signOut();
             if (error) throw error;
-            // Redirect to the login page after signing out
             window.location.href = './index.html'; 
         } catch (e) {
             console.error("Sign out failed:", e);
@@ -490,21 +498,16 @@
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log("Supabase Client Initialized.");
             
-            // 1. Get the current user session
             const { data: { user } } = await supabase.auth.getUser();
 
             if (user) {
-                // User is logged in
                 currentUserId = user.id;
-                // Use preferred name if available, otherwise fallback to email
                 currentUserName = user.user_metadata.full_name || user.email || "User"; 
             } else {
-                // User is not logged in, redirect them
                 window.location.href = './index.html'; 
                 return;
             }
 
-            // 2. Load state and render dashboard
             appState = loadState(currentUserId);
             mainRender();
 
