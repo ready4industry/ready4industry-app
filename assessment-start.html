@@ -35,8 +35,7 @@
   ></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
+<script>
     // --- CONFIGURATION ---
     const MOCK_USERS = {
       user_keshav: { id: "user_keshav", name: "Keshav Karn", email: "keshav.karn@example.com" },
@@ -79,6 +78,7 @@
         return JSON.parse(data);
       } catch (e) {
         console.error("Failed to load state from localStorage:", e);
+        // Fallback to a clean, default state on error
         return { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
       }
     };
@@ -123,6 +123,7 @@
       currentView = null;
       mainRender();
     };
+
 
     // --- RENDER FUNCTIONS ---
     const renderDashboard = (c) => {
@@ -213,6 +214,12 @@
             </div>
         `;
     };
+    
+    // Stub function for the quiz view
+    const renderQuizView = (c) => {
+        c.innerHTML = `<h1 class="text-center mt-20 text-3xl">QUIZ VIEW COMING SOON</h1><button onclick="handleBackToDashboard()" class="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg">Back to Dashboard</button>`;
+    }
+
 
     const mainRender = () => {
       const c = document.getElementById("content-container");
@@ -222,8 +229,7 @@
           if (quizState === 'loading') {
               renderLoading(c);
           } else {
-              // Stub for actual quiz rendering
-              c.innerHTML = `<h1 class="text-center mt-20 text-3xl">QUIZ VIEW COMING SOON</h1><button onclick="handleBackToDashboard()">Back</button>`;
+              renderQuizView(c);
           }
       } else {
           // If currentView is null, show the dashboard
