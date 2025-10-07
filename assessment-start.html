@@ -35,10 +35,11 @@
   ></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
     // --- CONFIGURATION ---
+    // Note: MOCK_USERS is kept for the admin email contact but not for authentication
     const MOCK_USERS = {
-      user_keshav: { id: "user_keshav", name: "Keshav Karn", email: "keshav.karn@example.com" },
       user_admin: { id: "user_admin", name: "Mentor Admin", email: "ready4industry@gmail.com" },
     };
 
@@ -55,27 +56,32 @@
     const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNzD0zEBbMhX8RZ1PLH5R8";
 
-    let supabase; // Global Supabase client
+    let supabase; 
     const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL.replace(/\/$/, "")}/functions/v1/assessment-api`;
 
     // --- STATE ---
-    let currentUserId = "user_keshav"; // Mock user for initial testing
+    let currentUserId = null; // Will be set to the real Supabase user ID
+    let currentUserName = "Guest"; // Will be set to the real user name
     let appState = {};
-    let currentView = null; // null for dashboard, module ID for quiz
+    let currentView = null;
     let questions = [];
     let currentQuestionIndex = 0;
     let selectedAnswers = {};
     let timeLeft = TIME_LIMIT_SECONDS;
-    let quizState = "loading"; // loading, ready, submitting, error
+    let quizState = "loading"; 
     let error = null;
     let timerInterval = null;
 
     // --- UTILITIES ---
     const loadState = (userId) => {
+      // Use the actual user ID in localStorage key
+      const key = userId ? `assessmentState_${userId}` : `assessmentState_GUEST`;
       try {
-        const data = localStorage.getItem(`assessmentState_${userId}`);
+        const data = localStorage.getItem(key);
         // Ensure default state has all module keys for safety
-        if (!data) return { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
+        const defaultState = { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
+
+        if (!data) return defaultState;
         
         const loadedState = JSON.parse(data);
         // Ensure loaded state has all module keys
@@ -92,7 +98,8 @@
     };
 
     const saveState = () => {
-        localStorage.setItem(`assessmentState_${currentUserId}`, JSON.stringify(appState));
+        const key = currentUserId ? `assessmentState_${currentUserId}` : `assessmentState_GUEST`;
+        localStorage.setItem(key, JSON.stringify(appState));
     };
     
     const formatTime = (s) => {
@@ -120,7 +127,7 @@
         timeLeft--;
         if (timeLeft <= 0) {
           clearInterval(timerInterval);
-          handleSubmit(true); // Auto-submit on timeout
+          handleSubmit(true); 
         }
         const t = document.querySelector(".font-mono");
         if (t) {
@@ -141,25 +148,25 @@
 
       error = null;
       quizState = "loading";
-      mainRender(); // Show loading spinner
+      mainRender();
 
       try {
-        // Get the current session to acquire a valid access token
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        // Use the authenticated token if available, otherwise use the anonymous key
+        const { data: { session } } = await supabase.auth.getSession();
+        // Use the authenticated token if available, otherwise use the Anonymous Key
         const token = session?.access_token || SUPABASE_ANON_KEY;
+        const userIdForApi = currentUserId || "guest_user"; 
 
         const res = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`, // Key to auth the Edge Function
           },
           body: JSON.stringify({
             action: "generate_questions",
             topic: m.topic,
             count: QUESTIONS_PER_MODULE,
+            userId: userIdForApi, // Pass the user ID for logging/context
           }),
         });
 
@@ -178,14 +185,14 @@
         selectedAnswers = {};
         timeLeft = TIME_LIMIT_SECONDS;
         quizState = "ready";
-        mainRender(); // Render the quiz
+        mainRender();
         startTimer();
 
       } catch (e) {
         console.error("Failed to fetch questions:", e);
-        error = `Could not load quiz: ${e.message}`;
+        error = `Could not load quiz: ${e.message}. Check browser console for network errors.`;
         quizState = "error";
-        mainRender(); // Render error state
+        mainRender(); 
       }
     };
     
@@ -208,8 +215,8 @@
 
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        // Use the authenticated token if possible, otherwise rely on RLS/Anon
         const token = session?.access_token || SUPABASE_ANON_KEY;
+        const userIdForApi = currentUserId || "guest_user"; 
 
         const submissionResponse = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
           method: 'POST',
@@ -221,7 +228,7 @@
             action: 'submit_assessment',
             moduleId: m.id,
             score: finalScore,
-            userId: currentUserId, // Pass the mock user ID for submission
+            userId: userIdForApi, 
           }),
         });
 
@@ -230,13 +237,12 @@
           throw new Error(errData.error || `Submission failed with status ${submissionResponse.status}`);
         }
 
-        // If submission is successful, complete the quiz
         handleQuizComplete(finalScore, isTimedOut);
 
       } catch (e) {
         console.error("Submission failed:", e);
         error = `Failed to save results: ${e.message}`;
-        quizState = 'ready'; // Return to quiz to let user try again
+        quizState = 'ready'; 
         showUserMessage(error, 'error');
         mainRender();
       }
@@ -265,7 +271,7 @@
       quizState = "loading";
       saveState();
       mainRender();
-      fetchQuestions(); // Start the API call
+      fetchQuestions();
     };
 
     const handleAnswerSelect = (index) => {
@@ -287,6 +293,19 @@
         mainRender();
       }
     };
+    
+    const handleSignOut = async () => {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+            // Redirect to the login page after signing out
+            window.location.href = './index.html'; 
+        } catch (e) {
+            console.error("Sign out failed:", e);
+            showUserMessage(`Sign out failed: ${e.message}`, 'error');
+        }
+    };
+
 
     // --- RENDER FUNCTIONS ---
     
@@ -304,7 +323,6 @@
             <button onclick="handleBackToDashboard()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Back to Dashboard</button>
           </div>`;
       } else if (quizState === "loading" || questions.length === 0) {
-        // Fallback to loading screen if state is inconsistent
         return renderLoading(c); 
       } else if (quizState === "submitting") {
          content = `
@@ -373,23 +391,22 @@
     };
 
     const renderDashboard = (c) => {
-      const user = MOCK_USERS[currentUserId];
       const total = MODULES.length;
       const done = MODULES.filter((m) => appState.progress[m.id]?.completed).length; 
       const complete = done === total;
       const mentorEmail = MOCK_USERS.user_admin.email;
 
       c.innerHTML = `
-        <div class="fixed top-2 right-4 bg-white p-2 rounded-lg shadow-lg border border-indigo-100 flex items-center space-x-2">
-          <label for="user-switcher" class="text-sm font-medium text-gray-700">Current User (Mock Login):</label>
-          <select id="user-switcher" class="p-1 border rounded-md text-sm bg-gray-50">
-            ${Object.entries(MOCK_USERS).map(([id, u]) => `<option value="${id}" ${id === currentUserId ? "selected" : ""}>${u.name}</option>`).join("")}
-          </select>
+        <div class="fixed top-2 right-4 bg-white p-2 rounded-lg shadow-lg border border-indigo-100 flex items-center space-x-3">
+          <span class="text-sm font-medium text-gray-700">Logged in as: 
+            <span class="font-bold text-indigo-600">${currentUserName}</span>
+          </span>
+          <button onclick="handleSignOut()" class="text-sm px-3 py-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">Sign Out</button>
         </div>
 
         <header class="text-center mb-10 pt-10">
           <h1 class="text-4xl font-extrabold text-indigo-700">Skills Challenge Dashboard</h1>
-          <p class="mt-2 text-xl text-gray-500">Welcome, ${user.name}. Complete the modules below to unlock your final report.</p>
+          <p class="mt-2 text-xl text-gray-500">Welcome, ${currentUserName}. Complete the modules below to unlock your final report.</p>
           <div class="mt-6 w-full max-w-2xl mx-auto">
             <div class="h-3 bg-gray-200 rounded-full">
               <div class="h-3 bg-indigo-500 rounded-full transition-all-slow" style="width:${(done / total) * 100}%"></div>
@@ -400,7 +417,6 @@
 
         <div class="max-w-4xl mx-auto space-y-6">
           ${MODULES.map((m) => {
-            // Defensive access implemented here
             const s = appState.progress[m.id] || { completed: false, score: 0 }; 
             const isCompleted = s.completed;  
             const btnText = isCompleted ? `Review Score: ${s.score}%` : "Start Assessment";
@@ -430,13 +446,6 @@
         </div>
       `;
 
-      // Attach event listeners after content is rendered
-      document.getElementById("user-switcher").addEventListener("change", (e) => {
-          currentUserId = e.target.value;
-          appState = loadState(currentUserId);
-          mainRender();
-      });
-
       document.querySelectorAll(".start-quiz-button").forEach((btn) => {
         btn.addEventListener("click", () => handleStartQuiz(btn.getAttribute("data-module-id")));
       });
@@ -465,27 +474,37 @@
       const c = document.getElementById("content-container");
       
       if (currentView) {
-          // If currentView is set, we are in the quiz/loading screen
           if (quizState === 'loading' || quizState === 'ready' || quizState === 'submitting' || quizState === 'error') {
               renderQuizView(c);
           } else {
-              // Safety fallback
               renderLoading(c); 
           }
       } else {
-          // If currentView is null, show the dashboard
           renderDashboard(c);
       }
     };
 
     // --- INIT ---
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("DOMContentLoaded", async () => {
         try {
-            // Initialize Supabase client
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log("Supabase Client Initialized.");
             
-            // Load state and render dashboard
+            // 1. Get the current user session
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (user) {
+                // User is logged in
+                currentUserId = user.id;
+                // Use preferred name if available, otherwise fallback to email
+                currentUserName = user.user_metadata.full_name || user.email || "User"; 
+            } else {
+                // User is not logged in, redirect them
+                window.location.href = './index.html'; 
+                return;
+            }
+
+            // 2. Load state and render dashboard
             appState = loadState(currentUserId);
             mainRender();
 
@@ -495,6 +514,7 @@
                 <div class="max-w-xl mx-auto text-center p-8 bg-red-100 border border-red-400 text-red-700 rounded-xl shadow-lg mt-20">
                     <h2 class="text-2xl font-bold mb-4">Initial Script Failed 🛑</h2>
                     <p class="mt-4 font-mono text-sm break-all">Error: ${e.message || 'Check your browser console.'}</p>
+                    <p class="mt-4"><a href="./index.html" class="text-indigo-600 hover:underline">Return to Login</a></p>
                 </div>
             `;
             showUserMessage(`Critical Init Error: ${e.message}`, 'error');
