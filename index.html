@@ -276,16 +276,6 @@
             }
         };
 
-        const payload = {
-            contents: [{ parts: [{ text: userQuery }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: responseSchema
-            },
-            temperature: 0.0,
-        };
-
         try {
             const response = await fetch(GEMINI_API_URL, {
                 method: 'POST',
@@ -299,8 +289,13 @@
                     // Exponential backoff retry logic
                     return fetchQuizQuestions(quizType, retries - 1, delay * 2); 
                 }
+                
+                // --- START OF IMPROVED ERROR LOGGING AND MESSAGE ---
+                const errorStatus = response.status;
                 const errorBody = await response.text();
-                throw new Error(`API response failed with status: ${response.status}. Body: ${errorBody.substring(0, 100)}...`);
+                console.error(`Gemini API Fetch Failed (Status: ${errorStatus}):`, errorBody);
+                throw new Error(`API response failed with status: ${errorStatus}. This usually means the API key is invalid or your domain (GitHub Pages URL) is not authorized for use with this API key.`);
+                // --- END OF IMPROVED ERROR LOGGING AND MESSAGE ---
             }
 
             const result = await response.json();
@@ -320,9 +315,9 @@
 
         } catch (error) {
             console.error("Fetch Quiz Error:", error);
-            showMessage("Quiz Generation Failed", `The quiz generation failed. Please try starting the quiz again. Error: ${error.message}`);
-            dashboardView.classList.remove('hidden');
-            quizView.classList.add('hidden');
+            // Use the improved error message if available, otherwise fallback
+            showMessage("Quiz Generation Failed", error.message.includes("API response failed") ? error.message : `The quiz generation failed due to a network or parsing error. Please check the console for details and try again.`);
+            resetToDashboard(); // Reset the UI gracefully
             return null;
         }
     }
@@ -361,7 +356,7 @@
             quizControls.classList.remove('hidden');
             submitButton.classList.remove('hidden');
         } else {
-            // Revert UI if fetch failed (handled in fetchQuizQuestions error block)
+            // The error handling inside fetchQuizQuestions already called resetToDashboard()
         }
     }
 
@@ -525,13 +520,15 @@
         updateSimulatedProgress(percentage);
     }
     
-    function resetToDashboard() {
+    window.resetToDashboard = function() {
         quizData = [];
         userAnswers = [];
         currentQuestionIndex = 0;
         stopTimer();
         currentQuizTitle = '';
         
+        // Reset timer display to default
+        quizTimerDisplay.textContent = "10:00"; 
         quizView.classList.add('hidden');
         dashboardView.classList.remove('hidden');
     }
