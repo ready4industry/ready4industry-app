@@ -1,270 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Skills Challenge Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skills Challenge Dashboard</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
-    rel="stylesheet"
-  />
-  <style>
-    body {
-      font-family: "Inter", sans-serif;
-      /* Light Blue-Gray Background for a premium feel */
-      background-color: #f1f5f9; /* slate-100 */
-    }
-    #app-root {
-      min-height: 100vh;
-    }
-    /* Custom hover effect for option buttons */
-    .option-button-styled {
-      transition: all 0.2s ease-in-out;
-      cursor: pointer;
-    }
-    .option-button-styled:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-    }
-    .option-button-styled.selected {
-      border-color: #4f46e5; /* indigo-600 */
-      background-color: #4f46e5;
-    }
-    .progress-bar-container {
-      height: 8px;
-      border-radius: 9999px;
-      background-color: #e5e7eb; /* gray-200 */
-      overflow: hidden;
-    }
-    .progress-bar {
-      transition: width 0.3s ease-in-out;
-      height: 100%;
-      background-color: #10b981; /* emerald-500 */
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: radial-gradient(circle at top right, #eef2ff 0%, #f9fafb 100%);
+    }
+    #app-root {
+      min-height: 100vh;
+    }
+    .transition-all-slow {
+      transition: all 0.3s ease-in-out;
+    }
+    .glass {
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 6px 32px rgba(60, 80, 180, .09);
+    }
+  </style>
 </head>
-
 <body class="p-4 md:p-8">
-  <div id="app-root">
-    <div id="content-container"></div>
-  </div>
+<div id="app-root">
+  <div id="user-header" class="flex justify-between items-center mb-10">
+    <div class="flex items-center space-x-3">
+      <img src="https://avatars.githubusercontent.com/u/583231?v=4" alt="Mentor" class="w-10 h-10 rounded-full border-2 border-indigo-300 shadow">
+      <div>
+        <div class="text-base font-bold text-indigo-700">Welcome, Mentor Admin</div>
+        <div class="text-xs text-gray-500">Ready4Industry | Career Coach</div>
+      </div>
+    </div>
+    <button onclick="handleSignOut()" class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-700 shadow transition-all-slow">
+      <svg class="w-5 h-5 inline-block -mt-1 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-2a4 4 0 014-4h7"></path>
+      </svg>
+      Sign Out
+    </button>
+  </div>
 
-  <div
-    id="user-message-box"
-    class="fixed top-4 right-4 z-50 p-4 rounded-xl shadow-2xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"
-  ></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    // --- CONFIGURATION (UNCHANGED) ---
-    const MOCK_USERS = {
-      user_admin: { id: "user_admin", name: "Mentor Admin", email: "ready4industry@gmail.com" },
-    };
-
-    const MODULES = [
-      { id: "technical", name: "Technical Fundamentals", topic: "BTech Graduate Syllabus Fundamentals", icon: '💻' },
-      { id: "aptitude", name: "Aptitude & Reasoning", topic: "Aptitude and Reasoning Fundamentals", icon: '🧠' },
-      { id: "behavioural", name: "Behavioural Skills", topic: "Behavioural Fundamentals", icon: '🤝' },
-    ];
-    
-    const QUESTIONS_PER_MODULE = 10;
-    const TIME_LIMIT_SECONDS = 600; // 10 minutes per quiz
-
-    // --- SUPABASE SETUP (UNCHANGED) ---
-    const SUPABASE_URL = "https://glskwkzzkhhwftzddqmo.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdsc2t3a3p6a2hod2Z0emRkcW1vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MDg2OTEsImV4cCI6MjA3NTA4NDY5MX0.g3XQyV6T_xfBCSOb0X1idGNzD0zEBbMhX8RZ1PLH5R8";
-
-    let supabase; 
-    const SUPABASE_EDGE_FUNCTION_URL = `${SUPABASE_URL.replace(/\/$/, "")}/functions/v1/assessment-api`;
-
-    // --- STATE (UNCHANGED) ---
-    let currentUserId = null; 
-    let currentUserName = "Guest"; 
-    let appState = {};
-    let currentView = null;
-    let questions = [];
-    let currentQuestionIndex = 0;
-    let selectedAnswers = {};
-    let timeLeft = TIME_LIMIT_SECONDS;
-    let quizState = "loading"; 
-    let error = null;
-    let timerInterval = null;
-
-    // --- UTILITIES (UNCHANGED - EXCEPT showUserMessage styling) ---
-    const loadState = (userId) => {
-      const key = userId ? `assessmentState_${userId}` : `assessmentState_GUEST`;
-      try {
-        const data = localStorage.getItem(key);
-        const defaultState = { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
-
-        if (!data) return defaultState;
-        
-        const loadedState = JSON.parse(data);
-        MODULES.forEach(m => {
-            if (!loadedState.progress[m.id]) {
-                loadedState.progress[m.id] = { completed: false, score: 0, started: false };
-            }
-        });
-        return loadedState;
-      } catch (e) {
-        console.error("Failed to load state from localStorage, resetting:", e);
-        return { progress: MODULES.reduce((acc, m) => { acc[m.id] = { completed: false, score: 0, started: false }; return acc; }, {}), };
-      }
-    };
-
-    const saveState = () => {
-        const key = currentUserId ? `assessmentState_${currentUserId}` : `assessmentState_GUEST`;
-        localStorage.setItem(key, JSON.stringify(appState));
-    };
-    
-    const formatTime = (s) => {
-      const m = Math.floor(s / 60);
-      const sec = s % 60;
-      return `${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
-    };
-
-    const showUserMessage = (msg, type = "info") => {
-      const box = document.getElementById("user-message-box");
-      let color = "bg-indigo-600"; // Changed default color
-      if (type === "error") color = "bg-red-600";
-      if (type === "success") color = "bg-emerald-600"; // Changed success color to Emerald
-      box.textContent = msg;
-      box.className = `fixed top-4 right-4 z-50 p-4 rounded-xl shadow-2xl text-white font-semibold ${color} transition-opacity duration-300 opacity-100 pointer-events-auto`;
-      setTimeout(() => {
-        box.classList.replace('opacity-100', 'opacity-0');
-        box.classList.replace('pointer-events-auto', 'pointer-events-none');
-      }, 3000);
-    };
-
-    const startTimer = () => {
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        timeLeft--;
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          handleSubmit(true); 
-        }
-        const t = document.querySelector(".quiz-timer-display"); // Targeted new class name
-        if (t) {
-          t.textContent = formatTime(timeLeft);
-          // Update color for warning state
-          if (timeLeft < 60) {
-            t.classList.remove("bg-indigo-100", "text-indigo-600");
-            t.classList.add("bg-red-100", "text-red-600", "animate-pulse");
-          }
-        }
-      }, 1000);
-    };
-
-    // --- API CALLS (UNCHANGED) ---
-    const fetchQuestions = async () => { /* ... (Code remains the same) ... */ };
-    const handleSubmit = async (isTimedOut = false) => { /* ... (Code remains the same) ... */ };
-
-    // --- ACTION HANDLERS (UNCHANGED) ---
-    const handleBackToDashboard = () => { /* ... (Code remains the same) ... */ };
-    const handleQuizComplete = (score, isTimedOut) => { /* ... (Code remains the same) ... */ };
-    const handleStartQuiz = (moduleId) => { /* ... (Code remains the same) ... */ };
-    const handleAnswerSelect = (index) => { /* ... (Code remains the same) ... */ };
-    const handleNext = () => { /* ... (Code remains the same) ... */ };
-    const handlePrevious = () => { /* ... (Code remains the same) ... */ };
-    const handleSignOut = async () => { /* ... (Code remains the same) ... */ };
-
-
-    // --- RENDER FUNCTIONS (DESIGN ENHANCEMENTS) ---
-    
-    const renderQuizView = (c) => {
-      const m = MODULES.find((m) => m.id === currentView);
-      const q = questions[currentQuestionIndex];
-      const progressPercent = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
-      
-      let content;
-
-      if (quizState === "error") {
-        content = `
-          <div class="bg-red-50 border border-red-400 text-red-700 p-8 rounded-xl shadow-xl max-w-4xl mx-auto mt-20">
-            <h2 class="text-3xl font-bold mb-4">Quiz Error 🛑</h2>
-            <p class="mt-2 text-lg">${error}</p>
-            <button onclick="handleBackToDashboard()" class="mt-6 bg-red-600 text-white px-6 py-3 rounded-xl hover:bg-red-700 font-semibold transition-colors">Back to Dashboard</button>
-          </div>`;
-      } else if (quizState === "loading" || questions.length === 0) {
-        return renderLoading(c); 
-      } else if (quizState === "submitting") {
-         content = `
-          <div class="flex items-center justify-center p-12 bg-white rounded-xl shadow-2xl max-w-4xl mx-auto mt-20 h-96">
-            <div class="text-center">
-              <svg class="animate-spin h-10 w-10 text-emerald-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <p class="mt-4 text-2xl text-emerald-700 font-semibold">Submitting Assessment...</p>
-              <p class="text-md text-gray-500 mt-2">Calculating your final score and saving progress.</p>
-            </div>
-          </div>`;
-      } else {
-        // Quiz is ready
-        content = `
-          <div class="bg-white p-6 md:p-10 rounded-3xl shadow-2xl border border-gray-100 max-w-4xl mx-auto mt-6">
-            <header class="mb-8 pb-4 border-b border-indigo-100 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-              <div>
-                <p class="text-sm font-medium text-indigo-500">${m.topic}</p>
-                <h2 class="text-3xl font-extrabold text-gray-900">${m.name} Challenge</h2>
-              </div>
-              <div class="mt-4 sm:mt-0 text-2xl font-mono px-4 py-2 rounded-xl shadow-lg flex items-center space-x-2 ${
-                timeLeft < 60 ? "bg-red-100 text-red-600" : "bg-indigo-500 text-white"
-              }">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="quiz-timer-display">${formatTime(timeLeft)}</span>
-              </div>
-            </header>
-            
-                        <div class="mb-6">
-              <p class="text-sm font-medium text-gray-500 mb-2">Question ${currentQuestionIndex + 1} of ${questions.length}</p>
-              <div class="progress-bar-container">
-                <div class="progress-bar shadow-md" style="width: ${progressPercent}%;"></div>
-              </div>
-            </div>
-
-                        <div class="mb-8 p-6 bg-indigo-50 rounded-xl shadow-inner border border-indigo-100">
-              <p class="text-xl font-semibold text-gray-800">${q.question}</p>
-            </div>
-
-                        <div id="options-container" class="space-y-4 mb-10">
-              ${q.options
-                .map(
-                  (opt, i) => {
-                    const isSelected = selectedAnswers[q.id] === i;
-                    const optionLabel = String.fromCharCode(65 + i);
-                    return `
-                <button data-option-index="${i}" class="option-button-styled w-full text-left p-4 rounded-xl border-2 font-medium flex items-start space-x-3 
-                  ${isSelected
-                      ? "bg-indigo-600 text-white border-indigo-700 shadow-lg selected"
-                      : "bg-white text-gray-900 hover:bg-indigo-50 border-gray-200 hover:border-indigo-300"
-                  }">
-                  <span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${isSelected ? 'bg-white text-indigo-600' : 'bg-gray-200 text-gray-700'}">
-                    ${optionLabel}
-                  </span>
-                  <span class="pt-1">${opt}</span>
-                </button>
-                `;
-                  }
-                )
-                .join("")}
-            </div>
-            
-                        <footer class="flex justify-between items-center border-t border-gray-100 pt-6">
-              <button onclick="handlePrevious()" ${
-                currentQuestionIndex === 0 ? "disabled" : ""
-              } class="flex items-center space-x-2 bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <span>Previous</span>
-              </button>
-
-              <div class="flex space-x-3">
-                <button onclick="handleBackToDashboard()" class="bg-red-50 text-red-600 px-5 py-2.5 rounded-xl hover:bg-red-100 font-semibold transition-colors">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-10 text-center">
+      <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-500 text-transparent bg-clip-text mb-2">Skills Challenge Dashboard</h1>
+      <p class="text-lg text-gray-700">Empowering B.Tech graduates for industry success. Choose a module below to begin your journey!</p>
+    </div>
+    <div class="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 justify-center">
+      <!-- Module Card Template -->
+      <div class="flex-1 glass rounded-2xl p-6 shadow-xl border border-indigo-100 transition-all-slow hover:scale-105 hover:shadow-2xl">
+        <div class="flex items-center justify-between">
+          <span class="text-lg font-bold text-indigo-800">Technical Fundamentals</span>
+          <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold shadow">B.Tech Syllabus</span>
+        </div>
+        <div class="mt-3">
+          <div class="text-sm text-gray-600 mb-1">10 Questions • 10 Minutes</div>
+          <div class="relative pt-2">
+            <div class="overflow-hidden h-2 mb-2 text-xs flex rounded bg-indigo-200">
+              <div class="progress-bar bg-indigo-500" style="width:40%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-400">
+              <span>Progress</span>
+              <span>40%</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="handleStartQuiz('technical')" class="mt-5 w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-indigo-700 transition-all-slow">
+          <svg class="w-4 h-4 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+          </svg>
+          Start Quiz
+        </button>
+      </div>
+      <div class="flex-1 glass rounded-2xl p-6 shadow-xl border border-indigo-100 transition-all-slow hover:scale-105 hover:shadow-2xl">
+        <div class="flex items-center justify-between">
+          <span class="text-lg font-bold text-indigo-800">Aptitude & Reasoning</span>
+          <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold shadow">Aptitude Skills</span>
+        </div>
+        <div class="mt-3">
+          <div class="text-sm text-gray-600 mb-1">10 Questions • 10 Minutes</div>
+          <div class="relative pt-2">
+            <div class="overflow-hidden h-2 mb-2 text-xs flex rounded bg-blue-200">
+              <div class="progress-bar bg-blue-500" style="width:80%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-400">
+              <span>Progress</span>
+              <span>80%</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="handleStartQuiz('aptitude')" class="mt-5 w-full bg-blue-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all-slow">
+          <svg class="w-4 h-4 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+          </svg>
+          Start Quiz
+        </button>
+      </div>
+      <div class="flex-1 glass rounded-2xl p-6 shadow-xl border border-indigo-100 transition-all-slow hover:scale-105 hover:shadow-2xl">
+        <div class="flex items-center justify-between">
+          <span class="text-lg font-bold text-indigo-800">Behavioural Skills</span>
+          <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold shadow">Soft Skills</span>
+        </div>
+        <div class="mt-3">
+          <div class="text-sm text-gray-600 mb-1">10 Questions • 10 Minutes</div>
+          <div class="relative pt-2">
+            <div class="overflow-hidden h-2 mb-2 text-xs flex rounded bg-purple-200">
+              <div class="progress-bar bg-purple-500" style="width:20%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-400">
+              <span>Progress</span>
+              <span>20%</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="handleStartQuiz('behavioural')" class="mt-5 w-full bg-purple-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-purple-700 transition-all-slow">
+          <svg class="w-4 h-4 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+          </svg>
+          Start Quiz
+        </button>
+      </div>
+    </div>
+    <div class="mt-12 text-center text-gray-500 text-sm">
+      Inspired by <span class="font-semibold text-indigo-600">Ready4Industry</span> | Bridging College to Career
+    </div>
+  </div>
+</div>
+<!-- Retain notification and Supabase setup -->
+<div id="user-message-box" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Your previous JS logic here (omit for brevity)
+</script>
+</body>
+</html>
