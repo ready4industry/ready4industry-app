@@ -2,138 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Skills Challenge Dashboard</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ready4Industry LMS Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: "Inter", sans-serif;
-      background: radial-gradient(circle at top right, #eef2ff 0%, #f9fafb 100%);
-    }
-    #app-root {
-      min-height: 100vh;
-    }
-    .transition-all-slow {
-      transition: all 0.3s ease-in-out;
-    }
-    .glass {
-      background: rgba(255,255,255,0.65);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 6px 32px rgba(60, 80, 180, .09);
-    }
+    body { font-family: "Inter", sans-serif; background: linear-gradient(120deg, #ecf2ff 0%, #f9fafb 100%); }
+    .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); }
+    .portal-shadow { box-shadow: 0 8px 40px rgba(47,70,255,0.10); }
   </style>
 </head>
-<body class="p-4 md:p-8">
-<div id="app-root">
-  <div id="user-header" class="flex justify-between items-center mb-10">
-    <div class="flex items-center space-x-3">
-      <img src="https://avatars.githubusercontent.com/u/583231?v=4" alt="Mentor" class="w-10 h-10 rounded-full border-2 border-indigo-300 shadow">
+<body class="min-h-screen flex items-center justify-center p-2 md:p-6">
+  <div class="max-w-5xl w-full glass rounded-xl portal-shadow p-8 md:p-16">
+    <header class="flex flex-col md:flex-row items-center justify-between mb-8">
       <div>
-        <div class="text-base font-bold text-indigo-700">Welcome, Mentor Admin</div>
-        <div class="text-xs text-gray-500">Ready4Industry | Career Coach</div>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-700 mb-2">Ready4Industry Learning Portal</h1>
+        <div class="text-lg text-gray-600">Empowering engineers for real-world success.</div>
       </div>
-    </div>
-    <button onclick="handleSignOut()" class="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-700 shadow transition-all-slow">
-      <svg class="w-5 h-5 inline-block -mt-1 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7"></path>
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-2a4 4 0 014-4h7"></path>
-      </svg>
-      Sign Out
-    </button>
-  </div>
+      <img src="https://avatars.githubusercontent.com/u/583231?v=4" class="w-14 h-14 rounded-lg border-2 border-indigo-300 shadow mt-6 md:mt-0" alt="Mentor Admin"/>
+    </header>
 
-  <div class="max-w-4xl mx-auto">
-    <div class="mb-10 text-center">
-      <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-500 text-transparent bg-clip-text mb-2">Skills Challenge Dashboard</h1>
-      <p class="text-lg text-gray-700">Empowering B.Tech graduates for industry success. Choose a module below to begin your journey!</p>
-    </div>
-    <div class="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 justify-center">
-      <!-- Module Card Template -->
-      <div class="flex-1 glass rounded-2xl p-6 shadow-xl border border-indigo-100 transition-all-slow hover:scale-105 hover:shadow-2xl">
-        <div class="flex items-center justify-between">
-          <span class="text-lg font-bold text-indigo-800">Technical Fundamentals</span>
-          <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold shadow">B.Tech Syllabus</span>
-        </div>
-        <div class="mt-3">
-          <div class="text-sm text-gray-600 mb-1">10 Questions • 10 Minutes</div>
-          <div class="relative pt-2">
-            <div class="overflow-hidden h-2 mb-2 text-xs flex rounded bg-indigo-200">
-              <div class="progress-bar bg-indigo-500" style="width:40%"></div>
-            </div>
-            <div class="flex justify-between text-xs text-gray-400">
-              <span>Progress</span>
-              <span>40%</span>
-            </div>
-          </div>
-        </div>
-        <button onclick="handleStartQuiz('technical')" class="mt-5 w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-indigo-700 transition-all-slow">
-          <svg class="w-4 h-4 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+    <div class="flex flex-col md:flex-row justify-center gap-8">
+      <button onclick="window.location.href='#technical'" class="flex-1 bg-gradient-to-br from-indigo-500 to-indigo-700 text-white font-bold py-8 px-4 rounded-2xl shadow-lg hover:scale-105 transition-all duration-200 text-2xl group relative">
+        <span class="absolute left-6 top-7">
+          <svg class="w-7 h-7 text-white opacity-80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6 8H6a2 2 0 01-2-2V6a2 2 0 012-2h7l5 5v13a2 2 0 01-2 2z"/>
           </svg>
-          Start Quiz
-        </button>
-      </div>
-      <div class="flex-1 glass rounded-2xl p-6 shadow-xl border border-indigo-100 transition-all-slow hover:scale-105 hover:shadow-2xl">
-        <div class="flex items-center justify-between">
-          <span class="text-lg font-bold text-indigo-800">Aptitude & Reasoning</span>
-          <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold shadow">Aptitude Skills</span>
-        </div>
-        <div class="mt-3">
-          <div class="text-sm text-gray-600 mb-1">10 Questions • 10 Minutes</div>
-          <div class="relative pt-2">
-            <div class="overflow-hidden h-2 mb-2 text-xs flex rounded bg-blue-200">
-              <div class="progress-bar bg-blue-500" style="width:80%"></div>
-            </div>
-            <div class="flex justify-between text-xs text-gray-400">
-              <span>Progress</span>
-              <span>80%</span>
-            </div>
-          </div>
-        </div>
-        <button onclick="handleStartQuiz('aptitude')" class="mt-5 w-full bg-blue-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-blue-700 transition-all-slow">
-          <svg class="w-4 h-4 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </span>
+        Technical Fundamentals
+        <div class="mt-3 text-base font-medium text-indigo-100/80">Industry-ready BTech syllabus</div>
+      </button>
+      <button onclick="window.location.href='#aptitude'" class="flex-1 bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold py-8 px-4 rounded-2xl shadow-lg hover:scale-105 transition-all duration-200 text-2xl group relative">
+        <span class="absolute left-6 top-7">
+          <svg class="w-7 h-7 text-white opacity-80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 9h4v4h-4z" />
           </svg>
-          Start Quiz
-        </button>
-      </div>
-      <div class="flex-1 glass rounded-2xl p-6 shadow-xl border border-indigo-100 transition-all-slow hover:scale-105 hover:shadow-2xl">
-        <div class="flex items-center justify-between">
-          <span class="text-lg font-bold text-indigo-800">Behavioural Skills</span>
-          <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold shadow">Soft Skills</span>
-        </div>
-        <div class="mt-3">
-          <div class="text-sm text-gray-600 mb-1">10 Questions • 10 Minutes</div>
-          <div class="relative pt-2">
-            <div class="overflow-hidden h-2 mb-2 text-xs flex rounded bg-purple-200">
-              <div class="progress-bar bg-purple-500" style="width:20%"></div>
-            </div>
-            <div class="flex justify-between text-xs text-gray-400">
-              <span>Progress</span>
-              <span>20%</span>
-            </div>
-          </div>
-        </div>
-        <button onclick="handleStartQuiz('behavioural')" class="mt-5 w-full bg-purple-600 text-white py-2 rounded-lg font-semibold shadow hover:bg-purple-700 transition-all-slow">
-          <svg class="w-4 h-4 inline-block mr-2 -mt-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+        </span>
+        Aptitude & Reasoning
+        <div class="mt-3 text-base font-medium text-blue-100/80">Quantitative, logic, and reasoning skills</div>
+      </button>
+      <button onclick="window.location.href='#behavioural'" class="flex-1 bg-gradient-to-br from-purple-500 to-purple-700 text-white font-bold py-8 px-4 rounded-2xl shadow-lg hover:scale-105 transition-all duration-200 text-2xl group relative">
+        <span class="absolute left-6 top-7">
+          <svg class="w-7 h-7 text-white opacity-80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 6.636a9 9 0 11-12.728 0M9 9h6v6H9V9z" />
           </svg>
-          Start Quiz
-        </button>
-      </div>
+        </span>
+        Behavioural Skills
+        <div class="mt-3 text-base font-medium text-purple-100/80">Soft skills for career success</div>
+      </button>
     </div>
-    <div class="mt-12 text-center text-gray-500 text-sm">
-      Inspired by <span class="font-semibold text-indigo-600">Ready4Industry</span> | Bridging College to Career
-    </div>
+
+    <footer class="mt-14 text-center text-gray-400">
+      <span>© 2025 Ready4Industry | Bridging College to Career</span>
+    </footer>
   </div>
-</div>
-<!-- Retain notification and Supabase setup -->
-<div id="user-message-box" class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-xl text-white font-semibold transition-opacity duration-300 opacity-0 pointer-events-none"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  // Your previous JS logic here (omit for brevity)
-</script>
 </body>
 </html>
