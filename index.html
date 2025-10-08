@@ -227,6 +227,7 @@
             // Call the secure local endpoint instead of the Perplexity API directly
             const response = await fetch(PROXY_ENDPOINT, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: { 
                     'Content-Type': 'application/json',
                     // NO AUTHORIZATION HEADER HERE! The backend handles it.
