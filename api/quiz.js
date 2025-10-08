@@ -18,7 +18,7 @@ function getSystemPrompt(quizType) {
     }
 }
 
-// --- JSON Output Schema Instruction ---
+// --- JSON Output Schema Definition ---
 const JSON_INSTRUCTION_SCHEMA = {
     type: "array",
     items: {
@@ -64,10 +64,13 @@ export default async function handler(request) {
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userQuery }
             ],
-            // ** 🚀 FIX APPLIED HERE 🚀 **
+            // ** 🚀 FINAL FIX APPLIED HERE 🚀 **
             response_format: {
-                type: "json_schema", // Corrected 'type' value for Perplexity API
-                json_schema: JSON_INSTRUCTION_SCHEMA // Corrected key to 'json_schema'
+                type: "json_schema",
+                // The 'json_schema' key must contain a 'schema' property
+                json_schema: {
+                    schema: JSON_INSTRUCTION_SCHEMA 
+                }
             },
             temperature: 0.7 
         };
