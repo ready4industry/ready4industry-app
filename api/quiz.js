@@ -1,5 +1,3 @@
-// /api/quiz.js (or similar location for your serverless provider)
-
 // 🔑 THE ONLY CHANGE: Use the name you stored in GitHub Secrets
 const PERPLEXITY_API_KEY = process.env.PERPLEXITY_KEY; 
 
@@ -66,9 +64,10 @@ export default async function handler(request) {
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userQuery }
             ],
+            // ** 🚀 FIX APPLIED HERE 🚀 **
             response_format: {
-                type: "json_object",
-                schema: JSON_INSTRUCTION_SCHEMA
+                type: "json_schema", // Corrected 'type' value for Perplexity API
+                json_schema: JSON_INSTRUCTION_SCHEMA // Corrected key to 'json_schema'
             },
             temperature: 0.7 
         };
@@ -87,7 +86,8 @@ export default async function handler(request) {
         if (!apiResponse.ok) {
             const errorBody = await apiResponse.text();
             console.error("Perplexity API Error:", errorBody);
-            return new Response(`Perplexity API Error: ${apiResponse.status}`, { status: apiResponse.status });
+            // Return the actual API status code for better debugging (e.g., 401 if the key is bad)
+            return new Response(`Perplexity API Error: ${apiResponse.status} - ${errorBody}`, { status: apiResponse.status });
         }
 
         const result = await apiResponse.json();
@@ -117,6 +117,6 @@ export default async function handler(request) {
 
     } catch (error) {
         console.error("Serverless Function Error:", error);
-        return new Response('Server Error processing request.', { status: 500 });
+        return new Response(`Server Error processing request: ${error.message}`, { status: 500 });
     }
 }
