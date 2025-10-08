@@ -53,21 +53,21 @@ export default async function handler(request) {
     }
 
     try {
-        const { quizType, model } = await request.json();
+        // 🚀 FIX: Removed 'model' from destructuring since we are hardcoding a known-good model
+        const { quizType } = await request.json(); 
 
         const systemPrompt = getSystemPrompt(quizType);
         const userQuery = "Generate the 10 multiple-choice quiz questions now, strictly in the JSON array format defined in the system instructions. Do not include any explanation or markdown outside the JSON.";
 
         const perplexityPayload = {
-            model: model,
+            // 🚀 FIX: Hardcoded a currently supported model that works with JSON
+            model: 'llama-3-8b-instruct', 
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userQuery }
             ],
-            // ** 🚀 FINAL FIX APPLIED HERE 🚀 **
             response_format: {
                 type: "json_schema",
-                // The 'json_schema' key must contain a 'schema' property
                 json_schema: {
                     schema: JSON_INSTRUCTION_SCHEMA 
                 }
@@ -80,7 +80,6 @@ export default async function handler(request) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                // This is where the secret is used!
                 'Authorization': `Bearer ${PERPLEXITY_API_KEY}` 
             },
             body: JSON.stringify(perplexityPayload)
@@ -88,8 +87,7 @@ export default async function handler(request) {
 
         if (!apiResponse.ok) {
             const errorBody = await apiResponse.text();
-            console.error("Perplexity API Error:", errorBody);
-            // Return the actual API status code for better debugging (e.g., 401 if the key is bad)
+            console.error("Perplexity API Error:", apiResponse.status, errorBody);
             return new Response(`Perplexity API Error: ${apiResponse.status} - ${errorBody}`, { status: apiResponse.status });
         }
 
