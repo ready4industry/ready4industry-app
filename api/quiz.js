@@ -61,7 +61,7 @@ export default async function handler(request) {
 
         const perplexityPayload = {
             // 🚀 FIX: Hardcoded a currently supported model that works with JSON
-            model: 'sonar pro', 
+            model: 'sonar-pro', 
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userQuery }
