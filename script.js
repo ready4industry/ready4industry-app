@@ -56,7 +56,7 @@ function navigateTo(screen) {
 
 // Loads 10 random questions from the database
 async function loadQuestions() {
-    // 🚨 CRITICAL: Uses lowercase snake_case column names to match your final table schema 🚨
+    // 🚨 CRITICAL: Uses lowercase snake_case column names to match your table schema 🚨
     const { data: questions, error: questionError } = await supabaseClient
         .from('questions')
         .select('id, question_text, option_a, option_b, option_c, option_d, correct_answer')
@@ -157,14 +157,17 @@ document.getElementById('registration-form').addEventListener('submit', async (e
         return;
     }
 
-    // SUCCESS: Store ID and navigate (Fix for navigating back to the same page)
+    // SUCCESS: Store ID and navigate (The definitive navigation fix)
     if (data && data.id) {
         candidateID = data.id;
         candidateNameDisplay.textContent = name;
         candidateEmailDisplay.textContent = email;
         
-        // Clear form and force navigation
+        // 1. Clear the form to prevent accidental resubmission/loop
         document.getElementById('registration-form').reset();
+        
+        // 2. ABSOLUTE FIX: Update the URL hash and force navigation
+        window.location.hash = '#instructions'; 
         navigateTo(instructionsScreen); 
     } else {
         // Fallback for unexpected empty response
