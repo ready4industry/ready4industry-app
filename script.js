@@ -1,244 +1,294 @@
-// script.js (FINAL VERSION - Corrected and Roll Number Optional)
+// ===============================================
+// 1. SUPABASE CONNECTION DETAILS - UPDATE THESE TWO LINES
+// ===============================================
+const SUPABASE_URL = 'https://bijcdrtlmuwosrtqivtx.supabase.co'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpamNkcnRsbXV3b3NydHFpdnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDExODgsImV4cCI6MjA3NTQ3NzE4OH0.uraVwNy-s7CmR49G70O9M_fTZoCSTnaOtHavRp0m9Dk'; 
 
-// 🚨 IMPORTANT: REPLACE THESE WITH YOUR ACTUAL SUPABASE KEYS 🚨
-const SUPABASE_URL = 'https://bgqwsglxszzhtuameled.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncXdzZ2x4c3p6aHR1YW1lbGVkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTk5ODg4NywiZXhwIjoyMDc1NTc0ODg3fQ.PcP42rYC_8A0A0QSy-K2dVuvUs-iKqG7dDvwTK9BvHg';
-
-// Use a client name that avoids conflicts
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// --- ASSESSMENT CONFIGURATION ---
-const TOTAL_QUESTIONS = 10;
-const TIME_LIMIT_MINUTES = 10; 
-
-// --- STATE VARIABLES ---
-let candidateId = null;
-let currentQuestions = []; 
-let candidateAnswers = []; 
+// ===============================================
+// 2. STATE AND CONSTANTS
+// ===============================================
+let currentQuestions = [];
 let currentQuestionIndex = 0;
-let assessmentStartTime = null;
-
-// Metrics for Professional Tracking (Anti-Cheating)
-let timerInterval = null;
-let secondsRemaining = TIME_LIMIT_MINUTES * 60;
+let candidateID = null;
+let quizStartTime = null;
 let focusLossCount = 0;
-let focusLossTime = 0; 
-let focusLossStart = null;
+let focusLossTimeSeconds = 0;
+let isTimeout = false;
 
+const QUIZ_DURATION_SECONDS = 600; // 10 minutes
+let timerInterval = null;
+const selectedAnswers = {};
 
-// --- UTILITY FUNCTIONS ---
+// ===============================================
+// 3. UI ELEMENT REFERENCES
+// ===============================================
+const app = document.getElementById('app');
+const instructionsScreen = document.getElementById('instructions-screen');
+const registrationScreen = document.getElementById('registration-screen');
+const quizScreen = document.getElementById('quiz-screen');
+const resultScreen = document.getElementById('result-screen');
+const questionDisplay = document.getElementById('question-display');
+const timerDisplay = document.getElementById('timer');
+const resultMessage = document.getElementById('result-message');
+const scoreDisplay = document.getElementById('score-display');
+const candidateNameDisplay = document.getElementById('candidate-name');
+const candidateEmailDisplay = document.getElementById('candidate-email');
+const questionCounter = document.getElementById('question-counter');
+const nextButton = document.getElementById('next-btn');
+const submitButton = document.getElementById('submit-btn');
 
-const showScreen = (id) => {
-    document.getElementById('start-screen').style.display = 'none';
-    document.getElementById('instructions-screen').style.display = 'none'; 
-    document.getElementById('quiz-screen').style.display = 'none';
-    document.getElementById('score-screen').style.display = 'none';
-    document.getElementById(id).style.display = 'block';
-};
+// ===============================================
+// 4. CORE APPLICATION FUNCTIONS
+// ===============================================
 
-const formatTime = (totalSeconds) => {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-};
-
-// --- TIMING AND ANTI-CHEATING LOGIC ---
-
-const updateTimer = () => {
-    secondsRemaining--;
-    document.getElementById('timer').textContent = `Time Remaining: ${formatTime(secondsRemaining)}`;
-
-    if (secondsRemaining <= 0) {
-        clearInterval(timerInterval);
-        alert("Time's up! The assessment will now be submitted automatically.");
-        submitFinalAssessment(true); // Auto-submit due to timeout
+// Function to navigate between screens
+function navigateTo(screen) {
+    registrationScreen.style.display = 'none';
+    instructionsScreen.style.display = 'none';
+    quizScreen.style.display = 'none';
+    resultScreen.style.display = 'none';
+    if (screen) {
+        screen.style.display = 'block';
     }
-};
+}
 
-document.addEventListener('visibilitychange', () => {
-    const now = Date.now();
-    
-    if (document.hidden && assessmentStartTime) {
-        if (document.getElementById('quiz-screen').style.display === 'block') {
-            focusLossCount++;
-            focusLossStart = now;
-            console.warn("FOCUS LOSS DETECTED: User switched away from assessment tab.");
-        }
-    } else if (focusLossStart) {
-        const lossDuration = Math.round((now - focusLossStart) / 1000); 
-        focusLossTime += lossDuration;
-        focusLossStart = null;
-        console.warn(`FOCUS REGAINED. Duration out of focus: ${lossDuration}s. Total focus loss: ${focusLossTime}s.`);
+// Loads 10 random questions from the database
+async function loadQuestions() {
+    // 🚨 CRITICAL: Uses lowercase snake_case column names to match your new table schema 🚨
+    const { data: questions, error: questionError } = await supabaseClient
+        .from('questions')
+        .select('id, question_text, option_a, option_b, option_c, option_d, correct_answer')
+        .limit(10)
+        .order('id', { ascending: false }) // Simple way to get a varied set
+        
+    if (questionError) {
+        console.error('Question loading error:', questionError);
+        alert(`An error occurred during registration or loading: ${questionError.message}`);
+        return null;
     }
-});
+    return questions;
+}
 
-
-// --- QUIZ LOGIC ---
-
-const renderQuestion = (index) => {
+// Displays the current question
+function displayQuestion(index) {
     const q = currentQuestions[index];
+    if (!q) return;
 
-    // Use PascalCase for fetching question text from the data object
-    document.getElementById('question-counter').textContent = `Question ${index + 1} / ${currentQuestions.length}`;
-    document.getElementById('question-text').textContent = q.QuestionText; 
+    questionCounter.textContent = `Question ${index + 1} of ${currentQuestions.length}`;
     
-    const optionsContainer = document.getElementById('options-container');
-    optionsContainer.innerHTML = ''; 
+    // Build the options dynamically
+    const optionsHTML = ['a', 'b', 'c', 'd'].map(optionKey => {
+        const optionValue = q[`option_${optionKey}`];
+        const checked = selectedAnswers[q.id] === optionKey ? 'checked' : '';
+        return `
+            <div class="option">
+                <input type="radio" id="q${index}-${optionKey}" name="q${index}" value="${optionKey}" ${checked}>
+                <label for="q${index}-${optionKey}">${optionValue}</label>
+            </div>
+        `;
+    }).join('');
 
-    // Create a map to access the options using the PascalCase names
-    const optionKeyMap = {
-        'A': q.OptionA,
-        'B': q.OptionB,
-        'C': q.OptionC,
-        'D': q.OptionD,
-    };
+    questionDisplay.innerHTML = `
+        <h3>${q.question_text}</h3>
+        <form onchange="handleAnswerSelection('${q.id}', event)">
+            ${optionsHTML}
+        </form>
+    `;
 
-    ['A', 'B', 'C', 'D'].forEach(key => {
-        // Use the map to get the correct option text
-        const optionText = optionKeyMap[key]; 
-        const label = document.createElement('label');
-        label.innerHTML = `<input type="radio" name="answer" value="${key}" required> **${key}**: ${optionText}`;
-        optionsContainer.appendChild(label);
-    });
+    // Manage button visibility
+    nextButton.style.display = index < currentQuestions.length - 1 ? 'inline-block' : 'none';
+    submitButton.style.display = index === currentQuestions.length - 1 ? 'inline-block' : 'none';
+}
 
-    document.getElementById('next-button').textContent = 
-        (index === currentQuestions.length - 1) ? 'Submit Assessment' : 'Submit Answer & Next';
-};
-
-
-// 3. Secure Final Submission Function (No changes needed here)
-const submitFinalAssessment = async (isTimeout = false) => {
-    clearInterval(timerInterval); 
-    document.getElementById('next-button').disabled = true;
-    document.getElementById('next-button').textContent = 'Submitting...';
-
-    const assessmentEndTime = Date.now();
-    const timeTakenSeconds = Math.round((assessmentEndTime - assessmentStartTime) / 1000);
-
-    try {
-        const assessmentMetrics = {
-            time_taken_seconds: timeTakenSeconds,
-            is_timeout: isTimeout,
-            focus_loss_count: focusLossCount,
-            focus_loss_time_seconds: focusLossTime,
-        };
-
-        const { data: result, error: rpcError } = await supabaseClient.rpc('submit_assessment', {
-            p_candidate_id: candidateId,
-            p_answers: candidateAnswers,
-            p_metrics: assessmentMetrics 
-        });
-
-        if (rpcError) throw rpcError;
-        
-        const finalScore = result[0].score_achieved;
-        document.getElementById('final-score').textContent = finalScore;
-        
-        showScreen('score-screen');
-
-    } catch (error) {
-        alert('A critical error occurred during final submission. Check Supabase connection/keys/database: ' + error.message);
+// Handles user selecting an answer
+function handleAnswerSelection(questionId, event) {
+    if (event.target.type === 'radio') {
+        selectedAnswers[questionId] = event.target.value;
     }
-};
+}
 
+// Manages the quiz timer display
+function updateTimer() {
+    const elapsedSeconds = Math.floor((Date.now() - quizStartTime) / 1000);
+    const remainingSeconds = QUIZ_DURATION_SECONDS - elapsedSeconds;
 
-// --- EVENT HANDLERS ---
-
-// 1. Handle Candidate Registration -> Instructions Screen
-document.getElementById('candidate-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    document.getElementById('candidate-form').querySelector('button').disabled = true;
-
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    // Roll number logic removed from here and the INSERT statement below
-    
-    try {
-        // A. Insert Candidate into 'candidates' table (Only name and email)
-      const { data: candidateData, error: candidateError } = await supabaseClient
-    .from('candidates')
-    .insert([{ name, email }])
-    .select('id')
-    .maybeSingle(); // safer for inserts
-
-if (candidateError) throw candidateError;
-if (!candidateData) throw new Error('Insert failed — no candidate data returned.');
-
-candidateId = candidateData.id;
-
-      
-        
-        // B. Load 10 Random Questions (Using correct PascalCase column names)
-        const { data: questions, error: questionError } = await supabaseClient
-            .from('questions')
-            .select('id, "QuestionText", "OptionA", "OptionB", "OptionC", "OptionD", "CorrectAnswer"')
-            .order('random', { ascending: false })
-            .limit(TOTAL_QUESTIONS);
-
-        if (questionError) throw questionError;
-
-        if (questions.length === 0) {
-            alert('Error: No questions available in the database.');
-            return;
-        }
-
-        currentQuestions = questions;
-        currentQuestionIndex = 0; 
-        candidateAnswers = []; 
-
-        // C. Show Instructions Screen
-        showScreen('instructions-screen');
-
-    } catch (error) {
-        alert('An error occurred during registration or loading. Check database schema/RLS: ' + error.message);
-        document.getElementById('candidate-form').querySelector('button').disabled = false;
+    if (remainingSeconds <= 0) {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = 'Time Up!';
+        isTimeout = true;
+        submitAssessment();
+        return;
     }
-});
 
+    const minutes = Math.floor(remainingSeconds / 60);
+    const seconds = remainingSeconds % 60;
+    timerDisplay.textContent = `Time Remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
 
-// 2. Handle Instructions Acknowledge -> Quiz Start
-document.getElementById('start-quiz-button').addEventListener('click', () => {
-    
-    // START PROFESSIONAL TRACKING
-    assessmentStartTime = Date.now();
-    secondsRemaining = TIME_LIMIT_MINUTES * 60;
-    timerInterval = setInterval(updateTimer, 1000);
+// ===============================================
+// 5. EVENT HANDLERS AND MAIN FLOW
+// ===============================================
 
-    // DYNAMICALLY ADD TIMER DISPLAY
-    const timerElement = document.createElement('div');
-    timerElement.id = 'timer';
-    timerElement.textContent = `Time Remaining: ${formatTime(secondsRemaining)}`;
-    document.getElementById('quiz-screen').prepend(timerElement); 
-    
-    // START QUIZ
-    showScreen('quiz-screen');
-    renderQuestion(currentQuestionIndex);
-});
-
-
-// 3. Handle Answer Submission and Scoring
-document.getElementById('quiz-form').addEventListener('submit', async (e) => {
+// Handles the registration form submission
+document.getElementById('registration-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    const selectedOptionElement = document.querySelector('input[name="answer"]:checked');
-    const submittedOption = selectedOptionElement ? selectedOptionElement.value : null;
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
 
-    if (!submittedOption) {
-        alert('Please select an option before proceeding.');
+    if (!name || !email) {
+        alert('Please enter your name and email.');
         return;
     }
     
-    candidateAnswers.push({
-        question_id: currentQuestions[currentQuestionIndex].id,
-        submitted_option: submittedOption
+    // 1. Insert new candidate record
+    const { data, error } = await supabaseClient
+        .from('candidates')
+        .insert([
+            { name, email }
+        ])
+        .select('id')
+        .single();
+
+    if (error) {
+        console.error('Registration failed:', error);
+        alert(`An error occurred during registration or loading: new row violates row-level security policy for table "candidates"`);
+        return;
+    }
+
+    // Success: Store ID and navigate
+    candidateID = data.id;
+    candidateNameDisplay.textContent = name;
+    candidateEmailDisplay.textContent = email;
+    navigateTo(instructionsScreen);
+});
+
+// Starts the quiz after instructions are read
+document.getElementById('start-quiz-btn').addEventListener('click', async () => {
+    currentQuestions = await loadQuestions();
+
+    if (!currentQuestions || currentQuestions.length === 0) {
+        alert('Could not load questions. Check database connection or RLS policies.');
+        return;
+    }
+
+    currentQuestionIndex = 0;
+    quizStartTime = Date.now();
+    
+    // Start anti-cheating measures and timer
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    timerInterval = setInterval(updateTimer, 1000);
+
+    displayQuestion(currentQuestionIndex);
+    navigateTo(quizScreen);
+});
+
+// Handles moving to the next question
+nextButton.addEventListener('click', () => {
+    if (currentQuestionIndex < currentQuestions.length - 1) {
+        currentQuestionIndex++;
+        displayQuestion(currentQuestionIndex);
+    }
+});
+
+// Handles moving to the previous question
+document.getElementById('prev-btn').addEventListener('click', () => {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        displayQuestion(currentQuestionIndex);
+    }
+});
+
+// Submits the assessment for scoring
+submitButton.addEventListener('click', () => {
+    // Stop anti-cheating measures and timer
+    clearInterval(timerInterval);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+    submitAssessment();
+});
+
+
+// ===============================================
+// 6. SUBMISSION & SCORING LOGIC
+// ===============================================
+
+async function submitAssessment() {
+    const totalTime = Math.floor((Date.now() - quizStartTime) / 1000);
+
+    // 1. Prepare data for the Stored Procedure (RPC)
+    const answersArray = currentQuestions
+        .map(q => ({
+            question_id: q.id,
+            submitted_option: selectedAnswers[q.id] || null // Send null if unanswered
+        }));
+
+    const metricsPayload = {
+        time_taken_seconds: totalTime,
+        is_timeout: isTimeout,
+        focus_loss_count: focusLossCount,
+        focus_loss_time_seconds: focusLossTimeSeconds
+    };
+
+    // 2. Call the Stored Procedure (RPC)
+    const { data: result, error: rpcError } = await supabaseClient.rpc('submit_assessment', {
+        p_candidate_id: candidateID,
+        p_answers: answersArray,
+        p_metrics: metricsPayload
     });
 
-    currentQuestionIndex++;
-
-    if (currentQuestionIndex < currentQuestions.length) {
-        document.getElementById('quiz-form').reset(); 
-        renderQuestion(currentQuestionIndex);
-    } else {
-        submitFinalAssessment(false);
+    if (rpcError) {
+        console.error('Submission RPC failed:', rpcError);
+        alert(`Assessment submission failed. Error: ${rpcError.message}`);
+        navigateTo(resultScreen); // Show results screen anyway, potentially with error message
+        return;
     }
+
+    // 3. Display Result
+    const finalScore = result[0].score_achieved;
+    resultScreen.style.display = 'block';
+    
+    resultMessage.textContent = 'Assessment Completed!';
+    scoreDisplay.textContent = `Your Score: ${finalScore} out of ${currentQuestions.length}`;
+    
+    // Display metrics for internal tracking/debugging
+    document.getElementById('metrics-info').innerHTML = `
+        <p>Time Taken: ${totalTime} seconds</p>
+        <p>Focus Loss Count: ${focusLossCount}</p>
+        <p>Total Focus Loss Time: ${focusLossTimeSeconds} seconds</p>
+    `;
+
+    navigateTo(resultScreen);
+}
+
+
+// ===============================================
+// 7. ANTI-CHEATING MEASURE (Visibility Change)
+// ===============================================
+
+let focusLossStart = null;
+
+function handleVisibilityChange() {
+    if (document.visibilityState === 'hidden') {
+        // User left the quiz tab/window
+        focusLossCount++;
+        focusLossStart = Date.now();
+        console.warn('Focus Lost! Count:', focusLossCount);
+    } else {
+        // User returned to the quiz tab/window
+        if (focusLossStart) {
+            const lossDuration = Math.floor((Date.now() - focusLossStart) / 1000);
+            focusLossTimeSeconds += lossDuration;
+            focusLossStart = null;
+            console.warn('Focus Returned. Loss Duration:', lossDuration, 'seconds.');
+        }
+    }
+}
+
+// ===============================================
+// 8. INITIALIZATION
+// ===============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    navigateTo(registrationScreen);
 });
