@@ -1,0 +1,99 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    width: 90%;
+}
+
+h1, h2 {
+    color: #007bff;
+    text-align: center;
+}
+
+input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 15px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.options-grid label {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.options-grid label:hover {
+    background-color: #f0f0f0;
+}
+
+.options-grid input[type="radio"] {
+    margin-right: 10px;
+}
+
+.counter {
+    text-align: right;
+    font-weight: bold;
+    color: #6c757d;
+}
+
+.small-text {
+    text-align: center;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+#timer {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #dc3545; /* Red color for visibility */
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #dc3545;
+    border-radius: 5px;
+}
+
+.instructions-content {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
