@@ -155,14 +155,18 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
     
     try {
         // A. Insert Candidate into 'candidates' table (Only name and email)
-        const { data: candidate, error: candidateError } = await supabaseClient
-            .from('candidates')
-            .insert([{ name, email }]) 
-            .select('id')
-            .single();
+      const { data: candidateData, error: candidateError } = await supabaseClient
+    .from('candidates')
+    .insert([{ name, email }])
+    .select('id')
+    .maybeSingle(); // safer for inserts
 
-        if (candidateError) throw candidateError;
-        candidateId = candidate.id;
+if (candidateError) throw candidateError;
+if (!candidateData) throw new Error('Insert failed — no candidate data returned.');
+
+candidateId = candidateData.id;
+
+      
         
         // B. Load 10 Random Questions (Using correct PascalCase column names)
         const { data: questions, error: questionError } = await supabaseClient
