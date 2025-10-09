@@ -4,7 +4,6 @@
 const SUPABASE_URL = 'https://bijcdrtlmuwosrtqivtx.supabase.co'; 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpamNkcnRsbXV3b3NydHFpdnR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDExODgsImV4cCI6MjA3NTQ3NzE4OH0.uraVwNy-s7CmR49G70O9M_fTZoCSTnaOtHavRp0m9Dk'; 
 
-
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ===============================================
@@ -57,12 +56,12 @@ function navigateTo(screen) {
 
 // Loads 10 random questions from the database
 async function loadQuestions() {
-    // 🚨 CRITICAL: Uses lowercase snake_case column names to match your new table schema 🚨
+    // 🚨 CRITICAL: Uses lowercase snake_case column names to match your final table schema 🚨
     const { data: questions, error: questionError } = await supabaseClient
         .from('questions')
         .select('id, question_text, option_a, option_b, option_c, option_d, correct_answer')
         .limit(10)
-        .order('id', { ascending: false }) // Simple way to get a varied set
+        .order('id', { ascending: false }) 
         
     if (questionError) {
         console.error('Question loading error:', questionError);
@@ -79,9 +78,8 @@ function displayQuestion(index) {
 
     questionCounter.textContent = `Question ${index + 1} of ${currentQuestions.length}`;
     
-    // Build the options dynamically
+    // Build the options dynamically (Uses snake_case lookup)
     const optionsHTML = ['a', 'b', 'c', 'd'].map(optionKey => {
-        // Uses snake_case lookup
         const optionValue = q[`option_${optionKey}`]; 
         const checked = selectedAnswers[q.id] === optionKey ? 'checked' : '';
         return `
@@ -159,13 +157,14 @@ document.getElementById('registration-form').addEventListener('submit', async (e
         return;
     }
 
-    // SUCCESS: Store ID and navigate to the instructions screen (Fix for returning to the same page)
+    // SUCCESS: Store ID and navigate (Fix for navigating back to the same page)
     if (data && data.id) {
         candidateID = data.id;
         candidateNameDisplay.textContent = name;
         candidateEmailDisplay.textContent = email;
         
-        // No need for setTimeout, direct navigation is fine if the promise resolves
+        // Clear form and force navigation
+        document.getElementById('registration-form').reset();
         navigateTo(instructionsScreen); 
     } else {
         // Fallback for unexpected empty response
@@ -261,3 +260,43 @@ async function submitAssessment() {
     scoreDisplay.textContent = `Your Score: ${finalScore} out of ${currentQuestions.length}`;
     
     // Display metrics for internal tracking/debugging
+    document.getElementById('metrics-info').innerHTML = `
+        <p>Time Taken: ${totalTime} seconds</p>
+        <p>Focus Loss Count: ${focusLossCount}</p>
+        <p>Total Focus Loss Time: ${focusLossTimeSeconds} seconds</p>
+    `;
+
+    navigateTo(resultScreen);
+}
+
+
+// ===============================================
+// 7. ANTI-CHEATING MEASURE (Visibility Change)
+// ===============================================
+
+let focusLossStart = null;
+
+function handleVisibilityChange() {
+    if (document.visibilityState === 'hidden') {
+        // User left the quiz tab/window
+        focusLossCount++;
+        focusLossStart = Date.now();
+        console.warn('Focus Lost! Count:', focusLossCount);
+    } else {
+        // User returned to the quiz tab/window
+        if (focusLossStart) {
+            const lossDuration = Math.floor((Date.now() - focusLossStart) / 1000);
+            focusLossTimeSeconds += lossDuration;
+            focusLossStart = null;
+            console.warn('Focus Returned. Loss Duration:', lossDuration, 'seconds.');
+        }
+    }
+}
+
+// ===============================================
+// 8. INITIALIZATION
+// ===============================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    navigateTo(registrationScreen);
+});
