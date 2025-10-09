@@ -4,7 +4,8 @@
 const SUPABASE_URL = 'https://bgqwsglxszzhtuameled.supabase.co'; 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncXdzZ2x4c3p6aHR1YW1lbGVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5OTg4ODcsImV4cCI6MjA3NTU3NDg4N30.cZcOsWlu6jnrdtuxtrFPRJbxiA83WBRyyl9D_EPnN08';
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// FIX: Renamed the local variable to supabaseClient to avoid conflict with the global 'supabase' object
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- ASSESSMENT CONFIGURATION ---
 const TOTAL_QUESTIONS = 10;
@@ -57,11 +58,16 @@ const updateTimer = () => {
 document.addEventListener('visibilitychange', () => {
     const now = Date.now();
     
-    if (document.hidden) {
-        focusLossCount++;
-        focusLossStart = now;
-        console.warn("FOCUS LOSS DETECTED: User switched away from assessment tab.");
+    // Check if the page is hidden (user switched tabs/windows) AND assessment has started
+    if (document.hidden && assessmentStartTime) {
+        // Only count a focus loss if the user is currently in the quiz phase
+        if (document.getElementById('quiz-screen').style.display === 'block') {
+            focusLossCount++;
+            focusLossStart = now;
+            console.warn("FOCUS LOSS DETECTED: User switched away from assessment tab.");
+        }
     } else if (focusLossStart) {
+        // Page is visible again
         const lossDuration = Math.round((now - focusLossStart) / 1000); 
         focusLossTime += lossDuration;
         focusLossStart = null;
@@ -109,7 +115,8 @@ const submitFinalAssessment = async (isTimeout = false) => {
             focus_loss_time_seconds: focusLossTime,
         };
 
-        const { data: result, error: rpcError } = await supabase.rpc('submit_assessment', {
+        // Use the renamed client: supabaseClient
+        const { data: result, error: rpcError } = await supabaseClient.rpc('submit_assessment', {
             p_candidate_id: candidateId,
             p_answers: candidateAnswers,
             p_metrics: assessmentMetrics 
@@ -123,7 +130,7 @@ const submitFinalAssessment = async (isTimeout = false) => {
         showScreen('score-screen');
 
     } catch (error) {
-        alert('A critical error occurred during final submission: ' + error.message);
+        alert('A critical error occurred during final submission. Check Supabase connection/keys/database: ' + error.message);
     }
 };
 
@@ -140,8 +147,8 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
     const rollNumber = document.getElementById('roll-number').value;
 
     try {
-        // A. Insert Candidate into 'candidates' table
-        const { data: candidate, error: candidateError } = await supabase
+        // Use the renamed client: supabaseClient
+        const { data: candidate, error: candidateError } = await supabaseClient
             .from('candidates')
             .insert([{ name, email, roll_number: rollNumber }])
             .select('id')
@@ -150,8 +157,8 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
         if (candidateError) throw candidateError;
         candidateId = candidate.id;
         
-        // B. Load 10 Random Questions
-        const { data: questions, error: questionError } = await supabase
+        // Use the renamed client: supabaseClient
+        const { data: questions, error: questionError } = await supabaseClient
             .from('questions')
             .select('id, question_text, option_a, option_b, option_c, option_d')
             .order('random', { ascending: false })
@@ -172,7 +179,7 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
         showScreen('instructions-screen');
 
     } catch (error) {
-        alert('An error occurred during registration or loading: ' + error.message);
+        alert('An error occurred during registration or loading. Check database schema/RLS: ' + error.message);
         document.getElementById('candidate-form').querySelector('button').disabled = false;
     }
 });
