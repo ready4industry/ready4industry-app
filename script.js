@@ -4,7 +4,7 @@
 const SUPABASE_URL = 'https://bgqwsglxszzhtuameled.supabase.co'; 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncXdzZ2x4c3p6aHR1YW1lbGVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5OTg4ODcsImV4cCI6MjA3NTU3NDg4N30.cZcOsWlu6jnrdtuxtrFPRJbxiA83WBRyyl9D_EPnN08';
 
-// FIX: Renamed the local variable to supabaseClient to avoid conflict with the global 'supabase' object
+// Use a client name that avoids conflicts
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- ASSESSMENT CONFIGURATION ---
@@ -58,16 +58,13 @@ const updateTimer = () => {
 document.addEventListener('visibilitychange', () => {
     const now = Date.now();
     
-    // Check if the page is hidden (user switched tabs/windows) AND assessment has started
     if (document.hidden && assessmentStartTime) {
-        // Only count a focus loss if the user is currently in the quiz phase
         if (document.getElementById('quiz-screen').style.display === 'block') {
             focusLossCount++;
             focusLossStart = now;
             console.warn("FOCUS LOSS DETECTED: User switched away from assessment tab.");
         }
     } else if (focusLossStart) {
-        // Page is visible again
         const lossDuration = Math.round((now - focusLossStart) / 1000); 
         focusLossTime += lossDuration;
         focusLossStart = null;
@@ -80,16 +77,27 @@ document.addEventListener('visibilitychange', () => {
 
 const renderQuestion = (index) => {
     const q = currentQuestions[index];
+
+    // FIX 2: Use PascalCase for fetching question text from the data object
     document.getElementById('question-counter').textContent = `Question ${index + 1} / ${currentQuestions.length}`;
-    document.getElementById('question-text').textContent = q.question_text;
+    document.getElementById('question-text').textContent = q.QuestionText; 
     
     const optionsContainer = document.getElementById('options-container');
     optionsContainer.innerHTML = ''; 
 
-    ['a', 'b', 'c', 'd'].forEach(key => {
-        const optionText = q[`option_${key}`];
+    // Create a map to access the options using the PascalCase names
+    const optionKeyMap = {
+        'A': q.OptionA,
+        'B': q.OptionB,
+        'C': q.OptionC,
+        'D': q.OptionD,
+    };
+
+    ['A', 'B', 'C', 'D'].forEach(key => {
+        // Use the map to get the correct option text
+        const optionText = optionKeyMap[key]; 
         const label = document.createElement('label');
-        label.innerHTML = `<input type="radio" name="answer" value="${key.toUpperCase()}" required> **${key.toUpperCase()}**: ${optionText}`;
+        label.innerHTML = `<input type="radio" name="answer" value="${key}" required> **${key}**: ${optionText}`;
         optionsContainer.appendChild(label);
     });
 
@@ -98,7 +106,7 @@ const renderQuestion = (index) => {
 };
 
 
-// 3. Secure Final Submission Function
+// 3. Secure Final Submission Function (No changes needed here)
 const submitFinalAssessment = async (isTimeout = false) => {
     clearInterval(timerInterval); 
     document.getElementById('next-button').disabled = true;
@@ -115,7 +123,6 @@ const submitFinalAssessment = async (isTimeout = false) => {
             focus_loss_time_seconds: focusLossTime,
         };
 
-        // Use the renamed client: supabaseClient
         const { data: result, error: rpcError } = await supabaseClient.rpc('submit_assessment', {
             p_candidate_id: candidateId,
             p_answers: candidateAnswers,
@@ -147,7 +154,7 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
     const rollNumber = document.getElementById('roll-number').value;
 
     try {
-        // Use the renamed client: supabaseClient
+        // A. Insert Candidate into 'candidates' table
         const { data: candidate, error: candidateError } = await supabaseClient
             .from('candidates')
             .insert([{ name, email, roll_number: rollNumber }])
@@ -157,10 +164,11 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
         if (candidateError) throw candidateError;
         candidateId = candidate.id;
         
-        // Use the renamed client: supabaseClient
+        // B. Load 10 Random Questions
+        // FIX 1: Use double quotes for PascalCase column names in the select query
         const { data: questions, error: questionError } = await supabaseClient
             .from('questions')
-            .select('id, question_text, option_a, option_b, option_c, option_d')
+            .select('id, "QuestionText", "OptionA", "OptionB", "OptionC", "OptionD", "CorrectAnswer"')
             .order('random', { ascending: false })
             .limit(TOTAL_QUESTIONS);
 
@@ -185,7 +193,7 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
 });
 
 
-// 2. Handle Instructions Acknowledge -> Quiz Start
+// 2. Handle Instructions Acknowledge -> Quiz Start (No changes needed here)
 document.getElementById('start-quiz-button').addEventListener('click', () => {
     
     // START PROFESSIONAL TRACKING
@@ -205,7 +213,7 @@ document.getElementById('start-quiz-button').addEventListener('click', () => {
 });
 
 
-// 3. Handle Answer Submission and Scoring 
+// 3. Handle Answer Submission and Scoring (No changes needed here)
 document.getElementById('quiz-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
