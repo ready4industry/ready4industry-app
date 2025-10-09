@@ -1,8 +1,8 @@
-// script.js (Professional Assessment Version with Instructions)
+// script.js (FINAL VERSION - Corrected and Roll Number Optional)
 
 // 🚨 IMPORTANT: REPLACE THESE WITH YOUR ACTUAL SUPABASE KEYS 🚨
-const SUPABASE_URL = 'https://bgqwsglxszzhtuameled.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncXdzZ2x4c3p6aHR1YW1lbGVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5OTg4ODcsImV4cCI6MjA3NTU3NDg4N30.cZcOsWlu6jnrdtuxtrFPRJbxiA83WBRyyl9D_EPnN08';
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL'; 
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
 // Use a client name that avoids conflicts
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -78,7 +78,7 @@ document.addEventListener('visibilitychange', () => {
 const renderQuestion = (index) => {
     const q = currentQuestions[index];
 
-    // FIX 2: Use PascalCase for fetching question text from the data object
+    // Use PascalCase for fetching question text from the data object
     document.getElementById('question-counter').textContent = `Question ${index + 1} / ${currentQuestions.length}`;
     document.getElementById('question-text').textContent = q.QuestionText; 
     
@@ -151,21 +151,20 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
 
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
-    const rollNumber = document.getElementById('roll-number').value;
-
+    // Roll number logic removed from here and the INSERT statement below
+    
     try {
-        // A. Insert Candidate into 'candidates' table
+        // A. Insert Candidate into 'candidates' table (Only name and email)
         const { data: candidate, error: candidateError } = await supabaseClient
             .from('candidates')
-            .insert([{ name, email, roll_number: rollNumber }])
+            .insert([{ name, email }]) 
             .select('id')
             .single();
 
         if (candidateError) throw candidateError;
         candidateId = candidate.id;
         
-        // B. Load 10 Random Questions
-        // FIX 1: Use double quotes for PascalCase column names in the select query
+        // B. Load 10 Random Questions (Using correct PascalCase column names)
         const { data: questions, error: questionError } = await supabaseClient
             .from('questions')
             .select('id, "QuestionText", "OptionA", "OptionB", "OptionC", "OptionD", "CorrectAnswer"')
@@ -193,7 +192,7 @@ document.getElementById('candidate-form').addEventListener('submit', async (e) =
 });
 
 
-// 2. Handle Instructions Acknowledge -> Quiz Start (No changes needed here)
+// 2. Handle Instructions Acknowledge -> Quiz Start
 document.getElementById('start-quiz-button').addEventListener('click', () => {
     
     // START PROFESSIONAL TRACKING
@@ -213,7 +212,7 @@ document.getElementById('start-quiz-button').addEventListener('click', () => {
 });
 
 
-// 3. Handle Answer Submission and Scoring (No changes needed here)
+// 3. Handle Answer Submission and Scoring
 document.getElementById('quiz-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
