@@ -2,7 +2,7 @@
 
 // 🚨 IMPORTANT: REPLACE THESE WITH YOUR ACTUAL SUPABASE KEYS 🚨
 const SUPABASE_URL = 'https://bgqwsglxszzhtuameled.supabase.co'; 
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncXdzZ2x4c3p6aHR1YW1lbGVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5OTg4ODcsImV4cCI6MjA3NTU3NDg4N30.cZcOsWlu6jnrdtuxtrFPRJbxiA83WBRyyl9D_EPnN08';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJncXdzZ2x4c3p6aHR1YW1lbGVkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTk5ODg4NywiZXhwIjoyMDc1NTc0ODg3fQ.PcP42rYC_8A0A0QSy-K2dVuvUs-iKqG7dDvwTK9BvHg';
 
 // Use a client name that avoids conflicts
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
