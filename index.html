@@ -1,491 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ready4Industry LMS Quiz Portal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrNq9rG/d0Fj/3e4c4O2/y4V5c4PzN9Jg=" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-hE8qS00W+Xq4v4h/4PzN9Jg=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="sha384-QO9Qv3S3r93JzFjA/pE4Jg=" crossorigin="anonymous"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    body { font-family: "Inter", sans-serif; background: linear-gradient(120deg, #ecf2ff 0%, #f9fafb 100%); }
-    .glass { 
-        background: rgba(255, 255, 255, 0.7); 
-        backdrop-filter: blur(8px); 
-        -webkit-backdrop-filter: blur(8px);
-    }
-    .portal-shadow { box-shadow: 0 8px 40px rgba(47,70,255,0.15); }
-    button:active { transform: scale(0.98); }
-    /* Ensure KaTeX output is readable */
-    .katex { font-size: 1.125rem; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B.Tech Assessment - Official</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
-  <div class="max-w-5xl w-full glass rounded-3xl portal-shadow p-8 md:p-16 border border-white/80">
-    <header class="flex flex-col md:flex-row items-start md:items-center justify-between mb-10">
-      <div class="mb-4 md:mb-0">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-800 mb-2">Ready4Industry Learning Portal</h1>
-        <div class="text-lg text-gray-600">Empowering engineers for real-world success.</div>
-      </div>
-      <div class="flex items-center space-x-3">
-        <span class="text-gray-700 font-medium hidden sm:inline">Mentor Admin</span>
-        <img src="https://avatars.githubusercontent.com/u/583231?v=4" class="w-14 h-14 rounded-full border-3 border-indigo-400 shadow-md" alt="Mentor Admin Avatar"/>
-      </div>
-    </header>
-    
-        <div id="progress-widget" class="mb-10 p-6 bg-white/70 border border-gray-100 rounded-xl flex flex-col sm:flex-row items-center justify-between transition-all duration-300 hover:border-indigo-400 shadow-inner">
-                <div class="flex items-center space-x-4 mb-4 sm:mb-0">
-            <svg class="w-12 h-12 text-indigo-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.167a11.955 11.955 0 010 16.334m-1.353-1.353l-1.353 1.353-4.167-4.167m-5.167-5.167l-4.167 4.167-1.353-1.353a11.955 11.955 0 010-16.334"/>
-            </svg>
-            <div>
-                <div class="text-xl font-bold text-gray-800">Your Current Progress</div>
-                <div class="text-sm text-gray-500">Keep up the great work! Ready to jump back in?</div>
-            </div>
-        </div>
+<body>
 
-                <div class="text-right w-full sm:w-auto">
-            <div class="text-4xl font-extrabold text-indigo-700 mb-1" id="progress-percentage-display">
-                42%
-            </div>
-            <div class="w-full sm:w-32 bg-gray-200 rounded-full h-3">
-                <div class="bg-indigo-600 h-3 rounded-full transition-all duration-500 ease-out" id="progress-bar" style="width: 42%"></div>
-            </div>
-        </div>
-    </div>
-        
-        <div id="main-content">
-                <div id="dashboard-view" class="flex flex-col lg:flex-row justify-center gap-6 md:gap-8">
-                        <button id="technical-button" onclick="startQuiz('technical', 'Technical Fundamentals Quiz')" class="flex-1 bg-gradient-to-br from-indigo-500 to-indigo-700 text-white font-extrabold p-8 rounded-2xl shadow-lg hover:scale-[1.02] transition-all duration-200 text-2xl group relative text-left min-h-[140px]">
-                <span class="absolute right-6 top-6 opacity-70 group-hover:opacity-100 transition-opacity">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 2m6 8H6a2 2 0 01-2-2V6a2 2 0 012-2h7l5 5v13a2 2 0 01-2 2z"/>
-                    </svg>
-                </span>
-                Technical Fundamentals Quiz
-                <div class="mt-2 text-base font-medium text-indigo-100/90">10 Questions | 10 Minutes | For Indian Freshers</div>
-            </button>
-            
-                        <button onclick="startQuiz('aptitude', 'Aptitude & Reasoning Quiz')" class="flex-1 bg-gradient-to-br from-blue-500 to-blue-700 text-white font-extrabold p-8 rounded-2xl shadow-lg hover:scale-[1.02] transition-all duration-200 text-2xl group relative text-left min-h-[140px]">
-                <span class="absolute right-6 top-6 opacity-70 group-hover:opacity-100 transition-opacity">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 9h4v4h-4z"/>
-                    </svg>
-                </span>
-                Aptitude & Reasoning
-                <div class="mt-2 text-base font-medium text-blue-100/90">Indian context, core quantitative skills.</div>
-            </button>
-            
-                        <button onclick="startQuiz('behavioural', 'Behavioural Skills Quiz')" class="flex-1 bg-gradient-to-br from-purple-500 to-purple-700 text-white font-extrabold p-8 rounded-2xl shadow-lg hover:scale-[1.02] transition-all duration-200 text-2xl group relative text-left min-h-[140px]">
-                <span class="absolute right-6 top-6 opacity-70 group-hover:opacity-100 transition-opacity">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 6.636a9 9 0 11-12.728 0M9 9h6v6H9V9z"/>
-                    </svg>
-                </span>
-                Behavioural Skills
-                <div class="mt-2 text-base font-medium text-purple-100/90">Entry-level ethics and teamwork (India).</div>
-            </button>
-        </div>
+    <div class="container">
+        <h1>B.Tech Assessment</h1>
 
-                <div id="quiz-view" class="hidden">
-                        <div class="flex justify-between items-center mb-6 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
-                <h2 class="text-xl font-bold text-indigo-700" id="quiz-title-header">Quiz Title </h2>
-                <div id="quiz-timer" class="text-2xl font-extrabold text-red-600 bg-white px-4 py-2 rounded-lg shadow-md border border-red-300">10:00</div>
-            </div>
-            
-                        <div id="quiz-card" class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100">
-                            </div>
+        <div id="start-screen" class="screen">
+            <h2>Candidate Registration</h2>
+            <form id="candidate-form">
+                <input type="text" id="name" placeholder="Full Name" required>
+                <input type="email" id="email" placeholder="Email Address" required>
+                <input type="text" id="roll-number" placeholder="Roll Number / ID" required>
+                <button type="submit">Proceed to Instructions</button>
+            </form>
+        </div>
 
-                          <div id="quiz-controls" class="hidden flex justify-between items-center mt-6">
-                <button onclick="prevQuestion()" id="prev-button" class="bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors disabled:opacity-50">
-                    Previous
-                </button>
-                <div id="question-indicator" class="text-lg font-semibold text-gray-700">Question 1/10</div>
-                <button onclick="nextQuestion()" id="next-button" class="bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-600 transition-colors disabled:opacity-50">
-                    Next
-                </button>
-            </div>
-            <button onclick="submitQuiz()" id="submit-button" class="hidden w-full bg-green-600 text-white font-extrabold py-3 mt-6 rounded-lg shadow-md hover:bg-green-700 transition-colors">
-                Submit Quiz
-            </button>
-        </div>
-    </div>
-
-
-    <footer class="mt-16 text-center text-gray-400 text-sm">
-      <span>© 2025 Ready4Industry | Bridging College to Career</span>
-    </footer>
-    
-        <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center p-4 z-50">
-        <div id="custom-modal" class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm transform transition-all duration-300 scale-95 opacity-0">
-            <h3 id="modal-title" class="text-xl font-bold text-indigo-700 mb-3">Message</h3>
-            <p id="modal-content" class="text-gray-600 mb-6"></p>
-            <button onclick="closeModal()" class="w-full bg-indigo-500 text-white py-2 rounded-lg font-semibold hover:bg-indigo-600 transition-colors">Close</button>
-        </div>
-    </div>
-  </div>
-
-<script>
-    // --- GLOBAL VARIABLES AND STATE (Simplified for Secure Proxy) ---
-    // NO API KEY is stored here.
-    const PROXY_ENDPOINT = 'https://wixakxhshdpgbmwxgyca.supabase.co/functions/v1/quiz'; // Standard endpoint for a serverless function
-    const PERPLEXITY_API_MODEL = 'sonar-pro'; 
-    
-    let quizData = [];
-    let userAnswers = [];
-    let currentQuestionIndex = 0;
-    let timerInterval;
-    let currentQuizTitle = ''; 
-    const QUIZ_DURATION_SECONDS = 10 * 60; // 10 minutes
-
-    // --- DOM ELEMENT REFERENCES ---
-    const dashboardView = document.getElementById('dashboard-view');
-    const quizView = document.getElementById('quiz-view');
-    const quizCard = document.getElementById('quiz-card');
-    const quizTimerDisplay = document.getElementById('quiz-timer');
-    const quizControls = document.getElementById('quiz-controls');
-    const questionIndicator = document.getElementById('question-indicator');
-    const prevButton = document.getElementById('prev-button');
-    const nextButton = document.getElementById('next-button');
-    const submitButton = document.getElementById('submit-button');
-    const quizTitleHeader = document.getElementById('quiz-title-header');
-
-    // --- UTILITY FUNCTIONS (unchanged) ---
-    function showMessage(title, content) {
-        document.getElementById('modal-title').textContent = title;
-        document.getElementById('modal-content').textContent = content;
-        document.getElementById('modal-container').classList.remove('hidden');
-        document.getElementById('modal-container').classList.add('flex');
-        
-        // Simple animation
-        setTimeout(() => {
-            document.getElementById('custom-modal').classList.remove('scale-95', 'opacity-0');
-            document.getElementById('custom-modal').classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-
-    function closeModal() {
-        // Simple animation
-        document.getElementById('custom-modal').classList.remove('scale-100', 'opacity-100');
-        document.getElementById('custom-modal').classList.add('scale-95', 'opacity-0');
-        
-        setTimeout(() => {
-            document.getElementById('modal-container').classList.add('hidden');
-            document.getElementById('modal-container').classList.remove('flex');
-        }, 300);
-    }
-
-    // --- QUIZ TIMER FUNCTIONS (unchanged) ---
-    function startTimer() {
-        let timeLeft = QUIZ_DURATION_SECONDS;
-        
-        function updateTimer() {
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                quizTimerDisplay.textContent = "00:00";
-                submitQuiz(true); // Auto-submit on timeout
-                return;
-            }
-
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            quizTimerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            
-            // Highlight timer red when low
-            if (timeLeft <= 60) {
-                quizTimerDisplay.classList.add('bg-red-100', 'animate-pulse');
-            } else {
-                quizTimerDisplay.classList.remove('bg-red-100', 'animate-pulse');
-            }
-
-            timeLeft--;
-        }
-
-        clearInterval(timerInterval);
-        updateTimer();
-        timerInterval = setInterval(updateTimer, 1000);
-    }
-
-    function stopTimer() {
-        clearInterval(timerInterval);
-    }
-
-    // --- API INTEGRATION (UPDATED to call the Proxy endpoint) ---
-    async function fetchQuizQuestions(quizType, retries = 3, delay = 1000) {
-        
-        // 1. Define the payload for the secure proxy
-        // We only send the information the backend needs to construct the API call
-        const payload = {
-            quizType: quizType,
-            model: PERPLEXITY_API_MODEL
-        };
-
-        try {
-            // Call the secure local endpoint instead of the Perplexity API directly
-            const response = await fetch(PROXY_ENDPOINT, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    // NO AUTHORIZATION HEADER HERE! The backend handles it.
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                if (retries > 0) {
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    return fetchQuizQuestions(quizType, retries - 1, delay * 2); 
-                }
+        <div id="instructions-screen" class="screen" style="display:none;">
+            <h2>Assessment Instructions & Rules</h2>
+            <div class="instructions-content">
+                <p>Welcome, Candidate. Please read these instructions carefully before beginning the assessment.</p>
                 
-                const errorStatus = response.status;
-                const errorBody = await response.text();
-                console.error(`Secure Proxy Fetch Failed (Status: ${errorStatus}):`, errorBody);
-                throw new Error(`Quiz generation failed. Check if your backend function is deployed correctly and has access to the PERPLEXITY_API_KEY secret.`);
-            }
+                <h3>Assessment Parameters:</h3>
+                <ul>
+                    <li>**Total Questions:** 10 (Randomly selected from a pool of 100).</li>
+                    <li>**Time Limit:** **10 Minutes** total. The assessment will auto-submit after the time expires.</li>
+                    <li>**Scoring:** Each question carries 1 mark. There is **NO** negative marking.</li>
+                </ul>
 
-            // The backend proxy function should return the CLEAN, parsed JSON array directly.
-            const parsedData = await response.json(); 
-            
-            if (!Array.isArray(parsedData) || parsedData.length !== 10) {
-                throw new Error(`The proxy returned invalid or incomplete data. Check the serverless function logs.`);
-            }
-            
-            return parsedData;
+                <h3>Integrity Rules (Monitored):</h3>
+                <ol>
+                    <li>**One Attempt:** This assessment can be taken only once.</li>
+                    <li>**Focus Tracking:** Switching windows or tabs (losing focus) during the test is logged as a metric. Excessive focus loss will be flagged to the recruiting team for review.</li>
+                    <li>**Submission:** Click 'Submit Answer & Next' to save your answer and move on. Once submitted, answers cannot be changed.</li>
+                    <li>**Security:** All scoring is handled securely on the server (Supabase) to prevent unauthorized inspection.</li>
+                </ol>
 
-        } catch (error) {
-            console.error("Fetch Quiz Error:", error);
-            showMessage("Quiz Generation Failed", error.message);
-            resetToDashboard(); 
-            return null;
-        }
-    }
-
-    // --- QUIZ CONTROL FUNCTIONS (startQuiz is now simpler) ---
-    window.startQuiz = async function(quizType, title) {
-        // Set the title of the quiz
-        currentQuizTitle = title;
-        quizTitleHeader.textContent = title;
-
-        // Show loading state
-        dashboardView.classList.add('hidden');
-        quizView.classList.remove('hidden');
-        stopTimer();
-        quizTimerDisplay.textContent = "Loading...";
-        quizControls.classList.add('hidden');
-        submitButton.classList.add('hidden');
-        
-        quizCard.innerHTML = `
-            <div class="flex flex-col items-center justify-center p-12 text-center">
-                <div class="animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent mb-4"></div>
-                <p class="text-xl font-semibold text-gray-700">Generating 10 ${title} Questions...</p>
-                <p class="text-sm text-gray-500 mt-2">Connecting to secure API service...</p>
+                <p style="font-weight: bold; margin-top: 15px;">By clicking 'Acknowledge & Start', you accept the rules above and confirm your readiness to begin the timed test.</p>
             </div>
-        `;
-        
-        // Fetch questions using the dynamic fetch function
-        quizData = await fetchQuizQuestions(quizType);
-        
-        if (quizData) {
-            // Initialize user answers array
-            userAnswers = new Array(quizData.length).fill(null); 
-            currentQuestionIndex = 0;
-            renderQuestion();
-            startTimer();
-            quizControls.classList.remove('hidden');
-            submitButton.classList.remove('hidden');
-        } 
-    }
+            <button id="start-quiz-button">Acknowledge & Start Assessment</button>
+        </div>
 
-    // --- RENDER & RESULT FUNCTIONS (unchanged) ---
-    function renderQuestion() {
-        if (!quizData || quizData.length === 0) return;
-
-        const q = quizData[currentQuestionIndex];
-        const questionNumber = currentQuestionIndex + 1;
-        const totalQuestions = quizData.length;
-        const currentAnswer = userAnswers[currentQuestionIndex];
-
-        // Update indicator
-        questionIndicator.textContent = `Question ${questionNumber}/${totalQuestions}`;
-        prevButton.disabled = currentQuestionIndex === 0;
-        nextButton.disabled = currentQuestionIndex === totalQuestions - 1;
-        
-        // Update submit button visibility
-        if (currentQuestionIndex === totalQuestions - 1) {
-            submitButton.classList.remove('hidden');
-            nextButton.classList.add('hidden');
-        } else {
-            submitButton.classList.add('hidden');
-            nextButton.classList.remove('hidden');
-        }
-
-        // Render question HTML
-        let optionsHtml = q.options.map((option, index) => `
-            <div 
-                data-index="${index}" 
-                onclick="selectAnswer(${index})" 
-                class="option-btn p-4 border border-gray-200 rounded-xl text-left cursor-pointer hover:bg-indigo-50 transition-colors flex items-start ${currentAnswer === index ? 'bg-indigo-100 border-indigo-500 ring-2 ring-indigo-500 font-semibold' : 'bg-white'}"
-            >
-                <span class="font-bold text-indigo-600 mr-3 mt-1 flex-shrink-0">${String.fromCharCode(65 + index)}.</span>
-                <span class="flex-grow min-w-0 pt-1 text-base">${option}</span>
-            </div>
-        `).join('');
-
-        quizCard.innerHTML = `
-            <h3 class="text-2xl font-bold text-gray-800 mb-6">Q${questionNumber}: ${q.question}</h3>
-            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                ${optionsHtml}
-            </div>
-        `;
-
-        // Render LaTeX using KaTeX Auto-render
-        if (typeof renderMathInElement !== 'undefined') {
-            renderMathInElement(quizCard, {
-                // Configure the delimiters to recognize $ for inline math
-                delimiters: [
-                    { left: '$$', right: '$$', display: true },
-                    { left: '$', right: '$', display: false }
-                ],
-                // Don't throw errors if a math expression is malformed
-                throwOnError: false
-            });
-        }
-    }
-
-    window.selectAnswer = function(index) {
-        userAnswers[currentQuestionIndex] = index;
-        
-        // Update UI to show selection immediately
-        const optionsContainer = document.getElementById('options-container');
-        Array.from(optionsContainer.children).forEach( (el, idx) => {
-            el.classList.remove('bg-indigo-100', 'border-indigo-500', 'ring-2', 'ring-indigo-500', 'font-semibold');
-            el.classList.add('bg-white');
-            if (idx === index) {
-                el.classList.add('bg-indigo-100', 'border-indigo-500', 'ring-2', 'ring-indigo-500', 'font-semibold');
-            }
-        });
-    }
-
-    window.nextQuestion = function() {
-        if (currentQuestionIndex < quizData.length - 1) {
-            currentQuestionIndex++;
-            renderQuestion();
-        }
-    }
-
-    window.prevQuestion = function() {
-        if (currentQuestionIndex > 0) {
-            currentQuestionIndex--;
-            renderQuestion();
-        }
-    }
-    
-    function calculateResults() {
-        let correctCount = 0;
-        let attemptedCount = 0;
-        
-        quizData.forEach((q, index) => {
-            const userAnswer = userAnswers[index];
-            if (userAnswer !== null) {
-                attemptedCount++;
-                if (userAnswer === q.correctAnswerIndex) {
-                    correctCount++;
-                }
-            }
-        });
-
-        return { correctCount, attemptedCount, totalQuestions: quizData.length };
-    }
-
-    window.submitQuiz = function(isTimeout = false) {
-        stopTimer();
-        const { correctCount, attemptedCount, totalQuestions } = calculateResults();
-        
-        // Show results immediately
-        renderResults(correctCount, attemptedCount, totalQuestions, isTimeout);
-    }
-    
-    function renderResults(correct, attempted, total, isTimeout) {
-        const score = correct * 10; // Assuming 10 points per question
-        const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
-        
-        quizTimerDisplay.textContent = "Finished";
-        quizControls.classList.add('hidden');
-        submitButton.classList.add('hidden');
-
-        const message = isTimeout ? 'Time Expired! The quiz was automatically submitted.' : 'Quiz submitted successfully! 🎉';
-        const scoreColor = percentage >= 70 ? 'text-green-600' : percentage >= 40 ? 'text-yellow-600' : 'text-red-600';
-
-        quizCard.innerHTML = `
-            <div class="flex flex-col items-center justify-center p-8 md:p-12 text-center">
-                <svg class="w-16 h-16 text-indigo-500 mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <h3 class="text-3xl font-extrabold text-indigo-800 mb-2">${message}</h3>
-                <p class="text-lg text-gray-600 mb-6">Here are your results for the ${currentQuizTitle}.</p>
-                
-                <div class="grid grid-cols-2 gap-4 w-full max-w-sm text-left">
-                    <div class="p-3 bg-gray-50 rounded-lg">
-                        <div class="text-sm text-gray-500">Total Questions</div>
-                        <div class="text-xl font-bold text-gray-800">${total}</div>
-                    </div>
-                    <div class="p-3 bg-gray-50 rounded-lg">
-                        <div class="text-sm text-gray-500">Attempted</div>
-                        <div class="text-xl font-bold text-gray-800">${attempted}</div>
-                    </div>
-                    <div class="p-3 bg-gray-50 rounded-lg">
-                        <div class="text-sm text-gray-500">Correct Answers</div>
-                        <div class="text-xl font-bold ${scoreColor}">${correct}</div>
-                    </div>
-                    <div class="p-3 bg-gray-50 rounded-lg">
-                        <div class="text-sm text-gray-500">Score Percentage</div>
-                        <div class="text-xl font-bold ${scoreColor}">${percentage}%</div>
-                    </div>
+        <div id="quiz-screen" class="screen" style="display:none;">
+            <p id="question-counter" class="counter"></p>
+            <h3 id="question-text"></h3>
+            <form id="quiz-form">
+                <div id="options-container" class="options-grid">
                 </div>
+                <button type="submit" id="next-button">Submit Answer & Next</button>
+            </form>
+        </div>
 
-                <button onclick="resetToDashboard()" class="mt-8 bg-indigo-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg">
-                    Return to Dashboard
-                </button>
-            </div>
-        `;
-        
-        // Update progress widget (simulated logic)
-        updateSimulatedProgress(percentage);
-    }
-    
-    window.resetToDashboard = function() {
-        quizData = [];
-        userAnswers = [];
-        currentQuestionIndex = 0;
-        stopTimer();
-        currentQuizTitle = '';
-        
-        // Reset timer display to default
-        quizTimerDisplay.textContent = "10:00"; 
-        quizView.classList.add('hidden');
-        dashboardView.classList.remove('hidden');
-    }
+        <div id="score-screen" class="screen" style="display:none;">
+            <h2>Assessment Complete! 🎉</h2>
+            <p>Your Final Score: <span id="final-score"></span> out of 10</p>
+            <p class="small-text">Your performance and integrity metrics have been securely recorded for review by the recruiting team.</p>
+        </div>
+    </div>
 
-    // Function to simulate updating the progress widget after a quiz
-    function updateSimulatedProgress(newPercentage) {
-        const progressDisplay = document.getElementById('progress-percentage-display');
-        const progressBar = document.getElementById('progress-bar');
-        const currentPercentage = parseInt(progressDisplay.textContent) || 0;
-        
-        // Only update if the new quiz resulted in a higher score/progress (simple logic)
-        if (newPercentage > currentPercentage) {
-            progressDisplay.textContent = `${newPercentage}%`;
-            progressBar.style.width = `${newPercentage}%`;
-        }
-    }
+    <script src="script.js"></script>
 
-    // Initialize/Reset
-    resetToDashboard(); 
-
-</script>
 </body>
 </html>
