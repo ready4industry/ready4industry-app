@@ -1,4 +1,447 @@
-<div class="form-section">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Roadmap to ₹12LPA+ (Survey)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES & GLOBAL STYLES (Mobile-First Default) --- */
+        :root {
+            --color-bg: #1A1A2E; 
+            --color-card: #2C2C40; 
+            --color-accent: #00FFC0; 
+            --color-text: #E0E0E0;
+            --color-placeholder: #8A8A99;
+            --color-border: #4A4A5E;
+            --color-star: #FFD700; 
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: var(--color-card);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--color-border);
+        }
+
+        /* --- HEADER & NEW SURVEY TAG --- */
+        .header { 
+            text-align: center; 
+            margin-bottom: 2.5rem; 
+        }
+
+        .survey-tag {
+            display: block; 
+            font-size: 1.2rem;
+            color: var(--color-bg); 
+            background-color: var(--color-accent); 
+            font-weight: 900;
+            padding: 0.25rem 0.5rem;
+            margin: 0 auto 0.5rem auto;
+            width: fit-content;
+            border-radius: 4px;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(0, 255, 192, 0.8);
+            text-shadow: none; 
+        }
+
+        .header h1 { 
+            font-size: 1.8rem; 
+            color: var(--color-accent); 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            text-shadow: 0 0 5px rgba(0, 255, 192, 0.5); 
+            line-height: 1.2; 
+        }
+
+        .header h2 { 
+            font-size: 1rem; 
+            font-weight: 600; 
+            color: var(--color-text); 
+            margin-top: 0.5rem; 
+        }
+
+        .header p { 
+            font-size: 0.85rem; 
+            color: var(--color-placeholder); 
+            margin-top: 1rem; 
+            font-style: italic; 
+        }
+
+        /* --- FORM STRUCTURE & INPUTS --- */
+        .form-section { 
+            margin-bottom: 2rem; 
+            padding: 1.5rem 0; 
+            border-bottom: 1px dashed var(--color-border); 
+        }
+        
+        .form-section:last-of-type { 
+            border-bottom: none; 
+        }
+
+        .form-section h3 { 
+            font-size: 1.2rem; 
+            color: var(--color-accent); 
+            margin-bottom: 1.5rem; 
+            border-left: 3px solid var(--color-accent); 
+            padding-left: 10px; 
+        }
+
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text);
+            font-size: 1rem;
+        }
+        
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E0E0E0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 1em;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 5px var(--color-accent);
+            outline: none;
+        }
+
+        /* --- CHIP/BUTTON GROUP STYLES (Radio Buttons) --- */
+        .chip-group, .role-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .chip-group input[type="radio"], .role-list input[type="radio"] {
+            display: none;
+        }
+
+        .chip-group label, .role-list label {
+            background-color: var(--color-card);
+            border: 1px solid var(--color-border);
+            padding: 0.6rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 400;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 0.9rem;
+            flex-grow: 0; 
+            flex-shrink: 0;
+            margin-bottom: 0;
+            white-space: nowrap; 
+        }
+
+        .chip-group input[type="radio"]:checked + label,
+        .role-list input[type="radio"]:checked + label {
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 8px rgba(0, 255, 192, 0.5);
+            font-weight: 600;
+        }
+
+        /* --- Segmented Control (Salary) --- */
+        .segmented-control {
+            display: flex;
+            gap: 0.25rem;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 0;
+            background-color: var(--color-bg);
+        }
+
+        .segmented-control label {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            border: none;
+            border-radius: 0;
+            background-color: transparent;
+            font-size: 0.85rem;
+            font-weight: 400;
+            margin: 0;
+            white-space: nowrap; 
+        }
+        
+        .segmented-control input[type="radio"]:checked + label {
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            box-shadow: none;
+        }
+
+        /* --- EXPANDABLE ROLES/SECTORS LIST --- */
+        .hidden-roles, .hidden-sectors {
+            /* This div contains the hidden elements. It should be hidden by default. */
+            display: none; 
+            width: 100%; 
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* Style for the View More Text Link */
+        .view-more-link {
+            display: block; 
+            width: 100%;
+            text-align: center;
+            color: var(--color-accent); 
+            text-decoration: none; 
+            padding: 0.5rem 0;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .view-more-link:hover {
+            color: #00E6B9; 
+            text-decoration: underline;
+        }
+
+        /* --- RATING SCALE (Star/Proficiency) --- */
+        .rating-group {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column; 
+        }
+        
+        .rating-scale {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+
+        .rating-scale input[type="radio"] {
+            display: none;
+        }
+        
+        .rating-scale label {
+            font-size: 1.6rem;
+            color: var(--color-border);
+            cursor: pointer;
+            padding: 0 0.2rem;
+            transition: color 0.2s;
+            margin-bottom: 0;
+        }
+        
+        .rating-scale label:before {
+            content: '★';
+            display: inline-block;
+        }
+
+        .rating-scale input:checked ~ label:before,
+        .rating-scale input:hover ~ label:before,
+        .rating-scale label:hover ~ label:before {
+            color: var(--color-star);
+        }
+        
+        /* --- SUBMIT BUTTON & STATUS --- */
+        .submit-group {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-button:hover {
+            background-color: #00E6B9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 192, 0.4);
+        }
+
+        #status-message {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: var(--color-accent);
+            text-shadow: 0 0 3px rgba(0, 255, 192, 0.4);
+            min-height: 20px; 
+        }
+        
+        /* --- DESKTOP OPTIMIZATION (Media Query) --- */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px; 
+                padding: 3rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .rating-group {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .rating-group label:first-child { 
+                flex-basis: 70%; 
+                margin-bottom: 0;
+            }
+
+            .rating-scale {
+                flex-basis: 30%;
+                justify-content: flex-end;
+                margin-top: 0;
+            }
+
+            .chip-group label, .role-list label {
+                flex-grow: 0;
+                flex-basis: auto;
+            }
+
+            .segmented-control label {
+                font-size: 0.95rem;
+                padding: 0.8rem 1rem;
+            }
+            
+            .submit-button {
+                width: 75%; 
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1><span class="survey-tag">SURVEY</span><br>Your Roadmap to ₹12LPA+</h1>
+            <h2>Pre-Training Survey: Unlock Your High-Value Engineering Potential</h2>
+            <p>Data from this short survey directly customizes the training session for your batch, focusing only on the skills that recruiters pay the most for.</p>
+        </div>
+
+        <form id="roadmap-form">
+            
+            <div class="form-section">
+                <h3>I. Target & Aspiration</h3>
+
+                <div class="form-group">
+                    <label for="target_industry">1. Which high-growth sector are you aiming for?</label>
+                    
+                    <div class="chip-group">
+                        <input type="radio" id="sector_ai_llm" name="target_industry" value="Generative AI and Large Language Models (LLMs)" required><label for="sector_ai_llm">Generative AI and Large Language Models (LLMs)</label>
+                        <input type="radio" id="sector_fintech" name="target_industry" value="FinTech and Financial Services"><label for="sector_fintech">FinTech and Financial Services</label>
+                        <input type="radio" id="sector_health" name="target_industry" value="HealthTech and Genomics"><label for="sector_health">HealthTech and Genomics</label>
+                        <input type="radio" id="sector_deeptech" name="target_industry" value="Deep Tech (Quantum Computing, Robotics, and IoT)"><label for="sector_deeptech">Deep Tech (Quantum Computing, Robotics, and IoT)</label>
+                        <input type="radio" id="sector_gaming" name="target_industry" value="Gaming and Extended Reality (XR/AR/VR)"><label for="sector_gaming">Gaming and Extended Reality (XR/AR/VR)</label>
+                        
+                        <div id="hiddenSectors" class="hidden-sectors">
+                            <input type="radio" id="sector_embedded" name="target_industry" value="Embedded Systems and Automotive Tech"><label for="sector_embedded">Embedded Systems and Automotive Tech</label>
+                            <input type="radio" id="sector_cyber" name="target_industry" value="Cybersecurity (DevSecOps)"><label for="sector_cyber">Cybersecurity (DevSecOps)</label>
+                            <input type="radio" id="sector_ecommerce" name="target_industry" value="E-commerce and SaaS (Software as a Service) Platforms"><label for="sector_ecommerce">E-commerce and SaaS (Software as a Service) Platforms</label>
+                            <input type="radio" id="sector_data_science" name="target_industry" value="Data Science and Business Intelligence"><label for="sector_data_science">Data Science and Business Intelligence</label>
+                            <input type="radio" id="sector_cloud" name="target_industry" value="Cloud Computing and Distributed Systems"><label for="sector_cloud">Cloud Computing and Distributed Systems</label>
+                        </div>
+                    </div>
+                    <a href="#" id="viewMoreSectorsLink" class="view-more-link">
+                        View 5 More Sectors ▼
+                    </a>
+                </div>
+
+                <div class="form-group">
+                    <label>2. What is your desired high-paying entry-level role?</label>
+                    
+                    <div class="role-list" id="roleListContainer">
+                        <input type="radio" id="role_ai" name="target_role" value="Artificial Intelligence and Machine Learning Engineer" required>
+                        <label for="role_ai">Artificial Intelligence and Machine Learning Engineer</label>
+                        <input type="radio" id="role_cyber" name="target_role" value="Cybersecurity and Application Security Analyst">
+                        <label for="role_cyber">Cybersecurity and Application Security Analyst</label>
+                        <input type="radio" id="role_cloud" name="target_role" value="Cloud Computing Solutions Architect">
+                        <label for="role_cloud">Cloud Computing Solutions Architect</label>
+                        <input type="radio" id="role_devops" name="target_role" value="DevOps and Site Reliability Engineer">
+                        <label for="role_devops">DevOps and Site Reliability Engineer</label>
+                        <input type="radio" id="role_data_eng" name="target_role" value="Data Engineering and Big Data Specialist">
+                        <label for="role_data_eng">Data Engineering and Big Data Specialist</label>
+
+                        <div id="hiddenRoles" class="hidden-roles">
+                            <input type="radio" id="role_fintech" name="target_role" value="FinTech Trading Systems Developer">
+                            <label for="role_fintech">FinTech Trading Systems Developer</label>
+                            <input type="radio" id="role_blockchain" name="target_role" value="Enterprise Blockchain Developer">
+                            <label for="role_blockchain">Enterprise Blockchain Developer</label>
+                            <input type="radio" id="role_fullstack" name="target_role" value="Specialized Full-Stack Microservices Developer">
+                            <label for="role_fullstack">Specialized Full-Stack Microservices Developer</label>
+                            <input type="radio" id="role_apm" name="target_role" value="Associate Product Management or Technical Program Manager">
+                            <label for="role_apm">Associate Product Management or Technical Program Manager</label>
+                            <input type="radio" id="role_consultant" name="target_role" value="Technical Consultant or Solutions Engineer">
+                            <label for="role_consultant">Technical Consultant or Solutions Engineer</label>
+                        </div>
+                    </div>
+                    <a href="#" id="viewMoreLink" class="view-more-link">
+                        View 5 More Roles ▼
+                    </a>
+                </div>
+
+                <div class="form-group">
+                    <label for="salary_expectation">3. What is your minimum acceptable annual compensation (CTC)?</label>
+                    <div class="segmented-control">
+                        <input type="radio" id="salary_under5" name="salary_expectation" value="<5LPA" required><label for="salary_under5">< ₹5LPA</label>
+                        <input type="radio" id="salary_5_8" name="salary_expectation" value="5-8LPA"><label for="salary_5_8">₹5LPA - ₹8LPA</label>
+                        <input type="radio" id="salary_8_12" name="salary_expectation" value="8-12LPA"><label for="salary_8_12">₹8LPA - ₹12LPA</label>
+                        <input type="radio" id="salary_12plus" name="salary_expectation" value="12LPA+"><label for="salary_12plus">₹12LPA+</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
                 <h3>II. Skills & Knowledge Gap</h3>
                 <p style="font-size: 0.85rem; color: var(--color-placeholder); margin-bottom: 1.5rem;">Rate your proficiency (1 = No experience, 5 = Expert/Can teach others).</p>
 
@@ -79,3 +522,165 @@
                     </div>
                 </div>
             </div>
+
+            <div class="form-section">
+                <h3>III. Training Design & Logistics</h3>
+
+                <div class="form-group">
+                    <label for="preferred_format">4. What learning format is most effective for you?</label>
+                    <div class="chip-group">
+                        <input type="radio" id="format_workshop" name="preferred_format" value="Hands-on Workshop" required><label for="format_workshop">Hands-on Workshop</label>
+                        <input type="radio" id="format_case" name="preferred_format" value="Case Study Analysis"><label for="format_case">Case Study Analysis</label>
+                        <input type="radio" id="format_interview" name="preferred_format" value="Interview Simulation"><label for="format_interview">Interview Simulation</label>
+                        <input type="radio" id="format_lecture" name="preferred_format" value="Interactive Lecture/Q&A"><label for="format_lecture">Interactive Q&A</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="biggest_training_need">5. Which single topic would most improve your high-paid job odds?</label>
+                    <select id="biggest_training_need" name="biggest_training_need" required>
+                        <option value="" disabled selected>Select one core need</option>
+                        <option value="Interview Strategy/Mock Interviews">Interview Strategy/Mock Interviews</option>
+                        <option value="Resume/LinkedIn Optimization">Resume/LinkedIn Optimization</option>
+                        <option value="Salary Negotiation/Offer Evaluation">Salary Negotiation/Offer Evaluation</option>
+                        <option value="Deep-dive into Technical Fundamentals">Deep-dive into Technical Fundamentals</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="time_commitment_hpd">6. How many extra hours per week are you willing to dedicate to this upskilling?</label>
+                    <div class="segmented-control">
+                        <input type="radio" id="time_0_3" name="time_commitment_hpd" value="0-3 hrs" required><label for="time_0_3">0-3 hrs</label>
+                        <input type="radio" id="time_3_6" name="time_commitment_hpd" value="3-6 hrs"><label for="time_3_6">3-6 hrs</label>
+                        <input type="radio" id="time_6_10" name="time_commitment_hpd" value="6-10 hrs"><label for="time_6_10">6-10 hrs</label>
+                        <input type="radio" id="time_10plus" name="time_commitment_hpd" value="10+ hrs"><label for="time_10plus">10+ hrs (I'm ready!)</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="qualitative_concern">7. Your \#1 job market concern? (Be specific)</label>
+                    <textarea id="qualitative_concern" name="qualitative_concern" placeholder="e.g., 'I can code, but I don't know how to negotiate an offer above ₹8LPA.'"></textarea>
+                </div>
+            </div>
+
+            <div class="submit-group">
+                <button type="submit" id="submit-button" class="submit-button">
+                    Submit & Reserve My Training Spot
+                </button>
+                <div id="status-message"></div>
+                <p style="font-size: 0.75rem; color: var(--color-placeholder); margin-top: 1rem;">
+                    Your responses are confidential and are secured by Supabase.
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // *** 1. SUPABASE CREDENTIALS (EMBEDDED) ***
+        const SUPABASE_URL = 'https://mijfiogntlghmogujpir.supabase.co'; 
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pamZpb2dudGxnaG1vZ3VqcGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDk5MjMsImV4cCI6MjA3NTYyNTkyM30.gi83P3L8TDQHxd5TQfA6BHr6-oIvOKmBrROlFQ-XFdg';
+        const TABLE_NAME = 'roadmap_submissions';
+        // *************************************************************
+
+        const form = document.getElementById('roadmap-form');
+        const submitButton = document.getElementById('submit-button');
+        const statusMessage = document.getElementById('status-message');
+        
+        
+        // --- EXPAND/COLLAPSE FUNCTION CREATOR ---
+        function setupToggle(hiddenContainerId, linkId, moreText, fewerText) {
+            const hiddenContainer = document.getElementById(hiddenContainerId);
+            const toggleLink = document.getElementById(linkId);
+
+            if (!hiddenContainer || !toggleLink) {
+                console.error(`Missing elements for toggle: Container ID ${hiddenContainerId}, Link ID ${linkId}`);
+                return;
+            }
+
+            toggleLink.addEventListener('click', function(e) {
+                e.preventDefault(); 
+                
+                // Determine visibility using computed style for robustness
+                const isHidden = window.getComputedStyle(hiddenContainer).display === 'none';
+                
+                if (isHidden) {
+                    hiddenContainer.style.display = 'flex'; // Show
+                    toggleLink.innerHTML = fewerText; 
+                } else {
+                    hiddenContainer.style.display = 'none'; // Hide
+                    toggleLink.innerHTML = moreText;
+                }
+            });
+        }
+
+        // --- SETUP BOTH TOGGLES (This uses the fixed function) ---
+        setupToggle('hiddenSectors', 'viewMoreSectorsLink', 'View 5 More Sectors ▼', 'View Fewer Sectors ▲');
+        setupToggle('hiddenRoles', 'viewMoreLink', 'View 5 More Roles ▼', 'View Fewer Roles ▲');
+
+
+        // --- SUPABASE SUBMISSION JS ---
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault(); 
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+            statusMessage.textContent = 'Sending data to server...';
+
+            const formData = new FormData(form);
+            const data = {};
+
+            // 2. Format the data for Supabase
+            for (let [name, value] of formData.entries()) {
+                // Convert proficiency ratings to integers, and handle new names
+                if ((name.includes('_dsa') || name.includes('_devops') || name.includes('_experience') || name.includes('_skills') || name.includes('_stat') || name.includes('_ethic') || name.includes('_context')) && value) {
+                    data[name] = parseInt(value, 10);
+                } else {
+                    data[name] = value;
+                }
+            }
+            
+            // Re-checking the data object for debugging (optional)
+            console.log('Data being sent to Supabase:', data);
+
+
+            // 3. Construct the API Call
+            const apiUrl = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                        'Prefer': 'return=minimal' 
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    // Success!
+                    statusMessage.textContent = 'Success! Data Captured. Thank you! 🎉';
+                    form.reset(); 
+                    submitButton.textContent = 'Submitted Successfully!';
+                } else {
+                    // Failure
+                    const errorText = await response.text();
+                    statusMessage.textContent = `Error: Submission failed. Check console. (${response.status})`;
+                    console.error('Supabase Error:', errorText);
+                    submitButton.textContent = 'Try Again';
+                    submitButton.disabled = false;
+                }
+
+            } catch (error) {
+                // Network or other critical error
+                statusMessage.textContent = 'Network Error. Could not connect to the database.';
+                console.error('Fetch Error:', error);
+                submitButton.textContent = 'Try Again';
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
