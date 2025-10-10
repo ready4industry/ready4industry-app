@@ -211,16 +211,16 @@
             box-shadow: none;
         }
 
-        /* --- EXPANDABLE ROLES LIST --- */
-        .hidden-roles {
+        /* --- EXPANDABLE ROLES/SECTORS LIST --- */
+        .hidden-roles, .hidden-sectors {
             width: 100%; 
             display: flex; 
             flex-wrap: wrap;
             gap: 0.5rem;
         }
         
-        .role-list > .hidden-roles {
-            /* This ensures the hidden block starts as display: none */
+        /* Ensures the hidden blocks start as display: none */
+        .role-list > .hidden-roles, .chip-group > .hidden-sectors {
             display: none; 
         }
 
@@ -345,7 +345,7 @@
                 margin-top: 0;
             }
 
-            .chip-group label, .role-list label, .hidden-roles label {
+            .chip-group label, .role-list label, .hidden-roles label, .hidden-sectors label {
                 flex-grow: 0;
                 flex-basis: auto;
             }
@@ -379,13 +379,24 @@
                 <div class="form-group">
                     <label for="target_industry">1. Which high-growth sector are you aiming for?</label>
                     <div class="chip-group">
-                        <input type="radio" id="industry_tech" name="target_industry" value="Tech/SaaS" required><label for="industry_tech">Tech/SaaS (Software)</label>
-                        <input type="radio" id="industry_fintech" name="target_industry" value="FinTech"><label for="industry_fintech">FinTech</label>
-                        <input type="radio" id="industry_ai" name="target_industry" value="Data Science/AI"><label for="industry_ai">Data Science/AI</label>
-                        <input type="radio" id="industry_energy" name="target_industry" value="Energy/Green Tech"><label for="industry_energy">Energy/Green Tech</label>
-                        <input type="radio" id="industry_core" name="target_industry" value="Core Engineering (R&D)"><label for="industry_core">Core Engineering (R&D)</label>
-                        <input type="radio" id="industry_consulting" name="target_industry" value="Consulting"><label for="industry_consulting">Consulting</label>
+                        <input type="radio" id="sector_ai_llm" name="target_industry" value="Generative AI and Large Language Models (LLMs)" required><label for="sector_ai_llm">Generative AI and Large Language Models (LLMs)</label>
+                        <input type="radio" id="sector_fintech" name="target_industry" value="FinTech and Financial Services"><label for="sector_fintech">FinTech and Financial Services</label>
+                        <input type="radio" id="sector_health" name="target_industry" value="HealthTech and Genomics"><label for="sector_health">HealthTech and Genomics</label>
+                        <input type="radio" id="sector_deeptech" name="target_industry" value="Deep Tech (Quantum Computing, Robotics, and IoT)"><label for="sector_deeptech">Deep Tech (Quantum Computing, Robotics, and IoT)</label>
+                        <input type="radio" id="sector_gaming" name="target_industry" value="Gaming and Extended Reality (XR/AR/VR)"><label for="sector_gaming">Gaming and Extended Reality (XR/AR/VR)</label>
+                        
+                        <div id="hiddenSectors" class="hidden-sectors">
+                            <input type="radio" id="sector_embedded" name="target_industry" value="Embedded Systems and Automotive Tech"><label for="sector_embedded">Embedded Systems and Automotive Tech</label>
+                            <input type="radio" id="sector_cyber" name="target_industry" value="Cybersecurity (DevSecOps)"><label for="sector_cyber">Cybersecurity (DevSecOps)</label>
+                            <input type="radio" id="sector_ecommerce" name="target_industry" value="E-commerce and SaaS (Software as a Service) Platforms"><label for="sector_ecommerce">E-commerce and SaaS (Software as a Service) Platforms</label>
+                            <input type="radio" id="sector_data_science" name="target_industry" value="Data Science and Business Intelligence"><label for="sector_data_science">Data Science and Business Intelligence</label>
+                            <input type="radio" id="sector_cloud" name="target_industry" value="Cloud Computing and Distributed Systems"><label for="sector_cloud">Cloud Computing and Distributed Systems</label>
+                        </div>
                     </div>
+                    
+                    <a href="#" id="viewMoreSectorsLink" class="view-more-link">
+                        View 5 More Sectors ▼
+                    </a>
                 </div>
 
                 <div class="form-group">
@@ -556,27 +567,42 @@
         
         // --- EXPANDABLE ROLES JS ---
         const hiddenRoles = document.getElementById('hiddenRoles');
-        const viewMoreLink = document.getElementById('viewMoreLink'); // Link reference
+        const viewMoreLink = document.getElementById('viewMoreLink'); 
 
         viewMoreLink.addEventListener('click', function(e) {
-            e.preventDefault(); // STOP the link from navigating/reloading the page
-
-            // Toggle the display property
+            e.preventDefault(); 
             const isHidden = hiddenRoles.style.display === 'none' || hiddenRoles.style.display === '';
             
             if (isHidden) {
-                hiddenRoles.style.display = 'flex'; // Use flex to maintain the chip layout
-                viewMoreLink.innerHTML = 'View Fewer Roles ▲'; // Update the text/arrow
+                hiddenRoles.style.display = 'flex'; 
+                viewMoreLink.innerHTML = 'View Fewer Roles ▲'; 
             } else {
                 hiddenRoles.style.display = 'none';
                 viewMoreLink.innerHTML = 'View 5 More Roles ▼';
+            }
+        });
+        
+        // --- EXPANDABLE SECTORS JS (NEW) ---
+        const hiddenSectors = document.getElementById('hiddenSectors');
+        const viewMoreSectorsLink = document.getElementById('viewMoreSectorsLink'); 
+
+        viewMoreSectorsLink.addEventListener('click', function(e) {
+            e.preventDefault(); 
+            const isHidden = hiddenSectors.style.display === 'none' || hiddenSectors.style.display === '';
+            
+            if (isHidden) {
+                hiddenSectors.style.display = 'flex'; 
+                viewMoreSectorsLink.innerHTML = 'View Fewer Sectors ▲'; 
+            } else {
+                hiddenSectors.style.display = 'none';
+                viewMoreSectorsLink.innerHTML = 'View 5 More Sectors ▼';
             }
         });
 
 
         // --- SUPABASE SUBMISSION JS ---
         form.addEventListener('submit', async function(event) {
-            event.preventDefault(); // Stop the default form submission (page reload)
+            event.preventDefault(); 
 
             submitButton.disabled = true;
             submitButton.textContent = 'Submitting...';
@@ -586,53 +612,3 @@
             const data = {};
 
             // 2. Format the data for Supabase
-            for (let [name, value] of formData.entries()) {
-                // Convert proficiency ratings to integers
-                if (name.includes('_proficiency') && value) {
-                    data[name] = parseInt(value, 10);
-                } else {
-                    data[name] = value;
-                }
-            }
-
-            // 3. Construct the API Call
-            const apiUrl = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
-            
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, // Required for RLS
-                        'Prefer': 'return=minimal' // We don't need the server to send the data back
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (response.ok) {
-                    // Success!
-                    statusMessage.textContent = 'Success! Data Captured. Thank you! 🎉';
-                    form.reset(); // Clear the form fields
-                    submitButton.textContent = 'Submitted Successfully!';
-                } else {
-                    // Failure
-                    const errorText = await response.text();
-                    statusMessage.textContent = `Error: Submission failed. Check console. (${response.status})`;
-                    console.error('Supabase Error:', errorText);
-                    submitButton.textContent = 'Try Again';
-                    submitButton.disabled = false;
-                }
-
-            } catch (error) {
-                // Network or other critical error
-                statusMessage.textContent = 'Network Error. Could not connect to the database.';
-                console.error('Fetch Error:', error);
-                submitButton.textContent = 'Try Again';
-                submitButton.disabled = false;
-            }
-        });
-    </script>
-
-</body>
-</html>
