@@ -357,17 +357,47 @@
             <div class="form-section">
                 <h3>I. Target & Aspiration</h3>
 
-                <div class="form-group">
-                    <label for="target_industry">1. Which high-growth sector are you aiming for?</label>
-                    <div class="chip-group">
-                        <input type="radio" id="industry_tech" name="target_industry" value="Tech/SaaS" required><label for="industry_tech">Tech/SaaS (Software)</label>
-                        <input type="radio" id="industry_fintech" name="target_industry" value="FinTech"><label for="industry_fintech">FinTech</label>
-                        <input type="radio" id="industry_ai" name="target_industry" value="Data Science/AI"><label for="industry_ai">Data Science/AI</label>
-                        <input type="radio" id="industry_energy" name="target_industry" value="Energy/Green Tech"><label for="industry_energy">Energy/Green Tech</label>
-                        <input type="radio" id="industry_core" name="target_industry" value="Core Engineering (R&D)"><label for="industry_core">Core Engineering (R&D)</label>
-                        <input type="radio" id="industry_consulting" name="target_industry" value="Consulting"><label for="industry_consulting">Consulting</label>
-                    </div>
-                </div>
+               <div class="form-group">
+    <label for="target_role">2. What is your desired high-paying entry-level role?</label>
+    
+    <div class="role-list">
+        <input type="radio" id="role_ai" name="target_role" value="Artificial Intelligence and Machine Learning Engineer" required>
+        <label for="role_ai">Artificial Intelligence and Machine Learning Engineer</label>
+
+        <input type="radio" id="role_cyber" name="target_role" value="Cybersecurity and Application Security Analyst">
+        <label for="role_cyber">Cybersecurity and Application Security Analyst</label>
+
+        <input type="radio" id="role_cloud" name="target_role" value="Cloud Computing Solutions Architect">
+        <label for="role_cloud">Cloud Computing Solutions Architect</label>
+
+        <input type="radio" id="role_devops" name="target_role" value="DevOps and Site Reliability Engineer">
+        <label for="role_devops">DevOps and Site Reliability Engineer</label>
+
+        <input type="radio" id="role_data_eng" name="target_role" value="Data Engineering and Big Data Specialist">
+        <label for="role_data_eng">Data Engineering and Big Data Specialist</label>
+
+        <div id="hiddenRoles" class="hidden-roles">
+            <input type="radio" id="role_fintech" name="target_role" value="FinTech Trading Systems Developer">
+            <label for="role_fintech">FinTech Trading Systems Developer</label>
+
+            <input type="radio" id="role_blockchain" name="target_role" value="Enterprise Blockchain Developer">
+            <label for="role_blockchain">Enterprise Blockchain Developer</label>
+
+            <input type="radio" id="role_fullstack" name="target_role" value="Specialized Full-Stack Microservices Developer">
+            <label for="role_fullstack">Specialized Full-Stack Microservices Developer</label>
+
+            <input type="radio" id="role_apm" name="target_role" value="Associate Product Management or Technical Program Manager">
+            <label for="role_apm">Associate Product Management or Technical Program Manager</label>
+
+            <input type="radio" id="role_consultant" name="target_role" value="Technical Consultant or Solutions Engineer">
+            <label for="role_consultant">Technical Consultant or Solutions Engineer</label>
+        </div>
+    </div>
+    
+    <button type="button" id="viewMoreBtn" class="view-more-btn">
+        View 5 More Roles ▼
+    </button>
+</div>
 
                 <div class="form-group">
                     <label for="target_role">2. What is your desired high-paying entry-level role?</label>
