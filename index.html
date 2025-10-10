@@ -184,19 +184,21 @@
             font-weight: 600;
         }
 
-        /* --- Segmented Control (Salary) --- */
+        /* --- Segmented Control (Salary & Time Commitment) --- */
         .segmented-control {
             display: flex;
-            gap: 0.25rem;
+            /* REMOVED: gap: 0.25rem; */ /* Remove the gap to make all 4 labels line up perfectly */
             border: 1px solid var(--color-border);
             border-radius: 8px;
             overflow: hidden;
             padding: 0;
             background-color: var(--color-bg);
+            width: 100%; /* Ensure it takes full width */
         }
 
         .segmented-control label {
-            flex: 1;
+            /* NEW: Flex property forces equal width for all 4 segments */
+            flex: 1 1 0; 
             padding: 0.75rem 0.5rem;
             border: none;
             border-radius: 0;
@@ -205,6 +207,14 @@
             font-weight: 400;
             margin: 0;
             white-space: nowrap; 
+            text-align: center; /* Center the text inside the segment */
+            /* Add separation lines back manually */
+            border-right: 1px solid var(--color-border); 
+        }
+        
+        /* Remove the right border from the last segment */
+        .segmented-control label:last-of-type {
+            border-right: none;
         }
         
         .segmented-control input[type="radio"]:checked + label {
@@ -212,6 +222,8 @@
             color: var(--color-bg);
             box-shadow: none;
         }
+        /* --- END OF SEGMENTED CONTROL FIX --- */
+
 
         /* --- EXPANDABLE ROLES/SECTORS LIST --- */
         .hidden-roles, .hidden-sectors {
@@ -626,7 +638,7 @@
         // *** 1. SUPABASE CREDENTIALS (EMBEDDED) ***
         const SUPABASE_URL = 'https://mijfiogntlghmogujpir.supabase.co'; 
         // 🚨 CRUCIAL: REPLACE THE STRING BELOW WITH YOUR ACTUAL, CORRECT SUPABASE ANON KEY
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pamZpb2dudGxnaG1vZ3VqcGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDk5MjMsImV4cCI6MjA3NTYyNTkyM30.gi83P3L8TDQHxd5TQfA6BHr6-oIvOKmBrROrFQ-XFdg'; 
+        const SUPABASE_ANON_KEY = 'YOUR_CORRECT_ANON_KEY_GOES_HERE'; 
         const TABLE_NAME = 'roadmap_submissions';
         // *************************************************************
 
@@ -680,7 +692,7 @@
 
             // Format the data for Supabase
             for (let [name, value] of formData.entries()) {
-                // Convert proficiency ratings to integers, checking for new and old rating field names
+                // Convert proficiency ratings to integers, checking for rating field names
                 if ((name.includes('_dsa') || name.includes('_devops') || name.includes('_experience') || name.includes('_skills') || name.includes('_stat') || name.includes('_ethic') || name.includes('_context')) && value) {
                     data[name] = parseInt(value, 10);
                 } else {
