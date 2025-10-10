@@ -17,8 +17,37 @@
             --color-border: #4A4A5E;
             --color-star: #FFD700; 
         }
+        /* --- Add this style block inside your existing <style> tags --- */
 
-        * {
+.survey-tag {
+    display: block; /* Forces it to its own line */
+    font-size: 1.2rem;
+    color: var(--color-bg); /* Dark text on bright background */
+    background-color: var(--color-accent); /* Neon green background */
+    font-weight: 900;
+    padding: 0.25rem 0.5rem;
+    margin: 0 auto 0.5rem auto; /* Center it and add space below */
+    width: fit-content; /* Only as wide as the text */
+    border-radius: 4px;
+    letter-spacing: 2px;
+    box-shadow: 0 0 10px rgba(0, 255, 192, 0.8);
+    text-shadow: none; /* Override existing text-shadow */
+}
+
+/* Update the main h1 style to accommodate the new line */
+.header h1 { 
+    font-size: 1.8rem; 
+    color: var(--color-accent); 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    text-shadow: 0 0 5px rgba(0, 255, 192, 0.5); 
+    line-height: 1.2; /* Ensures spacing between SURVEY and the main title */
+}
+
+/* ---------------------------------------------------------------- */
+
+         {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -317,11 +346,11 @@
 <body>
 
     <div class="container">
-        <div class="header">
-            <h1>Your Roadmap to ₹12LPA+</h1>
-            <h2>Pre-Training Survey: Unlock Your High-Value Engineering Potential</h2>
-            <p>Data from this short survey directly customizes the training session for your batch, focusing only on the skills that recruiters pay the most for.</p>
-        </div>
+      <div class="header">
+    <h1><span class="survey-tag">SURVEY</span><br>Your Roadmap to ₹12LPA+</h1>
+    <h2>Pre-Training Survey: Unlock Your High-Value Engineering Potential</h2>
+    <p>Data from this short survey directly customizes the training session for your batch, focusing only on the skills that recruiters pay the most for.</p>
+</div>
 
         <form id="roadmap-form">
             
@@ -346,13 +375,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="salary_expectation">3. What is your minimum acceptable annual compensation (CTC)?</label>
-                    <div class="segmented-control">
-                        <input type="radio" id="salary_under5" name="salary_expectation" value="<5LPA" required><label for="salary_under5">< ₹5LPA</label>
-                        <input type="radio" id="salary_5_8" name="salary_expectation" value="5-8LPA"><label for="salary_5_8">₹5LPA - ₹8LPA</label>
-                        <input type="radio" id="salary_8_12" name="salary_expectation" value="8-12LPA"><label for="salary_8_12">₹8LPA - ₹12LPA</label>
-                        <input type="radio" id="salary_12plus" name="salary_expectation" value="12LPA+"><label for="salary_12plus">₹12LPA+</label>
-                    </div>
+    <label for="salary_expectation">3. What is your minimum acceptable annual compensation (CTC)?</label>
+    <div class="segmented-control">
+        <input type="radio" id="salary_under5" name="salary_expectation" value="<5LPA" required><label for="salary_under5">< ₹5LPA</label>
+        <input type="radio" id="salary_5_8" name="salary_expectation" value="5-8LPA"><label for="salary_5_8">₹5LPA - ₹8LPA</label>
+        <input type="radio" id="salary_8_12" name="salary_expectation" value="8-12LPA"><label for="salary_8_12">₹8LPA - ₹12LPA</label>
+        <input type="radio" id="salary_12plus" name="salary_expectation" value="12LPA+"><label for="salary_12plus">₹12LPA+</label>
+    </div>
+</div>
                 </div>
             </div>
 
