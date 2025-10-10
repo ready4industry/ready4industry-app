@@ -152,6 +152,8 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
+            /* Added this to ensure the list itself wraps correctly */
+            align-items: flex-start;
         }
 
         .chip-group input[type="radio"], .role-list input[type="radio"] {
@@ -168,7 +170,9 @@
             transition: all 0.2s;
             text-align: center;
             font-size: 0.9rem;
-            flex-grow: 1; 
+            /* Changed to auto for better flow control */
+            flex-grow: 0; 
+            flex-shrink: 0;
             margin-bottom: 0;
             white-space: nowrap; 
         }
@@ -213,15 +217,11 @@
 
         /* --- EXPANDABLE ROLES/SECTORS LIST --- */
         .hidden-roles, .hidden-sectors {
+            /* This div contains the hidden elements. It should be hidden by default. */
+            display: none; 
             width: 100%; 
-            display: flex; 
             flex-wrap: wrap;
             gap: 0.5rem;
-        }
-        
-        /* Ensures the hidden blocks start as display: none */
-        .role-list > .hidden-roles, .chip-group > .hidden-sectors {
-            display: none; 
         }
 
         /* Style for the View More Text Link */
@@ -345,7 +345,7 @@
                 margin-top: 0;
             }
 
-            .chip-group label, .role-list label, .hidden-roles label, .hidden-sectors label {
+            .chip-group label, .role-list label {
                 flex-grow: 0;
                 flex-basis: auto;
             }
@@ -378,6 +378,7 @@
 
                 <div class="form-group">
                     <label for="target_industry">1. Which high-growth sector are you aiming for?</label>
+                    
                     <div class="chip-group">
                         <input type="radio" id="sector_ai_llm" name="target_industry" value="Generative AI and Large Language Models (LLMs)" required><label for="sector_ai_llm">Generative AI and Large Language Models (LLMs)</label>
                         <input type="radio" id="sector_fintech" name="target_industry" value="FinTech and Financial Services"><label for="sector_fintech">FinTech and Financial Services</label>
@@ -393,7 +394,6 @@
                             <input type="radio" id="sector_cloud" name="target_industry" value="Cloud Computing and Distributed Systems"><label for="sector_cloud">Cloud Computing and Distributed Systems</label>
                         </div>
                     </div>
-                    
                     <a href="#" id="viewMoreSectorsLink" class="view-more-link">
                         View 5 More Sectors ▼
                     </a>
@@ -405,37 +405,28 @@
                     <div class="role-list" id="roleListContainer">
                         <input type="radio" id="role_ai" name="target_role" value="Artificial Intelligence and Machine Learning Engineer" required>
                         <label for="role_ai">Artificial Intelligence and Machine Learning Engineer</label>
-
                         <input type="radio" id="role_cyber" name="target_role" value="Cybersecurity and Application Security Analyst">
                         <label for="role_cyber">Cybersecurity and Application Security Analyst</label>
-
                         <input type="radio" id="role_cloud" name="target_role" value="Cloud Computing Solutions Architect">
                         <label for="role_cloud">Cloud Computing Solutions Architect</label>
-
                         <input type="radio" id="role_devops" name="target_role" value="DevOps and Site Reliability Engineer">
                         <label for="role_devops">DevOps and Site Reliability Engineer</label>
-
                         <input type="radio" id="role_data_eng" name="target_role" value="Data Engineering and Big Data Specialist">
                         <label for="role_data_eng">Data Engineering and Big Data Specialist</label>
 
                         <div id="hiddenRoles" class="hidden-roles">
                             <input type="radio" id="role_fintech" name="target_role" value="FinTech Trading Systems Developer">
                             <label for="role_fintech">FinTech Trading Systems Developer</label>
-
                             <input type="radio" id="role_blockchain" name="target_role" value="Enterprise Blockchain Developer">
                             <label for="role_blockchain">Enterprise Blockchain Developer</label>
-
                             <input type="radio" id="role_fullstack" name="target_role" value="Specialized Full-Stack Microservices Developer">
                             <label for="role_fullstack">Specialized Full-Stack Microservices Developer</label>
-
                             <input type="radio" id="role_apm" name="target_role" value="Associate Product Management or Technical Program Manager">
                             <label for="role_apm">Associate Product Management or Technical Program Manager</label>
-
                             <input type="radio" id="role_consultant" name="target_role" value="Technical Consultant or Solutions Engineer">
                             <label for="role_consultant">Technical Consultant or Solutions Engineer</label>
                         </div>
                     </div>
-                    
                     <a href="#" id="viewMoreLink" class="view-more-link">
                         View 5 More Roles ▼
                     </a>
@@ -581,8 +572,8 @@
             toggleLink.addEventListener('click', function(e) {
                 e.preventDefault(); 
                 
-                // Toggle between 'none' (or empty string for initial state) and 'flex'
-                const isHidden = hiddenContainer.style.display === 'none' || hiddenContainer.style.display === '';
+                // Toggle between 'none' (initial state/hidden) and 'flex' (visible)
+                const isHidden = window.getComputedStyle(hiddenContainer).display === 'none';
                 
                 if (isHidden) {
                     hiddenContainer.style.display = 'flex'; // Show and maintain horizontal chip layout
