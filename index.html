@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Roadmap to ₹12LPA+ (Supabase Capture)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Your Roadmap to ₹12LPA+ (Survey)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
     
     <style>
         /* --- VARIABLES & GLOBAL STYLES (Mobile-First Default) --- */
@@ -17,37 +17,8 @@
             --color-border: #4A4A5E;
             --color-star: #FFD700; 
         }
-        /* --- Add this style block inside your existing <style> tags --- */
 
-.survey-tag {
-    display: block; /* Forces it to its own line */
-    font-size: 1.2rem;
-    color: var(--color-bg); /* Dark text on bright background */
-    background-color: var(--color-accent); /* Neon green background */
-    font-weight: 900;
-    padding: 0.25rem 0.5rem;
-    margin: 0 auto 0.5rem auto; /* Center it and add space below */
-    width: fit-content; /* Only as wide as the text */
-    border-radius: 4px;
-    letter-spacing: 2px;
-    box-shadow: 0 0 10px rgba(0, 255, 192, 0.8);
-    text-shadow: none; /* Override existing text-shadow */
-}
-
-/* Update the main h1 style to accommodate the new line */
-.header h1 { 
-    font-size: 1.8rem; 
-    color: var(--color-accent); 
-    font-weight: 700; 
-    text-transform: uppercase; 
-    letter-spacing: 1px; 
-    text-shadow: 0 0 5px rgba(0, 255, 192, 0.5); 
-    line-height: 1.2; /* Ensures spacing between SURVEY and the main title */
-}
-
-/* ---------------------------------------------------------------- */
-
-         {
+        * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -71,10 +42,25 @@
             border: 1px solid var(--color-border);
         }
 
-        /* --- HEADER --- */
+        /* --- HEADER & NEW SURVEY TAG --- */
         .header { 
             text-align: center; 
             margin-bottom: 2.5rem; 
+        }
+
+        .survey-tag {
+            display: block; 
+            font-size: 1.2rem;
+            color: var(--color-bg); 
+            background-color: var(--color-accent); 
+            font-weight: 900;
+            padding: 0.25rem 0.5rem;
+            margin: 0 auto 0.5rem auto;
+            width: fit-content;
+            border-radius: 4px;
+            letter-spacing: 2px;
+            box-shadow: 0 0 10px rgba(0, 255, 192, 0.8);
+            text-shadow: none; 
         }
 
         .header h1 { 
@@ -84,6 +70,7 @@
             text-transform: uppercase; 
             letter-spacing: 1px; 
             text-shadow: 0 0 5px rgba(0, 255, 192, 0.5); 
+            line-height: 1.2; 
         }
 
         .header h2 { 
@@ -141,8 +128,7 @@
             color: var(--color-text);
             font-size: 1rem;
         }
-
-        /* Styling for the select dropdown arrow */
+        
         select {
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -162,17 +148,17 @@
         }
 
         /* --- CHIP/BUTTON GROUP STYLES (Radio Buttons) --- */
-        .chip-group {
+        .chip-group, .role-list {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
         }
 
-        .chip-group input[type="radio"] {
+        .chip-group input[type="radio"], .role-list input[type="radio"] {
             display: none;
         }
 
-        .chip-group label {
+        .chip-group label, .role-list label {
             background-color: var(--color-card);
             border: 1px solid var(--color-border);
             padding: 0.6rem 1rem;
@@ -184,9 +170,11 @@
             font-size: 0.9rem;
             flex-grow: 1; 
             margin-bottom: 0;
+            white-space: nowrap; /* Ensures chips don't break lines awkwardly */
         }
 
-        .chip-group input[type="radio"]:checked + label {
+        .chip-group input[type="radio"]:checked + label,
+        .role-list input[type="radio"]:checked + label {
             background-color: var(--color-accent);
             color: var(--color-bg);
             border-color: var(--color-accent);
@@ -194,7 +182,7 @@
             font-weight: 600;
         }
 
-        /* Segmented Control (Salary) */
+        /* --- Segmented Control (Salary) --- */
         .segmented-control {
             display: flex;
             gap: 0.25rem;
@@ -214,7 +202,7 @@
             font-size: 0.85rem;
             font-weight: 400;
             margin: 0;
-            white-space: nowrap; /* Ensures the whole label stays on one line */
+            white-space: nowrap; 
         }
         
         .segmented-control input[type="radio"]:checked + label {
@@ -223,6 +211,42 @@
             box-shadow: none;
         }
 
+        /* --- EXPANDABLE ROLES LIST (New Feature) --- */
+        .hidden-roles {
+            display: none; 
+            width: 100%; 
+            display: flex; /* Override to block display for initial hiding */
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .role-list > .hidden-roles {
+            display: none; /* Initially hides the hidden-roles container */
+        }
+        
+        /* The container for hidden roles needs to apply the same styling to its children labels */
+        .hidden-roles label {
+             flex-grow: 1;
+        }
+
+        /* Style for the View More Button */
+        .view-more-btn {
+            display: block;
+            width: 100%;
+            background: transparent;
+            color: var(--color-accent);
+            border: 1px dashed var(--color-accent);
+            border-radius: 6px;
+            padding: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .view-more-btn:hover {
+            background-color: rgba(0, 255, 192, 0.1);
+        }
 
         /* --- RATING SCALE (Star/Proficiency) --- */
         .rating-group {
@@ -262,7 +286,7 @@
             color: var(--color-star);
         }
         
-        /* --- SUBMIT BUTTON --- */
+        /* --- SUBMIT BUTTON & STATUS --- */
         .submit-group {
             margin-top: 3rem;
             text-align: center;
@@ -289,7 +313,6 @@
             box-shadow: 0 4px 15px rgba(0, 255, 192, 0.4);
         }
 
-        /* Status Message Style */
         #status-message {
             margin-top: 1rem;
             font-size: 1rem;
@@ -326,7 +349,7 @@
                 margin-top: 0;
             }
 
-            .chip-group label {
+            .chip-group label, .role-list label, .hidden-roles label {
                 flex-grow: 0;
                 flex-basis: auto;
             }
@@ -346,73 +369,79 @@
 <body>
 
     <div class="container">
-      <div class="header">
-    <h1><span class="survey-tag">SURVEY</span><br>Your Roadmap to ₹12LPA+</h1>
-    <h2>Pre-Training Survey: Unlock Your High-Value Engineering Potential</h2>
-    <p>Data from this short survey directly customizes the training session for your batch, focusing only on the skills that recruiters pay the most for.</p>
-</div>
+        <div class="header">
+            <h1><span class="survey-tag">SURVEY</span><br>Your Roadmap to ₹12LPA+</h1>
+            <h2>Pre-Training Survey: Unlock Your High-Value Engineering Potential</h2>
+            <p>Data from this short survey directly customizes the training session for your batch, focusing only on the skills that recruiters pay the most for.</p>
+        </div>
 
         <form id="roadmap-form">
             
             <div class="form-section">
                 <h3>I. Target & Aspiration</h3>
 
-               <div class="form-group">
-    <label for="target_role">2. What is your desired high-paying entry-level role?</label>
-    
-    <div class="role-list">
-        <input type="radio" id="role_ai" name="target_role" value="Artificial Intelligence and Machine Learning Engineer" required>
-        <label for="role_ai">Artificial Intelligence and Machine Learning Engineer</label>
-
-        <input type="radio" id="role_cyber" name="target_role" value="Cybersecurity and Application Security Analyst">
-        <label for="role_cyber">Cybersecurity and Application Security Analyst</label>
-
-        <input type="radio" id="role_cloud" name="target_role" value="Cloud Computing Solutions Architect">
-        <label for="role_cloud">Cloud Computing Solutions Architect</label>
-
-        <input type="radio" id="role_devops" name="target_role" value="DevOps and Site Reliability Engineer">
-        <label for="role_devops">DevOps and Site Reliability Engineer</label>
-
-        <input type="radio" id="role_data_eng" name="target_role" value="Data Engineering and Big Data Specialist">
-        <label for="role_data_eng">Data Engineering and Big Data Specialist</label>
-
-        <div id="hiddenRoles" class="hidden-roles">
-            <input type="radio" id="role_fintech" name="target_role" value="FinTech Trading Systems Developer">
-            <label for="role_fintech">FinTech Trading Systems Developer</label>
-
-            <input type="radio" id="role_blockchain" name="target_role" value="Enterprise Blockchain Developer">
-            <label for="role_blockchain">Enterprise Blockchain Developer</label>
-
-            <input type="radio" id="role_fullstack" name="target_role" value="Specialized Full-Stack Microservices Developer">
-            <label for="role_fullstack">Specialized Full-Stack Microservices Developer</label>
-
-            <input type="radio" id="role_apm" name="target_role" value="Associate Product Management or Technical Program Manager">
-            <label for="role_apm">Associate Product Management or Technical Program Manager</label>
-
-            <input type="radio" id="role_consultant" name="target_role" value="Technical Consultant or Solutions Engineer">
-            <label for="role_consultant">Technical Consultant or Solutions Engineer</label>
-        </div>
-    </div>
-    
-    <button type="button" id="viewMoreBtn" class="view-more-btn">
-        View 5 More Roles ▼
-    </button>
-</div>
-
                 <div class="form-group">
-                    <label for="target_role">2. What is your desired high-paying entry-level role?</label>
-                    <input type="text" id="target_role" name="target_role" placeholder="e.g., Data Scientist, DevOps Engineer, Design Engineer" required>
+                    <label for="target_industry">1. Which high-growth sector are you aiming for?</label>
+                    <div class="chip-group">
+                        <input type="radio" id="industry_tech" name="target_industry" value="Tech/SaaS" required><label for="industry_tech">Tech/SaaS (Software)</label>
+                        <input type="radio" id="industry_fintech" name="target_industry" value="FinTech"><label for="industry_fintech">FinTech</label>
+                        <input type="radio" id="industry_ai" name="target_industry" value="Data Science/AI"><label for="industry_ai">Data Science/AI</label>
+                        <input type="radio" id="industry_energy" name="target_industry" value="Energy/Green Tech"><label for="industry_energy">Energy/Green Tech</label>
+                        <input type="radio" id="industry_core" name="target_industry" value="Core Engineering (R&D)"><label for="industry_core">Core Engineering (R&D)</label>
+                        <input type="radio" id="industry_consulting" name="target_industry" value="Consulting"><label for="industry_consulting">Consulting</label>
+                    </div>
                 </div>
 
                 <div class="form-group">
-    <label for="salary_expectation">3. What is your minimum acceptable annual compensation (CTC)?</label>
-    <div class="segmented-control">
-        <input type="radio" id="salary_under5" name="salary_expectation" value="<5LPA" required><label for="salary_under5">< ₹5LPA</label>
-        <input type="radio" id="salary_5_8" name="salary_expectation" value="5-8LPA"><label for="salary_5_8">₹5LPA - ₹8LPA</label>
-        <input type="radio" id="salary_8_12" name="salary_expectation" value="8-12LPA"><label for="salary_8_12">₹8LPA - ₹12LPA</label>
-        <input type="radio" id="salary_12plus" name="salary_expectation" value="12LPA+"><label for="salary_12plus">₹12LPA+</label>
-    </div>
-</div>
+                    <label>2. What is your desired high-paying entry-level role?</label>
+                    
+                    <div class="role-list">
+                        <input type="radio" id="role_ai" name="target_role" value="Artificial Intelligence and Machine Learning Engineer" required>
+                        <label for="role_ai">Artificial Intelligence and Machine Learning Engineer</label>
+
+                        <input type="radio" id="role_cyber" name="target_role" value="Cybersecurity and Application Security Analyst">
+                        <label for="role_cyber">Cybersecurity and Application Security Analyst</label>
+
+                        <input type="radio" id="role_cloud" name="target_role" value="Cloud Computing Solutions Architect">
+                        <label for="role_cloud">Cloud Computing Solutions Architect</label>
+
+                        <input type="radio" id="role_devops" name="target_role" value="DevOps and Site Reliability Engineer">
+                        <label for="role_devops">DevOps and Site Reliability Engineer</label>
+
+                        <input type="radio" id="role_data_eng" name="target_role" value="Data Engineering and Big Data Specialist">
+                        <label for="role_data_eng">Data Engineering and Big Data Specialist</label>
+
+                        <div id="hiddenRoles" class="hidden-roles">
+                            <input type="radio" id="role_fintech" name="target_role" value="FinTech Trading Systems Developer">
+                            <label for="role_fintech">FinTech Trading Systems Developer</label>
+
+                            <input type="radio" id="role_blockchain" name="target_role" value="Enterprise Blockchain Developer">
+                            <label for="role_blockchain">Enterprise Blockchain Developer</label>
+
+                            <input type="radio" id="role_fullstack" name="target_role" value="Specialized Full-Stack Microservices Developer">
+                            <label for="role_fullstack">Specialized Full-Stack Microservices Developer</label>
+
+                            <input type="radio" id="role_apm" name="target_role" value="Associate Product Management or Technical Program Manager">
+                            <label for="role_apm">Associate Product Management or Technical Program Manager</label>
+
+                            <input type="radio" id="role_consultant" name="target_role" value="Technical Consultant or Solutions Engineer">
+                            <label for="role_consultant">Technical Consultant or Solutions Engineer</label>
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="viewMoreBtn" class="view-more-btn">
+                        View 5 More Roles ▼
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="salary_expectation">3. What is your minimum acceptable annual compensation (CTC)?</label>
+                    <div class="segmented-control">
+                        <input type="radio" id="salary_under5" name="salary_expectation" value="<5LPA" required><label for="salary_under5">< ₹5LPA</label>
+                        <input type="radio" id="salary_5_8" name="salary_expectation" value="5-8LPA"><label for="salary_5_8">₹5LPA - ₹8LPA</label>
+                        <input type="radio" id="salary_8_12" name="salary_expectation" value="8-12LPA"><label for="salary_8_12">₹8LPA - ₹12LPA</label>
+                        <input type="radio" id="salary_12plus" name="salary_expectation" value="12LPA+"><label for="salary_12plus">₹12LPA+</label>
+                    </div>
                 </div>
             </div>
 
@@ -528,7 +557,26 @@
         const form = document.getElementById('roadmap-form');
         const submitButton = document.getElementById('submit-button');
         const statusMessage = document.getElementById('status-message');
+        
+        // --- EXPANDABLE ROLES JS ---
+        const hiddenRoles = document.getElementById('hiddenRoles');
+        const viewMoreBtn = document.getElementById('viewMoreBtn');
 
+        viewMoreBtn.addEventListener('click', function() {
+            // Toggle the display property
+            const isHidden = hiddenRoles.style.display === 'none' || hiddenRoles.style.display === '';
+            
+            if (isHidden) {
+                hiddenRoles.style.display = 'flex'; // Use flex to maintain the chip layout
+                viewMoreBtn.textContent = 'View Fewer Roles ▲';
+            } else {
+                hiddenRoles.style.display = 'none';
+                viewMoreBtn.textContent = 'View 5 More Roles ▼';
+            }
+        });
+
+
+        // --- SUPABASE SUBMISSION JS ---
         form.addEventListener('submit', async function(event) {
             event.preventDefault(); // Stop the default form submission (page reload)
 
@@ -572,7 +620,7 @@
                 } else {
                     // Failure
                     const errorText = await response.text();
-                    statusMessage.textContent = `Error: Submission failed. Check your Supabase API keys. (${response.status})`;
+                    statusMessage.textContent = `Error: Submission failed. Check console. (${response.status})`;
                     console.error('Supabase Error:', errorText);
                     submitButton.textContent = 'Try Again';
                     submitButton.disabled = false;
