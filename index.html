@@ -184,9 +184,10 @@
             font-weight: 600;
         }
 
-        /* --- Segmented Control (Salary) --- */
+        /* --- Segmented Control (Salary & Time Commitment) - FIX FOR MOBILE WRAPPING --- */
         .segmented-control {
             display: flex;
+            flex-wrap: wrap; /* Allows wrapping on very small screens */
             gap: 0.25rem;
             border: 1px solid var(--color-border);
             border-radius: 8px;
@@ -196,7 +197,8 @@
         }
 
         .segmented-control label {
-            flex: 1;
+            flex: 1 1 24%; /* Ensures four labels attempt to fit on one line */
+            min-width: 80px; /* Guarantees a minimum width for readability */
             padding: 0.75rem 0.5rem;
             border: none;
             border-radius: 0;
@@ -205,6 +207,7 @@
             font-weight: 400;
             margin: 0;
             white-space: nowrap; 
+            text-align: center;
         }
         
         .segmented-control input[type="radio"]:checked + label {
@@ -215,7 +218,6 @@
 
         /* --- EXPANDABLE ROLES/SECTORS LIST --- */
         .hidden-roles, .hidden-sectors {
-            /* This div contains the hidden elements. It should be hidden by default. */
             display: none; 
             width: 100%; 
             flex-wrap: wrap;
@@ -577,8 +579,10 @@
 
     <script>
         // *** 1. SUPABASE CREDENTIALS (EMBEDDED) ***
+        // NOTE: The 401 error is caused by the key below. You MUST replace this value
+        // with the EXACT 'anon' key copied from your Supabase dashboard API settings.
         const SUPABASE_URL = 'https://mijfiogntlghmogujpir.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pamZpb2dudGxnaG1vZ3VqcGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDk5MjMsImV4cCI6MjA3NTYyNTkyM30.gi83P3L8TDQHxd5TQfA6BHr6-oIvOKmBrROrFQ-XFdg';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pamZpb2dudGxnaG1vZ3VqcGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDk5MjMsImV4cCI6MjA3NTYyNTkyM30.gi83P3L8TDQHxd5TQfA6BHr6-oIvOKmBrROlFQ-XFdg';
         const TABLE_NAME = 'roadmap_submissions';
         // *************************************************************
 
@@ -613,7 +617,7 @@
             });
         }
 
-        // --- SETUP BOTH TOGGLES (This uses the fixed function) ---
+        // --- SETUP BOTH TOGGLES ---
         setupToggle('hiddenSectors', 'viewMoreSectorsLink', 'View 5 More Sectors ▼', 'View Fewer Sectors ▲');
         setupToggle('hiddenRoles', 'viewMoreLink', 'View 5 More Roles ▼', 'View Fewer Roles ▲');
 
@@ -631,17 +635,13 @@
 
             // 2. Format the data for Supabase
             for (let [name, value] of formData.entries()) {
-                // Convert proficiency ratings to integers, and handle new names
+                // Convert proficiency ratings (which now include the new names) to integers
                 if ((name.includes('_dsa') || name.includes('_devops') || name.includes('_experience') || name.includes('_skills') || name.includes('_stat') || name.includes('_ethic') || name.includes('_context')) && value) {
                     data[name] = parseInt(value, 10);
                 } else {
                     data[name] = value;
                 }
             }
-            
-            // Re-checking the data object for debugging (optional)
-            console.log('Data being sent to Supabase:', data);
-
 
             // 3. Construct the API Call
             const apiUrl = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
