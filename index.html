@@ -565,39 +565,41 @@
         const submitButton = document.getElementById('submit-button');
         const statusMessage = document.getElementById('status-message');
         
-        // --- EXPANDABLE ROLES JS ---
-        const hiddenRoles = document.getElementById('hiddenRoles');
-        const viewMoreLink = document.getElementById('viewMoreLink'); 
-
-        viewMoreLink.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            const isHidden = hiddenRoles.style.display === 'none' || hiddenRoles.style.display === '';
-            
-            if (isHidden) {
-                hiddenRoles.style.display = 'flex'; 
-                viewMoreLink.innerHTML = 'View Fewer Roles ▲'; 
-            } else {
-                hiddenRoles.style.display = 'none';
-                viewMoreLink.innerHTML = 'View 5 More Roles ▼';
-            }
-        });
         
-        // --- EXPANDABLE SECTORS JS (NEW) ---
-        const hiddenSectors = document.getElementById('hiddenSectors');
-        const viewMoreSectorsLink = document.getElementById('viewMoreSectorsLink'); 
+        // --- EXPAND/COLLAPSE FUNCTION CREATOR ---
+        // This function makes the toggle logic reusable for both sections
+        function setupToggle(hiddenContainerId, linkId, moreText, fewerText) {
+            const hiddenContainer = document.getElementById(hiddenContainerId);
+            const toggleLink = document.getElementById(linkId);
 
-        viewMoreSectorsLink.addEventListener('click', function(e) {
-            e.preventDefault(); 
-            const isHidden = hiddenSectors.style.display === 'none' || hiddenSectors.style.display === '';
-            
-            if (isHidden) {
-                hiddenSectors.style.display = 'flex'; 
-                viewMoreSectorsLink.innerHTML = 'View Fewer Sectors ▲'; 
-            } else {
-                hiddenSectors.style.display = 'none';
-                viewMoreSectorsLink.innerHTML = 'View 5 More Sectors ▼';
+            if (!hiddenContainer || !toggleLink) {
+                // Log an error if the elements aren't found, but don't stop the rest of the script.
+                console.error(`Missing elements for toggle: Container ID ${hiddenContainerId}, Link ID ${linkId}`);
+                return;
             }
-        });
+
+            toggleLink.addEventListener('click', function(e) {
+                e.preventDefault(); 
+                
+                // Toggle between 'none' (or empty string for initial state) and 'flex'
+                const isHidden = hiddenContainer.style.display === 'none' || hiddenContainer.style.display === '';
+                
+                if (isHidden) {
+                    hiddenContainer.style.display = 'flex'; // Show and maintain horizontal chip layout
+                    toggleLink.innerHTML = fewerText; 
+                } else {
+                    hiddenContainer.style.display = 'none'; // Hide
+                    toggleLink.innerHTML = moreText;
+                }
+            });
+        }
+
+        // --- SETUP BOTH TOGGLES ---
+        // 1. Sector Toggle
+        setupToggle('hiddenSectors', 'viewMoreSectorsLink', 'View 5 More Sectors ▼', 'View Fewer Sectors ▲');
+
+        // 2. Role Toggle
+        setupToggle('hiddenRoles', 'viewMoreLink', 'View 5 More Roles ▼', 'View Fewer Roles ▲');
 
 
         // --- SUPABASE SUBMISSION JS ---
@@ -612,3 +614,53 @@
             const data = {};
 
             // 2. Format the data for Supabase
+            for (let [name, value] of formData.entries()) {
+                // Convert proficiency ratings to integers
+                if (name.includes('_proficiency') && value) {
+                    data[name] = parseInt(value, 10);
+                } else {
+                    data[name] = value;
+                }
+            }
+
+            // 3. Construct the API Call
+            const apiUrl = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, 
+                        'Prefer': 'return=minimal' 
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    // Success!
+                    statusMessage.textContent = 'Success! Data Captured. Thank you! 🎉';
+                    form.reset(); 
+                    submitButton.textContent = 'Submitted Successfully!';
+                } else {
+                    // Failure
+                    const errorText = await response.text();
+                    statusMessage.textContent = `Error: Submission failed. Check console. (${response.status})`;
+                    console.error('Supabase Error:', errorText);
+                    submitButton.textContent = 'Try Again';
+                    submitButton.disabled = false;
+                }
+
+            } catch (error) {
+                // Network or other critical error
+                statusMessage.textContent = 'Network Error. Could not connect to the database.';
+                console.error('Fetch Error:', error);
+                submitButton.textContent = 'Try Again';
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
