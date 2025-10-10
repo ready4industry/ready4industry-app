@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- VARIABLES & GLOBAL STYLES (Your Existing Responsive Design) --- */
+        /* --- VARIABLES & GLOBAL STYLES (Mobile-First Default) --- */
         :root {
             --color-bg: #1A1A2E; 
             --color-card: #2C2C40; 
@@ -42,55 +42,222 @@
             border: 1px solid var(--color-border);
         }
 
-        /* --- Header/Form Structure/Input Styles (UNCHANGED from previous mobile-first design) --- */
-        .header { text-align: center; margin-bottom: 2.5rem; }
-        .header h1 { font-size: 1.8rem; color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 5px rgba(0, 255, 192, 0.5); }
-        .header h2 { font-size: 1rem; font-weight: 600; color: var(--color-text); margin-top: 0.5rem; }
-        .header p { font-size: 0.85rem; color: var(--color-placeholder); margin-top: 1rem; font-style: italic; }
+        /* --- HEADER --- */
+        .header { 
+            text-align: center; 
+            margin-bottom: 2.5rem; 
+        }
 
-        .form-section { margin-bottom: 2rem; padding: 1.5rem 0; border-bottom: 1px dashed var(--color-border); }
-        .form-section:last-of-type { border-bottom: none; }
-        .form-section h3 { font-size: 1.2rem; color: var(--color-accent); margin-bottom: 1.5rem; border-left: 3px solid var(--color-accent); padding-left: 10px; }
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .header h1 { 
+            font-size: 1.8rem; 
+            color: var(--color-accent); 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            text-shadow: 0 0 5px rgba(0, 255, 192, 0.5); 
+        }
+
+        .header h2 { 
+            font-size: 1rem; 
+            font-weight: 600; 
+            color: var(--color-text); 
+            margin-top: 0.5rem; 
+        }
+
+        .header p { 
+            font-size: 0.85rem; 
+            color: var(--color-placeholder); 
+            margin-top: 1rem; 
+            font-style: italic; 
+        }
+
+        /* --- FORM STRUCTURE & INPUTS --- */
+        .form-section { 
+            margin-bottom: 2rem; 
+            padding: 1.5rem 0; 
+            border-bottom: 1px dashed var(--color-border); 
+        }
         
-        input[type="text"], select, textarea { width: 100%; padding: 0.8rem; background-color: var(--color-bg); border: 1px solid var(--color-border); border-radius: 6px; color: var(--color-text); font-size: 1rem; }
-        input:focus, textarea:focus, select:focus { border-color: var(--color-accent); box-shadow: 0 0 5px var(--color-accent); outline: none; }
+        .form-section:last-of-type { 
+            border-bottom: none; 
+        }
 
-        /* Chip Group */
-        .chip-group, .segmented-control { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .chip-group input[type="radio"], .segmented-control input[type="radio"] { display: none; }
-        .chip-group label { background-color: var(--color-card); border: 1px solid var(--color-border); padding: 0.6rem 1rem; border-radius: 20px; cursor: pointer; font-weight: 400; transition: all 0.2s; text-align: center; font-size: 0.9rem; flex-grow: 1; margin-bottom: 0; }
-        .chip-group input[type="radio"]:checked + label { background-color: var(--color-accent); color: var(--color-bg); border-color: var(--color-accent); box-shadow: 0 0 8px rgba(0, 255, 192, 0.5); font-weight: 600; }
+        .form-section h3 { 
+            font-size: 1.2rem; 
+            color: var(--color-accent); 
+            margin-bottom: 1.5rem; 
+            border-left: 3px solid var(--color-accent); 
+            padding-left: 10px; 
+        }
+
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
         
-        /* Segmented Control */
-        .segmented-control { gap: 0.25rem; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; padding: 0; background-color: var(--color-bg); }
-        .segmented-control label { flex: 1; padding: 0.75rem 0.5rem; border: none; border-radius: 0; background-color: transparent; font-size: 0.85rem; font-weight: 400; margin: 0; }
-        .segmented-control input[type="radio"]:checked + label { background-color: var(--color-accent); color: var(--color-bg); box-shadow: none; }
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            color: var(--color-text);
+            font-size: 1rem;
+        }
 
-        /* Star Rating */
-        .rating-group { margin-bottom: 2rem; display: flex; flex-direction: column; }
-        .rating-scale { display: flex; flex-direction: row-reverse; justify-content: flex-end; margin-top: 0.5rem; }
-        .rating-scale input[type="radio"] { display: none; }
-        .rating-scale label { font-size: 1.6rem; color: var(--color-border); cursor: pointer; padding: 0 0.2rem; transition: color 0.2s; margin-bottom: 0; }
-        .rating-scale label:before { content: '★'; display: inline-block; }
-        .rating-scale input:checked ~ label:before, .rating-scale input:hover ~ label:before, .rating-scale label:hover ~ label:before { color: var(--color-star); }
+        /* Styling for the select dropdown arrow */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E0E0E0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 1em;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 5px var(--color-accent);
+            outline: none;
+        }
+
+        /* --- CHIP/BUTTON GROUP STYLES (Radio Buttons) --- */
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .chip-group input[type="radio"] {
+            display: none;
+        }
+
+        .chip-group label {
+            background-color: var(--color-card);
+            border: 1px solid var(--color-border);
+            padding: 0.6rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 400;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 0.9rem;
+            flex-grow: 1; 
+            margin-bottom: 0;
+        }
+
+        .chip-group input[type="radio"]:checked + label {
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 8px rgba(0, 255, 192, 0.5);
+            font-weight: 600;
+        }
+
+        /* Segmented Control (Salary) */
+        .segmented-control {
+            display: flex;
+            gap: 0.25rem;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 0;
+            background-color: var(--color-bg);
+        }
+
+        .segmented-control label {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            border: none;
+            border-radius: 0;
+            background-color: transparent;
+            font-size: 0.85rem;
+            font-weight: 400;
+            margin: 0;
+            white-space: nowrap; /* Ensures the whole label stays on one line */
+        }
         
-        /* Submit Button */
-        .submit-group { margin-top: 3rem; text-align: center; }
-        .submit-button { width: 100%; padding: 1rem; background-color: var(--color-accent); color: var(--color-bg); border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background-color 0.3s, transform 0.1s; text-transform: uppercase; letter-spacing: 0.5px; }
-        .submit-button:hover { background-color: #00E6B9; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 255, 192, 0.4); }
+        .segmented-control input[type="radio"]:checked + label {
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            box-shadow: none;
+        }
 
-        /* DESKTOP OPTIMIZATION (UNCHANGED) */
-        @media (min-width: 768px) {
-            .container { max-width: 750px; padding: 3rem; }
-            .header h1 { font-size: 2.5rem; }
-            .rating-group { flex-direction: row; justify-content: space-between; align-items: center; }
-            .rating-group label:first-child { flex-basis: 70%; margin-bottom: 0; }
-            .rating-scale { flex-basis: 30%; justify-content: flex-end; margin-top: 0; }
-            .chip-group label { flex-grow: 0; flex-basis: auto; }
-            .segmented-control label { font-size: 0.95rem; padding: 0.8rem 1rem; }
-            .submit-button { width: 75%; }
+
+        /* --- RATING SCALE (Star/Proficiency) --- */
+        .rating-group {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column; 
+        }
+        
+        .rating-scale {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+
+        .rating-scale input[type="radio"] {
+            display: none;
+        }
+        
+        .rating-scale label {
+            font-size: 1.6rem;
+            color: var(--color-border);
+            cursor: pointer;
+            padding: 0 0.2rem;
+            transition: color 0.2s;
+            margin-bottom: 0;
+        }
+        
+        .rating-scale label:before {
+            content: '★';
+            display: inline-block;
+        }
+
+        .rating-scale input:checked ~ label:before,
+        .rating-scale input:hover ~ label:before,
+        .rating-scale label:hover ~ label:before {
+            color: var(--color-star);
+        }
+        
+        /* --- SUBMIT BUTTON --- */
+        .submit-group {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-button:hover {
+            background-color: #00E6B9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 192, 0.4);
         }
 
         /* Status Message Style */
@@ -99,7 +266,50 @@
             font-size: 1rem;
             color: var(--color-accent);
             text-shadow: 0 0 3px rgba(0, 255, 192, 0.4);
-            min-height: 20px; /* Prevent layout jump */
+            min-height: 20px; 
+        }
+        
+        /* --- DESKTOP OPTIMIZATION (Media Query) --- */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 750px; 
+                padding: 3rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .rating-group {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .rating-group label:first-child { 
+                flex-basis: 70%; 
+                margin-bottom: 0;
+            }
+
+            .rating-scale {
+                flex-basis: 30%;
+                justify-content: flex-end;
+                margin-top: 0;
+            }
+
+            .chip-group label {
+                flex-grow: 0;
+                flex-basis: auto;
+            }
+
+            .segmented-control label {
+                font-size: 0.95rem;
+                padding: 0.8rem 1rem;
+            }
+            
+            .submit-button {
+                width: 75%; 
+            }
         }
 
     </style>
@@ -108,7 +318,7 @@
 
     <div class="container">
         <div class="header">
-            <h1>Your Roadmap to $\text{₹} 12\text{LPA+}$</h1>
+            <h1>Your Roadmap to ₹12LPA+</h1>
             <h2>Pre-Training Survey: Unlock Your High-Value Engineering Potential</h2>
             <p>Data from this short survey directly customizes the training session for your batch, focusing only on the skills that recruiters pay the most for.</p>
         </div>
@@ -117,6 +327,7 @@
             
             <div class="form-section">
                 <h3>I. Target & Aspiration</h3>
+
                 <div class="form-group">
                     <label for="target_industry">1. Which high-growth sector are you aiming for?</label>
                     <div class="chip-group">
@@ -137,10 +348,10 @@
                 <div class="form-group">
                     <label for="salary_expectation">3. What is your minimum acceptable annual compensation (CTC)?</label>
                     <div class="segmented-control">
-                        <input type="radio" id="salary_under5" name="salary_expectation" value="<5LPA" required><label for="salary_under5">< $\text{₹} 5\text{LPA}$</label>
-                        <input type="radio" id="salary_5_8" name="salary_expectation" value="5-8LPA"><label for="salary_5_8">$\text{₹} 5\text{LPA}$ - $\text{₹} 8\text{LPA}$</label>
-                        <input type="radio" id="salary_8_12" name="salary_expectation" value="8-12LPA"><label for="salary_8_12">$\text{₹} 8\text{LPA}$ - $\text{₹} 12\text{LPA}$</label>
-                        <input type="radio" id="salary_12plus" name="salary_expectation" value="12LPA+"><label for="salary_12plus">$\text{₹} 12\text{LPA}+$</label>
+                        <input type="radio" id="salary_under5" name="salary_expectation" value="<5LPA" required><label for="salary_under5">< ₹5LPA</label>
+                        <input type="radio" id="salary_5_8" name="salary_expectation" value="5-8LPA"><label for="salary_5_8">₹5LPA - ₹8LPA</label>
+                        <input type="radio" id="salary_8_12" name="salary_expectation" value="8-12LPA"><label for="salary_8_12">₹8LPA - ₹12LPA</label>
+                        <input type="radio" id="salary_12plus" name="salary_expectation" value="12LPA+"><label for="salary_12plus">₹12LPA+</label>
                     </div>
                 </div>
             </div>
@@ -270,8 +481,8 @@
 
             // 2. Format the data for Supabase
             for (let [name, value] of formData.entries()) {
-                // Convert proficiency ratings (which are radio button values) to integers
-                if (name.includes('_proficiency')) {
+                // Convert proficiency ratings to integers
+                if (name.includes('_proficiency') && value) {
                     data[name] = parseInt(value, 10);
                 } else {
                     data[name] = value;
