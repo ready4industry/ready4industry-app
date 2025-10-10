@@ -3,67 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B.Tech Assessment - Official</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="style.css">
+    <title>Your Roadmap to ₹12LPA+ (Supabase Capture)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES & GLOBAL STYLES (Your Existing Responsive Design) --- */
+        :root {
+            --color-bg: #1A1A2E; 
+            --color-card: #2C2C40; 
+            --color-accent: #00FFC0; 
+            --color-text: #E0E0E0;
+            --color-placeholder: #8A8A99;
+            --color-border: #4A4A5E;
+            --color-star: #FFD700; 
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: var(--color-card);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--color-border);
+        }
+
+        /* --- Header/Form Structure/Input Styles (UNCHANGED from previous mobile-first design) --- */
+        .header { text-align: center; margin-bottom: 2.5rem; }
+        .header h1 { font-size: 1.8rem; color: var(--color-accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 5px rgba(0, 255, 192, 0.5); }
+        .header h2 { font-size: 1rem; font-weight: 600; color: var(--color-text); margin-top: 0.5rem; }
+        .header p { font-size: 0.85rem; color: var(--color-placeholder); margin-top: 1rem; font-style: italic; }
+
+        .form-section { margin-bottom: 2rem; padding: 1.5rem 0; border-bottom: 1px dashed var(--color-border); }
+        .form-section:last-of-type { border-bottom: none; }
+        .form-section h3 { font-size: 1.2rem; color: var(--color-accent); margin-bottom: 1.5rem; border-left: 3px solid var(--color-accent); padding-left: 10px; }
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        
+        input[type="text"], select, textarea { width: 100%; padding: 0.8rem; background-color: var(--color-bg); border: 1px solid var(--color-border); border-radius: 6px; color: var(--color-text); font-size: 1rem; }
+        input:focus, textarea:focus, select:focus { border-color: var(--color-accent); box-shadow: 0 0 5px var(--color-accent); outline: none; }
+
+        /* Chip Group */
+        .chip-group, .segmented-control { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .chip-group input[type="radio"], .segmented-control input[type="radio"] { display: none; }
+        .chip-group label { background-color: var(--color-card); border: 1px solid var(--color-border); padding: 0.6rem 1rem; border-radius: 20px; cursor: pointer; font-weight: 400; transition: all 0.2s; text-align: center; font-size: 0.9rem; flex-grow: 1; margin-bottom: 0; }
+        .chip-group input[type="radio"]:checked + label { background-color: var(--color-accent); color: var(--color-bg); border-color: var(--color-accent); box-shadow: 0 0 8px rgba(0, 255, 192, 0.5); font-weight: 600; }
+        
+        /* Segmented Control */
+        .segmented-control { gap: 0.25rem; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; padding: 0; background-color: var(--color-bg); }
+        .segmented-control label { flex: 1; padding: 0.75rem 0.5rem; border: none; border-radius: 0; background-color: transparent; font-size: 0.85rem; font-weight: 400; margin: 0; }
+        .segmented-control input[type="radio"]:checked + label { background-color: var(--color-accent); color: var(--color-bg); box-shadow: none; }
+
+        /* Star Rating */
+        .rating-group { margin-bottom: 2rem; display: flex; flex-direction: column; }
+        .rating-scale { display: flex; flex-direction: row-reverse; justify-content: flex-end; margin-top: 0.5rem; }
+        .rating-scale input[type="radio"] { display: none; }
+        .rating-scale label { font-size: 1.6rem; color: var(--color-border); cursor: pointer; padding: 0 0.2rem; transition: color 0.2s; margin-bottom: 0; }
+        .rating-scale label:before { content: '★'; display: inline-block; }
+        .rating-scale input:checked ~ label:before, .rating-scale input:hover ~ label:before, .rating-scale label:hover ~ label:before { color: var(--color-star); }
+        
+        /* Submit Button */
+        .submit-group { margin-top: 3rem; text-align: center; }
+        .submit-button { width: 100%; padding: 1rem; background-color: var(--color-accent); color: var(--color-bg); border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background-color 0.3s, transform 0.1s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .submit-button:hover { background-color: #00E6B9; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 255, 192, 0.4); }
+
+        /* DESKTOP OPTIMIZATION (UNCHANGED) */
+        @media (min-width: 768px) {
+            .container { max-width: 750px; padding: 3rem; }
+            .header h1 { font-size: 2.5rem; }
+            .rating-group { flex-direction: row; justify-content: space-between; align-items: center; }
+            .rating-group label:first-child { flex-basis: 70%; margin-bottom: 0; }
+            .rating-scale { flex-basis: 30%; justify-content: flex-end; margin-top: 0; }
+            .chip-group label { flex-grow: 0; flex-basis: auto; }
+            .segmented-control label { font-size: 0.95rem; padding: 0.8rem 1rem; }
+            .submit-button { width: 75%; }
+        }
+
+        /* Status Message Style */
+        #status-message {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: var(--color-accent);
+            text-shadow: 0 0 3px rgba(0, 255, 192, 0.4);
+            min-height: 20px; /* Prevent layout jump */
+        }
+
+    </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>B.Tech Assessment</h1>
-
-        <div id="start-screen" class="screen">
-            <h2>Candidate Registration</h2>
-            <form id="candidate-form">
-                <input type="text" id="name" placeholder="Full Name" required>
-                <input type="email" id="email" placeholder="Email Address" required>
-                <button type="submit">Proceed to Instructions</button>
-            </form>
+        <div class="header">
+            <h1>Your Roadmap to $\text{₹} 12\text{LPA+}$</h1>
+            <h2>Pre-Training Survey: Unlock Your High-Value Engineering Potential</h2>
+            <p>Data from this short survey directly customizes the training session for your batch, focusing only on the skills that recruiters pay the most for.</p>
         </div>
 
-        <div id="instructions-screen" class="screen" style="display:none;">
-            <h2>Assessment Instructions & Rules</h2>
-            <div class="instructions-content">
-                <p>Welcome, Candidate. Please read these instructions carefully before beginning the assessment.</p>
-                
-                <h3>Assessment Parameters:</h3>
-                <ul>
-                    <li>**Total Questions:** 10 (Randomly selected from a pool of 100).</li>
-                    <li>**Time Limit:** **10 Minutes** total. The assessment will auto-submit after the time expires.</li>
-                    <li>**Scoring:** Each question carries 1 mark. There is **NO** negative marking.</li>
-                </ul>
-
-                <h3>Integrity Rules (Monitored):</h3>
-                <ol>
-                    <li>**One Attempt:** This assessment can be taken only once.</li>
-                    <li>**Focus Tracking:** Switching windows or tabs (losing focus) during the test is logged as a metric. Excessive focus loss will be flagged to the recruiting team for review.</li>
-                    <li>**Submission:** Click 'Submit Answer & Next' to save your answer and move on. Once submitted, answers cannot be changed.</li>
-                    <li>**Security:** All scoring is handled securely on the server (Supabase) to prevent unauthorized inspection.</li>
-                </ol>
-
-                <p style="font-weight: bold; margin-top: 15px;">By clicking 'Acknowledge & Start', you accept the rules above and confirm your readiness to begin the timed test.</p>
-            </div>
-            <button id="start-quiz-button">Acknowledge & Start Assessment</button>
-        </div>
-
-        <div id="quiz-screen" class="screen" style="display:none;">
-            <p id="question-counter" class="counter"></p>
-            <h3 id="question-text"></h3>
-            <form id="quiz-form">
-                <div id="options-container" class="options-grid">
+        <form id="roadmap-form">
+            
+            <div class="form-section">
+                <h3>I. Target & Aspiration</h3>
+                <div class="form-group">
+                    <label for="target_industry">1. Which high-growth sector are you aiming for?</label>
+                    <div class="chip-group">
+                        <input type="radio" id="industry_tech" name="target_industry" value="Tech/SaaS" required><label for="industry_tech">Tech/SaaS (Software)</label>
+                        <input type="radio" id="industry_fintech" name="target_industry" value="FinTech"><label for="industry_fintech">FinTech</label>
+                        <input type="radio" id="industry_ai" name="target_industry" value="Data Science/AI"><label for="industry_ai">Data Science/AI</label>
+                        <input type="radio" id="industry_energy" name="target_industry" value="Energy/Green Tech"><label for="industry_energy">Energy/Green Tech</label>
+                        <input type="radio" id="industry_core" name="target_industry" value="Core Engineering (R&D)"><label for="industry_core">Core Engineering (R&D)</label>
+                        <input type="radio" id="industry_consulting" name="target_industry" value="Consulting"><label for="industry_consulting">Consulting</label>
+                    </div>
                 </div>
-                <button type="submit" id="next-button">Submit Answer & Next</button>
-            </form>
-        </div>
 
-        <div id="score-screen" class="screen" style="display:none;">
-            <h2>Assessment Complete! 🎉</h2>
-            <p>Your Final Score: <span id="final-score"></span> out of 10</p>
-            <p class="small-text">Your performance and integrity metrics have been securely recorded for review by the recruiting team.</p>
-        </div>
+                <div class="form-group">
+                    <label for="target_role">2. What is your desired high-paying entry-level role?</label>
+                    <input type="text" id="target_role" name="target_role" placeholder="e.g., Data Scientist, DevOps Engineer, Design Engineer" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="salary_expectation">3. What is your minimum acceptable annual compensation (CTC)?</label>
+                    <div class="segmented-control">
+                        <input type="radio" id="salary_under5" name="salary_expectation" value="<5LPA" required><label for="salary_under5">< $\text{₹} 5\text{LPA}$</label>
+                        <input type="radio" id="salary_5_8" name="salary_expectation" value="5-8LPA"><label for="salary_5_8">$\text{₹} 5\text{LPA}$ - $\text{₹} 8\text{LPA}$</label>
+                        <input type="radio" id="salary_8_12" name="salary_expectation" value="8-12LPA"><label for="salary_8_12">$\text{₹} 8\text{LPA}$ - $\text{₹} 12\text{LPA}$</label>
+                        <input type="radio" id="salary_12plus" name="salary_expectation" value="12LPA+"><label for="salary_12plus">$\text{₹} 12\text{LPA}+$</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>II. Skills & Knowledge Gap</h3>
+                <p style="font-size: 0.85rem; color: var(--color-placeholder); margin-bottom: 1.5rem;">Rate your proficiency (1 = No experience, 5 = Expert/Can teach others).</p>
+
+                <div class="rating-group">
+                    <label>Data Structures & Algorithms (DSA):</label>
+                    <div class="rating-scale">
+                        <input type="radio" id="dsa5" name="ds_algo_proficiency" value="5" required><label for="dsa5" title="5 - Expert"></label>
+                        <input type="radio" id="dsa4" name="ds_algo_proficiency" value="4"><label for="dsa4" title="4 - Proficient"></label>
+                        <input type="radio" id="dsa3" name="ds_algo_proficiency" value="3"><label for="dsa3" title="3 - Intermediate"></label>
+                        <input type="radio" id="dsa2" name="ds_algo_proficiency" value="2"><label for="dsa2" title="2 - Basic"></label>
+                        <input type="radio" id="dsa1" name="ds_algo_proficiency" value="1"><label for="dsa1" title="1 - No experience"></label>
+                    </div>
+                </div>
+
+                <div class="rating-group">
+                    <label>Cloud/DevOps Fluency (AWS/GCP/Docker/Git):</label>
+                    <div class="rating-scale">
+                        <input type="radio" id="cloud5" name="cloud_fluency" value="5" required><label for="cloud5"></label>
+                        <input type="radio" id="cloud4" name="cloud_fluency" value="4"><label for="cloud4"></label>
+                        <input type="radio" id="cloud3" name="cloud_fluency" value="3"><label for="cloud3"></label>
+                        <input type="radio" id="cloud2" name="cloud_fluency" value="2"><label for="cloud2"></label>
+                        <input type="radio" id="cloud1" name="cloud_fluency" value="1"><label for="cloud1"></label>
+                    </div>
+                </div>
+                
+                <div class="rating-group">
+                    <label>Communication & Negotiation Confidence (Interviews/Salary):</label>
+                    <div class="rating-scale">
+                        <input type="radio" id="comm5" name="comm_negotiation_conf" value="5" required><label for="comm5"></label>
+                        <input type="radio" id="comm4" name="comm_negotiation_conf" value="4"><label for="comm4"></label>
+                        <input type="radio" id="comm3" name="comm_negotiation_conf" value="3"><label for="comm3"></label>
+                        <input type="radio" id="comm2" name="comm_negotiation_conf" value="2"><label for="comm2"></label>
+                        <input type="radio" id="comm1" name="comm_negotiation_conf" value="1"><label for="comm1"></label>
+                    </div>
+                </div>
+                
+                <div class="rating-group">
+                    <label>Critical Problem Solving (Unstructured Problems):</label>
+                    <div class="rating-scale">
+                        <input type="radio" id="prob5" name="critical_problem_solving" value="5" required><label for="prob5"></label>
+                        <input type="radio" id="prob4" name="critical_problem_solving" value="4"><label for="prob4"></label>
+                        <input type="radio" id="prob3" name="critical_problem_solving" value="3"><label for="prob3"></label>
+                        <input type="radio" id="prob2" name="critical_problem_solving" value="2"><label for="prob2"></label>
+                        <input type="radio" id="prob1" name="critical_problem_solving" value="1"><label for="prob1"></label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-section">
+                <h3>III. Training Design & Logistics</h3>
+
+                <div class="form-group">
+                    <label for="preferred_format">4. What learning format is most effective for you?</label>
+                    <div class="chip-group">
+                        <input type="radio" id="format_workshop" name="preferred_format" value="Hands-on Workshop" required><label for="format_workshop">Hands-on Workshop</label>
+                        <input type="radio" id="format_case" name="preferred_format" value="Case Study Analysis"><label for="format_case">Case Study Analysis</label>
+                        <input type="radio" id="format_interview" name="preferred_format" value="Interview Simulation"><label for="format_interview">Interview Simulation</label>
+                        <input type="radio" id="format_lecture" name="preferred_format" value="Interactive Lecture/Q&A"><label for="format_lecture">Interactive Q&A</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="biggest_training_need">5. Which single topic would most improve your high-paid job odds?</label>
+                    <select id="biggest_training_need" name="biggest_training_need" required>
+                        <option value="" disabled selected>Select one core need</option>
+                        <option value="Interview Strategy/Mock Interviews">Interview Strategy/Mock Interviews</option>
+                        <option value="Resume/LinkedIn Optimization">Resume/LinkedIn Optimization</option>
+                        <option value="Salary Negotiation/Offer Evaluation">Salary Negotiation/Offer Evaluation</option>
+                        <option value="Deep-dive into Technical Fundamentals">Deep-dive into Technical Fundamentals</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="time_commitment_hpd">6. How many extra hours per week are you willing to dedicate to this upskilling?</label>
+                    <div class="segmented-control">
+                        <input type="radio" id="time_0_3" name="time_commitment_hpd" value="0-3 hrs" required><label for="time_0_3">0-3 hrs</label>
+                        <input type="radio" id="time_3_6" name="time_commitment_hpd" value="3-6 hrs"><label for="time_3_6">3-6 hrs</label>
+                        <input type="radio" id="time_6_10" name="time_commitment_hpd" value="6-10 hrs"><label for="time_6_10">6-10 hrs</label>
+                        <input type="radio" id="time_10plus" name="time_commitment_hpd" value="10+ hrs"><label for="time_10plus">10+ hrs (I'm ready!)</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="qualitative_concern">7. Your \#1 job market concern? (Be specific)</label>
+                    <textarea id="qualitative_concern" name="qualitative_concern" placeholder="e.g., 'I can code, but I don't know how to negotiate an offer above ₹8LPA.'"></textarea>
+                </div>
+            </div>
+
+            <div class="submit-group">
+                <button type="submit" id="submit-button" class="submit-button">
+                    Submit & Reserve My Training Spot
+                </button>
+                <div id="status-message"></div>
+                <p style="font-size: 0.75rem; color: var(--color-placeholder); margin-top: 1rem;">
+                    Your responses are confidential and are secured by Supabase.
+                </p>
+            </div>
+        </form>
     </div>
 
-    <script src="script.js"></script> 
+    <script>
+        // *** 1. REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS ***
+        const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL'; 
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const TABLE_NAME = 'roadmap_submissions';
+        // *************************************************************
+
+        const form = document.getElementById('roadmap-form');
+        const submitButton = document.getElementById('submit-button');
+        const statusMessage = document.getElementById('status-message');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Stop the default form submission (page reload)
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+            statusMessage.textContent = 'Sending data to server...';
+
+            const formData = new FormData(form);
+            const data = {};
+
+            // 2. Format the data for Supabase
+            for (let [name, value] of formData.entries()) {
+                // Convert proficiency ratings (which are radio button values) to integers
+                if (name.includes('_proficiency')) {
+                    data[name] = parseInt(value, 10);
+                } else {
+                    data[name] = value;
+                }
+            }
+
+            // 3. Construct the API Call
+            const apiUrl = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`, // Required for RLS
+                        'Prefer': 'return=minimal' // We don't need the server to send the data back
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    // Success!
+                    statusMessage.textContent = 'Success! Data Captured. Thank you! 🎉';
+                    form.reset(); // Clear the form fields
+                    submitButton.textContent = 'Submitted Successfully!';
+                } else {
+                    // Failure
+                    const errorText = await response.text();
+                    statusMessage.textContent = `Error: Submission failed. Check your Supabase API keys. (${response.status})`;
+                    console.error('Supabase Error:', errorText);
+                    submitButton.textContent = 'Try Again';
+                    submitButton.disabled = false;
+                }
+
+            } catch (error) {
+                // Network or other critical error
+                statusMessage.textContent = 'Network Error. Could not connect to the database.';
+                console.error('Fetch Error:', error);
+                submitButton.textContent = 'Try Again';
+                submitButton.disabled = false;
+            }
+        });
+    </script>
 
 </body>
 </html>
