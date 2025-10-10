@@ -170,7 +170,7 @@
             font-size: 0.9rem;
             flex-grow: 1; 
             margin-bottom: 0;
-            white-space: nowrap; /* Ensures chips don't break lines awkwardly */
+            white-space: nowrap; 
         }
 
         .chip-group input[type="radio"]:checked + label,
@@ -211,41 +211,37 @@
             box-shadow: none;
         }
 
-        /* --- EXPANDABLE ROLES LIST (New Feature) --- */
+        /* --- EXPANDABLE ROLES LIST --- */
         .hidden-roles {
-            display: none; 
             width: 100%; 
-            display: flex; /* Override to block display for initial hiding */
+            display: flex; 
             flex-wrap: wrap;
             gap: 0.5rem;
         }
         
         .role-list > .hidden-roles {
-            display: none; /* Initially hides the hidden-roles container */
-        }
-        
-        /* The container for hidden roles needs to apply the same styling to its children labels */
-        .hidden-roles label {
-             flex-grow: 1;
+            /* This ensures the hidden block starts as display: none */
+            display: none; 
         }
 
-        /* Style for the View More Button */
-        .view-more-btn {
-            display: block;
+        /* Style for the View More Text Link */
+        .view-more-link {
+            display: block; 
             width: 100%;
-            background: transparent;
-            color: var(--color-accent);
-            border: 1px dashed var(--color-accent);
-            border-radius: 6px;
-            padding: 0.75rem;
+            text-align: center;
+            color: var(--color-accent); 
+            text-decoration: none; 
+            padding: 0.5rem 0;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 1rem;
-            transition: background-color 0.2s;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            transition: color 0.2s;
         }
 
-        .view-more-btn:hover {
-            background-color: rgba(0, 255, 192, 0.1);
+        .view-more-link:hover {
+            color: #00E6B9; 
+            text-decoration: underline;
         }
 
         /* --- RATING SCALE (Star/Proficiency) --- */
@@ -395,7 +391,7 @@
                 <div class="form-group">
                     <label>2. What is your desired high-paying entry-level role?</label>
                     
-                    <div class="role-list">
+                    <div class="role-list" id="roleListContainer">
                         <input type="radio" id="role_ai" name="target_role" value="Artificial Intelligence and Machine Learning Engineer" required>
                         <label for="role_ai">Artificial Intelligence and Machine Learning Engineer</label>
 
@@ -429,9 +425,9 @@
                         </div>
                     </div>
                     
-                    <button type="button" id="viewMoreBtn" class="view-more-btn">
+                    <a href="#" id="viewMoreLink" class="view-more-link">
                         View 5 More Roles ▼
-                    </button>
+                    </a>
                 </div>
 
                 <div class="form-group">
@@ -548,9 +544,9 @@
     </div>
 
     <script>
-        // *** 1. REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS ***
+        // *** 1. SUPABASE CREDENTIALS (EMBEDDED) ***
         const SUPABASE_URL = 'https://mijfiogntlghmogujpir.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pamZpb2dudGxnaG1vZ3VqcGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDk5MjMsImV4cCI6MjA3NTYyNTkyM30.gi83P3L8TDQHxd5TQfA6BHr6-oIvOKmBrROrFQ-XFdg';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pamZpb2dudGxnaG1vZ3VqcGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDk5MjMsImV4cCI6MjA3NTYyNTkyM30.gi83P3L8TDQHxd5TQfA6BHr6-oIvOKmBrROlFQ-XFdg';
         const TABLE_NAME = 'roadmap_submissions';
         // *************************************************************
 
@@ -560,18 +556,20 @@
         
         // --- EXPANDABLE ROLES JS ---
         const hiddenRoles = document.getElementById('hiddenRoles');
-        const viewMoreBtn = document.getElementById('viewMoreBtn');
+        const viewMoreLink = document.getElementById('viewMoreLink'); // Link reference
 
-        viewMoreBtn.addEventListener('click', function() {
+        viewMoreLink.addEventListener('click', function(e) {
+            e.preventDefault(); // STOP the link from navigating/reloading the page
+
             // Toggle the display property
             const isHidden = hiddenRoles.style.display === 'none' || hiddenRoles.style.display === '';
             
             if (isHidden) {
                 hiddenRoles.style.display = 'flex'; // Use flex to maintain the chip layout
-                viewMoreBtn.textContent = 'View Fewer Roles ▲';
+                viewMoreLink.innerHTML = 'View Fewer Roles ▲'; // Update the text/arrow
             } else {
                 hiddenRoles.style.display = 'none';
-                viewMoreBtn.textContent = 'View 5 More Roles ▼';
+                viewMoreLink.innerHTML = 'View 5 More Roles ▼';
             }
         });
 
