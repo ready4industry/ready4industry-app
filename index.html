@@ -184,10 +184,9 @@
             font-weight: 600;
         }
 
-        /* --- Segmented Control (Salary & Time Commitment) - FIX FOR MOBILE WRAPPING --- */
+        /* --- Segmented Control (Salary) --- */
         .segmented-control {
             display: flex;
-            flex-wrap: wrap; /* Allows wrapping on very small screens */
             gap: 0.25rem;
             border: 1px solid var(--color-border);
             border-radius: 8px;
@@ -197,8 +196,7 @@
         }
 
         .segmented-control label {
-            flex: 1 1 24%; /* Ensures four labels attempt to fit on one line */
-            min-width: 80px; /* Guarantees a minimum width for readability */
+            flex: 1;
             padding: 0.75rem 0.5rem;
             border: none;
             border-radius: 0;
@@ -207,7 +205,6 @@
             font-weight: 400;
             margin: 0;
             white-space: nowrap; 
-            text-align: center;
         }
         
         .segmented-control input[type="radio"]:checked + label {
@@ -218,6 +215,7 @@
 
         /* --- EXPANDABLE ROLES/SECTORS LIST --- */
         .hidden-roles, .hidden-sectors {
+            /* This div contains the hidden elements. It should be hidden by default. */
             display: none; 
             width: 100%; 
             flex-wrap: wrap;
@@ -317,6 +315,46 @@
             min-height: 20px; 
         }
         
+        /* --- THANK YOU MESSAGE STYLES --- */
+        #thankYouMessage {
+            display: none; /* Hidden by default */
+            text-align: center;
+            padding: 3rem 1rem;
+            background-color: var(--color-card);
+            border-radius: 8px;
+            border: 1px solid var(--color-accent);
+            margin-top: 2rem;
+        }
+        
+        #thankYouMessage h2 {
+            color: var(--color-accent);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        #thankYouMessage p {
+            font-size: 1.1rem;
+            color: var(--color-text);
+            margin-bottom: 2rem;
+        }
+        
+        .close-button {
+            background-color: var(--color-accent);
+            color: var(--color-bg);
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.3s;
+        }
+
+        .close-button:hover {
+            opacity: 0.9;
+        }
+
+
         /* --- DESKTOP OPTIMIZATION (Media Query) --- */
         @media (min-width: 768px) {
             .container {
@@ -575,20 +613,28 @@
                 </p>
             </div>
         </form>
+
+        <div id="thankYouMessage">
+            <h2>Survey Complete! Thank You.</h2>
+            <p>Your tailored training path is now being generated based on your input. We appreciate your commitment to your career growth.</p>
+            <button class="close-button" onclick="window.close();">Close Survey</button>
+        </div>
+
     </div>
 
     <script>
         // *** 1. SUPABASE CREDENTIALS (EMBEDDED) ***
-        // NOTE: The 401 error is caused by the key below. You MUST replace this value
-        // with the EXACT 'anon' key copied from your Supabase dashboard API settings.
         const SUPABASE_URL = 'https://mijfiogntlghmogujpir.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pamZpb2dudGxnaG1vZ3VqcGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDk5MjMsImV4cCI6MjA3NTYyNTkyM30.gi83P3L8TDQHxd5TQfA6BHr6-oIvOKmBrROlFQ-XFdg';
+        // 🚨 CRUCIAL: REPLACE THE STRING BELOW WITH YOUR ACTUAL, CORRECT SUPABASE ANON KEY
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pamZpb2dudGxnaG1vZ3VqcGlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwNDk5MjMsImV4cCI6MjA3NTYyNTkyM30.gi83P3L8TDQHxd5TQfA6BHr6-oIvOKmBrROrFQ-XFdg'; 
         const TABLE_NAME = 'roadmap_submissions';
         // *************************************************************
 
         const form = document.getElementById('roadmap-form');
         const submitButton = document.getElementById('submit-button');
         const statusMessage = document.getElementById('status-message');
+        const thankYouMessage = document.getElementById('thankYouMessage');
+        const container = document.querySelector('.container');
         
         
         // --- EXPAND/COLLAPSE FUNCTION CREATOR ---
@@ -604,7 +650,6 @@
             toggleLink.addEventListener('click', function(e) {
                 e.preventDefault(); 
                 
-                // Determine visibility using computed style for robustness
                 const isHidden = window.getComputedStyle(hiddenContainer).display === 'none';
                 
                 if (isHidden) {
@@ -633,17 +678,16 @@
             const formData = new FormData(form);
             const data = {};
 
-            // 2. Format the data for Supabase
+            // Format the data for Supabase
             for (let [name, value] of formData.entries()) {
-                // Convert proficiency ratings (which now include the new names) to integers
+                // Convert proficiency ratings to integers, checking for new and old rating field names
                 if ((name.includes('_dsa') || name.includes('_devops') || name.includes('_experience') || name.includes('_skills') || name.includes('_stat') || name.includes('_ethic') || name.includes('_context')) && value) {
                     data[name] = parseInt(value, 10);
                 } else {
                     data[name] = value;
                 }
             }
-
-            // 3. Construct the API Call
+            
             const apiUrl = `${SUPABASE_URL}/rest/v1/${TABLE_NAME}`;
             
             try {
@@ -660,11 +704,19 @@
 
                 if (response.ok) {
                     // Success!
-                    statusMessage.textContent = 'Success! Data Captured. Thank you! 🎉';
-                    form.reset(); 
-                    submitButton.textContent = 'Submitted Successfully!';
+                    statusMessage.textContent = ''; // Clear status
+                    
+                    // 1. Hide the entire form
+                    form.style.display = 'none';
+                    
+                    // 2. Show the thank you message
+                    thankYouMessage.style.display = 'block';
+
+                    // Adjust container size for a cleaner look
+                    container.style.padding = '3rem'; 
+                    
                 } else {
-                    // Failure
+                    // Failure (Supabase or API key error)
                     const errorText = await response.text();
                     statusMessage.textContent = `Error: Submission failed. Check console. (${response.status})`;
                     console.error('Supabase Error:', errorText);
